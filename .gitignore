@@ -1,1 +1,5 @@
 scratch/*
+*.csv
+*.RData
+*.pdf
+*.html
