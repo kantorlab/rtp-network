@@ -28,7 +28,7 @@ ls()
 # individuals_dt <- read.csv(paste0(data_dir, "/Individuals.csv"))
 
 #-------------------
-## when mounting using SMB, comment above three lines
+## when mounting using SMB, comment the above lines
 #-------------------
 
 dim(net_dt)
@@ -121,6 +121,80 @@ length(intersect(net_dt_r1_mat[,1], net_dt_r1_mat[,2]))
 length(which(unique(net_dt_mat[,1]) %in% (unique(net %v% "vertex.names"))))
 #length(which(unique(net_dt_r2_mat[,1]) %in% (unique(net_r2 %v% "vertex.names"))))
 
+
+# Measure network characteristics ---------------------------
+
+options(max.print = 5000)
+
+## size of the contact tracing network?
+network.size(net) #nodes
+network.edgecount(net) #edgecount
+
+vnames <- (net %v% "vertex.names")
+vnames 
+table(substr(vnames, 1, 5)); table(substr(vnames, 1, 5))/sum(table(substr(vnames, 1, 5)))
+table(substr(vnames, 1, 8))
+
+## unique sources and receivers in the contact tracing network?
+length(net_dt$StudyIDFrom); length(unique(net_dt$StudyIDFrom))
+length(net_dt$StudyIDTo); length(unique(net_dt$StudyIDTo))
+
+
+## msm
+table(individuals_dt$RiskMSM, exclude = NULL); nrow(individuals_dt)
+msm_individuals <- which(individuals_dt$RiskMSM == "True")
+msm_ids <- individuals_dt$StudyID[msm_individuals]
+length(msm_individuals); length(msm_individuals)/nrow(individuals_dt)
+
+## IDU
+table(individuals_dt$RiskIDU, exclude = NULL); nrow(individuals_dt)
+IDU_individuals <- which(individuals_dt$RiskIDU == "True")
+idu_ids <- individuals_dt$StudyID[IDU_individuals]
+length(IDU_individuals); length(IDU_individuals)/nrow(individuals_dt)
+
+## HRH
+table(individuals_dt$RiskHRH, exclude = NULL); nrow(individuals_dt)
+HRH_individuals <- which(individuals_dt$RiskHRH == "True")
+HRH_ids <- individuals_dt$StudyID[HRH_individuals]
+length(HRH_individuals); length(HRH_individuals)/nrow(individuals_dt)
+
+msm_idu <- (intersect(msm_ids, idu_ids))
+idu_hrh <- (intersect(idu_ids, HRH_ids))
+msm_hrh <- (intersect(msm_ids, HRH_ids))
+
+intersect3 <- function(a, b, c){
+  a_b <- intersect(a, b)
+  a_b_c <- intersect(a_b, c)
+  return(a_b_c)
+}
+
+intersect3(msm_ids, idu_ids, HRH_ids)
+
+## how many nodes from individual dataset appear in the network?
+length(which(vnames %in% individuals_dt$StudyID))
+
+## msm network
+msm_ids_in_net <- which(vnames %in% msm_ids)
+idu_ids_in_net <- which(vnames %in% idu_ids)
+hrh_ids_in_net <- which(vnames %in% HRH_ids)
+
+length(msm_ids_in_net)
+length(idu_ids_in_net)
+length(hrh_ids_in_net)
+
+## add behaviors as attributes to networks
+set.vertex.attribute(x=net, attrname = "behavior", value = "msm", v=msm_ids_in_net)
+set.vertex.attribute(x=net, attrname = "behavior", value = "idu", v=idu_ids_in_net)
+set.vertex.attribute(x=net, attrname = "behavior", value = "hrh", v=hrh_ids_in_net)
+
+table(net %v% "behavior", exclude = NULL)
+mixingmatrix(net, "behavior")
+
+table(net %v% "behavior", exclude = NULL)/sum(table(net %v% "behavior", exclude = NULL))
+
+png("net_by_behavior.png")
+plot(net, vertex.col="behavior")
+dev.off()
 
 #Save Object ---------------------------
 
