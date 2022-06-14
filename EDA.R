@@ -238,13 +238,15 @@ studyids_HIVTRACE_100_005  %in% net_dt$StudyIDFrom
 studyids_HIVTRACE_100_005  %in% net_dt$StudyIDTo 
   #Only the second appears in the STUDYIDTO column
 
-identify_p1_rows <- which(net_dt$StudyIDFrom == individuals_dt$StudyID[HIVTRACE_100_005])
-identify_p2_rows <- which(net_dt$StudyIDTo == individuals_dt$StudyID[HIVTRACE_100_005])
+identify_p1_rows <- which(net_dt$StudyIDFrom %in% studyids_HIVTRACE_100_005)
+identify_p2_rows <- which(net_dt$StudyIDTo %in% studyids_HIVTRACE_100_005)
+
+intersect(identify_p1_rows, identify_p2_rows) #1 such occurence out of max of 2
 
 named_pt_dt[identify_p1_rows,]
 named_pt_dt[identify_p2_rows,]
 
-# CONCLUSION: "S15005676050" names "S20000532945" but not vice versa. 
+### CONCLUSION: "S15005676050" names "S20000532945" but not vice versa. 
 
 ### HIV TRACE 59
 HIVTRACE_59_005 <- which(individuals_dt$ClusteredHIVTrace005 == "HIVTRACE_59") 
@@ -257,18 +259,24 @@ studyids_HIVTRACE_59_005  %in% net_dt$StudyIDFrom
 studyids_HIVTRACE_59_005  %in% net_dt$StudyIDTo 
   #Five STUDY IDs appear in the STUDYIDTO column
 
-identify_p1_rows <- which(net_dt$StudyIDFrom == individuals_dt$StudyID[HIVTRACE_59_005])
-identify_p2_rows <- which(net_dt$StudyIDTo == individuals_dt$StudyID[HIVTRACE_59_005])
+identify_p1_rows <- which(net_dt$StudyIDFrom %in% studyids_HIVTRACE_59_005)
+identify_p2_rows <- which(net_dt$StudyIDTo %in% studyids_HIVTRACE_59_005)
 
-studyids_HIVTRACE_59_005 
+intersect(identify_p1_rows, identify_p2_rows) #2 such occurences out of max of 9 Choose 2??
+
 named_pt_dt[identify_p1_rows,]
 named_pt_dt[identify_p2_rows,]
 
-# CONCLUSION: None of the 9 seem to name each other
+
+### CONCLUSION: Two seem to name each other
 
 
 # Automate process for assessing if persons in transmission network are named partners?
 
+## Step 1: List all clusters with >2 persons
+## Step 2: Identify persons in each such cluster
+## Step 3: Note STUDYIDFROM and STUDYIDTO where such persons appear
+## Step 4: Identify pairs where STUDYIDFROM and STUDYIDTO are both in this list
 
 
 
