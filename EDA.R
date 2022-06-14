@@ -262,7 +262,7 @@ studyids_HIVTRACE_59_005  %in% net_dt$StudyIDTo
 identify_p1_rows <- which(net_dt$StudyIDFrom %in% studyids_HIVTRACE_59_005)
 identify_p2_rows <- which(net_dt$StudyIDTo %in% studyids_HIVTRACE_59_005)
 
-intersect(identify_p1_rows, identify_p2_rows) #2 such occurences out of max of 9 Choose 2??
+intersect(identify_p1_rows, identify_p2_rows) #2 such occurences out of max of 9 Choose 2 = 36??
 
 named_pt_dt[identify_p1_rows,]
 named_pt_dt[identify_p2_rows,]
@@ -278,8 +278,34 @@ named_pt_dt[identify_p2_rows,]
 ## Step 3: Note STUDYIDFROM and STUDYIDTO where such persons appear
 ## Step 4: Identify pairs where STUDYIDFROM and STUDYIDTO are both in this list
 
+class(HIVTRACE005_ge2_members)
+names(HIVTRACE005_ge2_members)
 
 
+calc_num_in_named_partners <- 
+  function(distance="005"){
+    
+    named_pt_num_list <- NULL
+    
+    #for (i in 2:length(names(HIVTRACE005_ge2_members))){
+       (i=names(HIVTRACE005_ge2_members)[4]){  
+        label_col <- paste0("ClusteredHIVTrace", distance)
+        
+        #cluster <- names(HIVTRACE005_ge2_members)[i]
+        cluster_distance <- which(individuals_dt[[label_col]] == i) 
+        studyids_cluster_distance <- individuals_dt$StudyID[cluster_distance] 
+        
+        identify_p1_rows <- which(net_dt$StudyIDFrom %in% studyids_cluster_distance)
+        identify_p2_rows <- which(net_dt$StudyIDTo %in% studyids_cluster_distance)
+        
+        named_pt_num <- intersect(identify_p1_rows, identify_p2_rows)       
+        named_pt_num_list <- c(named_pt_num_list, length(named_pt_num))
+        
+    }
+    
+    return(named_pt_num_list)
+  }
+calc_num_in_named_partners()
 
 #Save Object ---------------------------
 
