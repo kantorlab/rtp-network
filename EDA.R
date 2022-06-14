@@ -221,7 +221,7 @@ length(which(table(individuals_dt$ClusteredHIVTrace015) == 1)) #35 clusters only
 
 # Which specific clusters have at least 2 individuals?
 HIVTRACE005_ge2_members <- which(table(individuals_dt$ClusteredHIVTrace005) >= 2) 
-HIVTRACE015_ge2_members <- which(table(individuals_dt$ClusteredHIVTrace005) >= 2)
+HIVTRACE015_ge2_members <- which(table(individuals_dt$ClusteredHIVTrace015) >= 2)
 
 # For individuals in each of these defined clusters, how many are in the named list?
 
@@ -281,14 +281,17 @@ named_pt_dt[identify_p2_rows,]
 class(HIVTRACE005_ge2_members)
 names(HIVTRACE005_ge2_members)
 
+class(HIVTRACE015_ge2_members)
+names(HIVTRACE015_ge2_members)
 
 calc_num_in_named_partners <- 
-  function(distance="005"){
+  function(distance="015"){
     
     named_pt_num_list <- NULL
     
-    #for (i in 2:length(names(HIVTRACE005_ge2_members))){
-       (i=names(HIVTRACE005_ge2_members)[4]){  
+    for (i in names(HIVTRACE015_ge2_members)){
+      #browser()
+       #(i=names(HIVTRACE005_ge2_members)[4]){  
         label_col <- paste0("ClusteredHIVTrace", distance)
         
         #cluster <- names(HIVTRACE005_ge2_members)[i]
