@@ -227,7 +227,7 @@ HIVTRACE015_ge2_members <- which(table(individuals_dt$ClusteredHIVTrace015) >= 2
 
 named_pt_dt <- cbind(net_dt$StudyIDFrom, net_dt$StudyIDTo)
 
-## Take specific examples
+## Take specific examples (Distance = 005)
 
 ### HIV TRACE 100
 HIVTRACE_100_005 <- which(individuals_dt$ClusteredHIVTrace005 == "HIVTRACE_100") # 2 indidviduals in cluster HIVTRACE_100
@@ -285,16 +285,19 @@ class(HIVTRACE015_ge2_members)
 names(HIVTRACE015_ge2_members)
 
 calc_num_in_named_partners <- 
-  function(distance="015"){
+  function(distance="005"){
     
     named_pt_num_list <- NULL
+  
+    if (distance == "005"){
+      clusters_List = HIVTRACE005_ge2_members
+    } else if (distance == "015")
+      clusters_List = HIVTRACE015_ge2_members
     
-    for (i in names(HIVTRACE015_ge2_members)){
-      #browser()
-       #(i=names(HIVTRACE005_ge2_members)[4]){  
+    for (i in names(clusters_List)){
+
         label_col <- paste0("ClusteredHIVTrace", distance)
         
-        #cluster <- names(HIVTRACE005_ge2_members)[i]
         cluster_distance <- which(individuals_dt[[label_col]] == i) 
         studyids_cluster_distance <- individuals_dt$StudyID[cluster_distance] 
         
@@ -308,7 +311,64 @@ calc_num_in_named_partners <-
     
     return(named_pt_num_list)
   }
-calc_num_in_named_partners()
+
+a <- calc_num_in_named_partners(distance="005")
+
+b <- calc_num_in_named_partners(distance="015")
+
+
+length(a)
+table(a[-1], exclude = NULL)
+
+length(b)
+table(b[-1], exclude = NULL)
+
+
+# Testing --
+
+## Distance = 015
+
+### HIV TRACE 1(Expected 0. )
+HIVTRACE_1_015 <- which(individuals_dt$ClusteredHIVTrace015 == "HIVTRACE_1") 
+# 2 indidviduals in cluster HIVTRACE_1
+studyids_HIVTRACE_1_015 <- individuals_dt$StudyID[HIVTRACE_1_015] 
+#Study IDs of these 1 individuals
+
+studyids_HIVTRACE_1_015  %in% net_dt$StudyIDFrom 
+#None of the IDs appear in the STUDYIDFROM col in named partner data set 
+studyids_HIVTRACE_1_015  %in% net_dt$StudyIDTo 
+# None of the IDs appear in the STUDYIDTO column
+
+identify_p1_rows <- which(net_dt$StudyIDFrom %in% studyids_HIVTRACE_1_015)
+identify_p2_rows <- which(net_dt$StudyIDTo %in% studyids_HIVTRACE_1_015)
+
+intersect(identify_p1_rows, identify_p2_rows) #2 such occurences out of max of 9 Choose 2 = 36??
+
+named_pt_dt[identify_p1_rows,]
+named_pt_dt[identify_p2_rows,]
+
+## EXPECTATION MATCHED
+
+### HIV TRACE 81 (Expected named partners: 7. Matched)
+HIVTRACE_81_015 <- which(individuals_dt$ClusteredHIVTrace015 == "HIVTRACE_81") 
+# 22 indidviduals in cluster HIVTRACE_81
+studyids_HIVTRACE_81_015 <- individuals_dt$StudyID[HIVTRACE_81_015] 
+#Study IDs of these 22 individuals
+
+studyids_HIVTRACE_81_015  %in% net_dt$StudyIDFrom 
+#14 of the IDs appear in the STUDYIDFROM col in named partner data set 
+studyids_HIVTRACE_81_015  %in% net_dt$StudyIDTo 
+# 7 of the IDs appear in the STUDYIDTO column
+
+identify_p1_rows <- which(net_dt$StudyIDFrom %in% studyids_HIVTRACE_81_015)
+identify_p2_rows <- which(net_dt$StudyIDTo %in% studyids_HIVTRACE_81_015)
+
+intersect(identify_p1_rows, identify_p2_rows) #2 such occurences out of max of 9 Choose 2 = 36??
+
+named_pt_dt[identify_p1_rows,]
+named_pt_dt[identify_p2_rows,]
+
+## EXPECTATION MATCHED
 
 #Save Object ---------------------------
 
