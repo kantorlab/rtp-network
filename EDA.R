@@ -107,7 +107,6 @@ head(net_r1 %v% "vertex.names")
 plot(net)
 plot(net_r1)
 
-
 #Examine network datasets ---------------------------
 
 length(which(net_dt_mat[,1] %in% net_dt_mat[,2]))
@@ -139,7 +138,6 @@ table(substr(vnames, 1, 8))
 length(net_dt$StudyIDFrom); length(unique(net_dt$StudyIDFrom))
 length(net_dt$StudyIDTo); length(unique(net_dt$StudyIDTo))
 
-
 ## msm
 table(individuals_dt$RiskMSM, exclude = NULL); nrow(individuals_dt)
 msm_individuals <- which(individuals_dt$RiskMSM == "True")
@@ -170,8 +168,6 @@ intersect3 <- function(a, b, c){
 
 intersect3(msm_ids, idu_ids, HRH_ids)
 
-## how many nodes from individual dataset appear in the network?
-length(which(vnames %in% individuals_dt$StudyID))
 
 ## msm network
 msm_ids_in_net <- which(vnames %in% msm_ids)
@@ -195,6 +191,87 @@ table(net %v% "behavior", exclude = NULL)/sum(table(net %v% "behavior", exclude 
 png("net_by_behavior.png")
 plot(net, vertex.col="behavior")
 dev.off()
+
+# How many nodes from individual dataset appear in the network? ---------------------------
+
+length(which(vnames %in% individuals_dt$StudyID)) ## IMPORTANT
+
+
+# For how many of individuals in contact network do we have sequence information ---------------------------
+
+table(individuals_dt$Sequence) # Sequences available for 2308 individuals
+
+StudyIDs_of_Seq_Individuals <- individuals_dt$StudyID[(which(individuals_dt$Sequence == "True"))]
+StudyIDs_of_Seq_Individuals_in_ContactNetwork <- which(StudyIDs_of_Seq_Individuals %in% vnames)
+
+length(StudyIDs_of_Seq_Individuals_in_ContactNetwork)
+
+
+# How many unique clusters are the individuals in? ---------------------------
+
+unique(individuals_dt$ClusteredHIVTrace005) #161 unique clusters
+unique(individuals_dt$ClusteredHIVTrace015) #256 unique clusters
+
+
+# How many unique clusters have only one individual? ---------------------------
+
+length(which(table(individuals_dt$ClusteredHIVTrace005) == 1)) #34 clusters only have 1 member
+length(which(table(individuals_dt$ClusteredHIVTrace015) == 1)) #35 clusters only have 1 member
+
+
+# Which specific clusters have at least 2 individuals?
+HIVTRACE005_ge2_members <- which(table(individuals_dt$ClusteredHIVTrace005) >= 2) 
+HIVTRACE015_ge2_members <- which(table(individuals_dt$ClusteredHIVTrace005) >= 2)
+
+# For individuals in each of these defined clusters, how many are in the named list?
+
+named_pt_dt <- cbind(net_dt$StudyIDFrom, net_dt$StudyIDTo)
+
+## Take specific examples
+
+### HIV TRACE 100
+HIVTRACE_100_005 <- which(individuals_dt$ClusteredHIVTrace005 == "HIVTRACE_100") # 2 indidviduals in cluster HIVTRACE_100
+studyids_HIVTRACE_100_005 <- individuals_dt$StudyID[HIVTRACE_100_005] #Study IDs of these 2 individuals
+
+studyids_HIVTRACE_100_005  %in% net_dt$StudyIDFrom 
+  #Both appear in the STUDYIDFROM col in named partner data set 
+studyids_HIVTRACE_100_005  %in% net_dt$StudyIDTo 
+  #Only the second appears in the STUDYIDTO column
+
+identify_p1_rows <- which(net_dt$StudyIDFrom == individuals_dt$StudyID[HIVTRACE_100_005])
+identify_p2_rows <- which(net_dt$StudyIDTo == individuals_dt$StudyID[HIVTRACE_100_005])
+
+named_pt_dt[identify_p1_rows,]
+named_pt_dt[identify_p2_rows,]
+
+# CONCLUSION: "S15005676050" names "S20000532945" but not vice versa. 
+
+### HIV TRACE 59
+HIVTRACE_59_005 <- which(individuals_dt$ClusteredHIVTrace005 == "HIVTRACE_59") 
+  # 9 indidviduals in cluster HIVTRACE_59
+studyids_HIVTRACE_59_005 <- individuals_dt$StudyID[HIVTRACE_59_005] 
+  #Study IDs of these 9 individuals
+
+studyids_HIVTRACE_59_005  %in% net_dt$StudyIDFrom 
+  #All 9 IDs appear in the STUDYIDFROM col in named partner data set 
+studyids_HIVTRACE_59_005  %in% net_dt$StudyIDTo 
+  #Five STUDY IDs appear in the STUDYIDTO column
+
+identify_p1_rows <- which(net_dt$StudyIDFrom == individuals_dt$StudyID[HIVTRACE_59_005])
+identify_p2_rows <- which(net_dt$StudyIDTo == individuals_dt$StudyID[HIVTRACE_59_005])
+
+studyids_HIVTRACE_59_005 
+named_pt_dt[identify_p1_rows,]
+named_pt_dt[identify_p2_rows,]
+
+# CONCLUSION: None of the 9 seem to name each other
+
+
+# Automate process for assessing if persons in transmission network are named partners?
+
+
+
+
 
 #Save Object ---------------------------
 
