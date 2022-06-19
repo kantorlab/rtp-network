@@ -9,7 +9,7 @@ library(network)
 
 # Setup ---------------------------
 
-setwd("/Volumes/home/akhann16/code/rtp-network/out") #on smb
+setwd("/Volumes/akhann16/code/rtp-network/out") #on smb
 #setwd("/gpfs/home/akhann16/code/rtp-network/out") #on remote desktop 
 load("EDA.RData") #When mounting using SMB, uncomment
 par(mar=c(1,1,1,1)) #for figures
@@ -223,6 +223,23 @@ length(which(table(individuals_dt$ClusteredHIVTrace015) == 1)) #35 clusters only
 HIVTRACE005_ge2_members <- which(table(individuals_dt$ClusteredHIVTrace005) >= 2) 
 HIVTRACE015_ge2_members <- which(table(individuals_dt$ClusteredHIVTrace015) >= 2)
 
+cluster_members_005 <- table(individuals_dt$ClusteredHIVTrace005)[HIVTRACE005_ge2_members]
+cluster_members_015 <- table(individuals_dt$ClusteredHIVTrace015)[HIVTRACE015_ge2_members]
+
+theoretical_max_ties_HIVTRACE005_ge2_members <- 
+  lapply(cluster_members_005, function(x) choose(x, 2)*2)
+theoretical_max_ties_HIVTRACE015_ge2_members <- 
+  lapply(cluster_members_015, function(x) choose(x, 2)*2)
+
+
+length(HIVTRACE005_ge2_members)+
+  length(which(table(individuals_dt$ClusteredHIVTrace005) == 1)) ==
+  length(unique(individuals_dt$ClusteredHIVTrace005)) 
+  
+length(HIVTRACE015_ge2_members)+
+  length(which(table(individuals_dt$ClusteredHIVTrace015) == 1)) ==
+  length(unique(individuals_dt$ClusteredHIVTrace015)) 
+
 # For individuals in each of these defined clusters, how many are in the named list?
 
 named_pt_dt <- cbind(net_dt$StudyIDFrom, net_dt$StudyIDTo)
@@ -323,7 +340,19 @@ table(a[-1], exclude = NULL)
 length(b)
 table(b[-1], exclude = NULL)
 
+named_partner_nums_005 <- cbind(a[-1])
+named_partner_nums_015 <- cbind(b[-1])
+      
+write.csv(cbind(named_partner_nums_005, cluster_members_005[-1], theoretical_max_ties_HIVTRACE005_ge2_members[-1]), 
+          "named_partner_nums_005.csv")
+write.csv(cbind(named_partner_nums_015, cluster_members_015[-1], theoretical_max_ties_HIVTRACE015_ge2_members[-1]),
+                "named_partner_nums_015.csv")
 
+
+summary(as.integer(named_partner_nums_005)/as.integer(theoretical_max_ties_HIVTRACE005_ge2_members[-1]))
+summary(as.integer(as.integer(named_partner_nums_015)/
+                     as.integer(theoretical_max_ties_HIVTRACE015_ge2_members[-1])))
+           
 # Testing --
 
 ## Distance = 015
@@ -346,6 +375,7 @@ intersect(identify_p1_rows, identify_p2_rows) #2 such occurences out of max of 9
 
 named_pt_dt[identify_p1_rows,]
 named_pt_dt[identify_p2_rows,]
+
 
 ## EXPECTATION MATCHED
 
