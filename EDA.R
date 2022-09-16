@@ -9,9 +9,7 @@ library(network)
 
 # Setup ---------------------------
 
-setwd("/Volumes/akhann16/code/rtp-network/out") #on smb
-#setwd("/gpfs/home/akhann16/code/rtp-network/out") #on remote desktop 
-load("EDA.RData") #When mounting using SMB, uncomment
+setwd("/gpfs/home/akhann16/code/rtp-network/out") #on remote desktop 
 par(mar=c(1,1,1,1)) #for figures
 ls()
 
@@ -22,14 +20,11 @@ ls()
 ## Comment below lines on SMB
 ## Uncomment if needed on remote desktop
 
-# data_dir <- "/gpfs/data/rkantor/rtp/datasets/D30_20211013_V1"
-# list.files(path=data_dir)
-# net_dt <- read.csv(paste0(data_dir, "/ContactTracingNetwork.csv"))
-# individuals_dt <- read.csv(paste0(data_dir, "/Individuals.csv"))
+data_dir <- "/gpfs/data/rkantor/rtp/datasets/D30_20211013_V1"
+list.files(path=data_dir)
+net_dt <- read.csv(paste0(data_dir, "/ContactTracingNetwork.csv"))
+individuals_dt <- read.csv(paste0(data_dir, "/Individuals.csv"))
 
-#-------------------
-## when mounting using SMB, comment the above lines
-#-------------------
 
 dim(net_dt)
 str(net_dt)
