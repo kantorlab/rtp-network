@@ -5,7 +5,7 @@ rm(list=ls())
 
 library(dplyr)
 library(network)
-
+#library(sna)
 
 # Setup ---------------------------
 
@@ -17,14 +17,11 @@ ls()
 
 # Read data ---------------------------
 
-## Comment below lines on SMB
-## Uncomment if needed on remote desktop
 
 data_dir <- "/gpfs/data/rkantor/rtp/datasets/D30_20211013_V1"
 list.files(path=data_dir)
 net_dt <- read.csv(paste0(data_dir, "/ContactTracingNetwork.csv"))
 individuals_dt <- read.csv(paste0(data_dir, "/Individuals.csv"))
-
 
 dim(net_dt)
 str(net_dt)
@@ -37,6 +34,15 @@ colnames(individuals_dt)
 table(net_dt$InterviewRank, exclude = NULL)
 table(net_dt$InterviewRank, exclude = NULL)/
   sum(table(net_dt$InterviewRank, exclude = NULL))
+
+
+#Create network object ---------------------------
+
+net_dt_mat <- cbind(as.character(net_dt[,1]), as.character(net_dt[,2]))
+net <- as.network(net_dt_mat, bipartite = F, directed = T)
+net
+length(net %v% "vertex.names")
+net %v% "vertex.names"
 
 
 # Filter by rank 1 ---------------------------
@@ -62,6 +68,11 @@ table(net_dt_r1$ClientNotReached, exclude = NULL)/sum(
   table(net_dt_r1$ClientNotReached, exclude = NULL)
 )
 
+net_dt_r1_mat <- cbind(as.character(net_dt_r1[,1]), as.character(net_dt_r1[,2]))
+net_r1 <- as.network(net_dt_r1_mat, bipartite = F, directed = T)
+net_r1
+length(net_r1 %v% "vertex.names")
+head(net_r1 %v% "vertex.names")
 
 ## Client Reached
 table(net_dt$ClientReached, exclude = NULL)
@@ -70,6 +81,8 @@ table(net_dt$ClientReached, exclude = NULL)/sum(table(net_dt$ClientReached,
 table(net_dt_r1$ClientReached, exclude = NULL)
 table(net_dt_r1$ClientReached, exclude = NULL)/sum(table(net_dt_r1$ClientReached, 
                                                          exclude = NULL))
+
+# Properties of full network ---------------------------
 
 ## Already Index Case
 table(net_dt$AlreadyIndexCase, exclude = NULL)
@@ -86,18 +99,7 @@ table(net_dt$InterviewType, exclude = NULL)/sum(table(net_dt$InterviewType, excl
 table(net_dt_r1$InterviewType, exclude = NULL)
 table(net_dt_r1$InterviewType, exclude = NULL)/sum(table(net_dt_r1$InterviewType, exclude = NULL))
 
-#Create network object ---------------------------
 
-net_dt_mat <- as.matrix.data.frame(cbind(net_dt[,1], net_dt[,2]))
-net <- as.network(net_dt_mat, bipartite = F, directed = T)
-net
-length(net %v% "vertex.names")
-
-net_dt_r1_mat <- as.matrix.data.frame(cbind(net_dt_r1[,1], net_dt_r1[,2]))
-net_r1 <- as.network(net_dt_r1_mat, bipartite = F, directed = T)
-net_r1
-length(net_r1 %v% "vertex.names")
-head(net_r1 %v% "vertex.names")
 
 plot(net)
 plot(net_r1)
@@ -155,6 +157,9 @@ msm_idu <- (intersect(msm_ids, idu_ids))
 idu_hrh <- (intersect(idu_ids, HRH_ids))
 msm_hrh <- (intersect(msm_ids, HRH_ids))
 
+Reduce(intersect, list(msm_ids, idu_ids))
+Reduce(intersect, list(HRH_ids, idu_ids))
+Reduce(intersect, list(HRH_ids, msm_ids))
 Reduce(intersect, list(msm_ids, idu_ids, HRH_ids))
 
 ## msm network
@@ -183,6 +188,8 @@ dev.off()
 # How many nodes from individual dataset appear in the network? ---------------------------
 
 length(which(vnames %in% individuals_dt$StudyID)) ## IMPORTANT
+
+
 
 
 # For how many of individuals in contact network do we have sequence information ---------------------------
@@ -390,5 +397,5 @@ named_pt_dt[identify_p2_rows,]
 
 #Save Object ---------------------------
 
-save.image(file="EDA.RData")
+#save.image(file="EDA.RData")
 
