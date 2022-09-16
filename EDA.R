@@ -155,14 +155,7 @@ msm_idu <- (intersect(msm_ids, idu_ids))
 idu_hrh <- (intersect(idu_ids, HRH_ids))
 msm_hrh <- (intersect(msm_ids, HRH_ids))
 
-intersect3 <- function(a, b, c){
-  a_b <- intersect(a, b)
-  a_b_c <- intersect(a_b, c)
-  return(a_b_c)
-}
-
-intersect3(msm_ids, idu_ids, HRH_ids)
-
+Reduce(intersect, list(msm_ids, idu_ids, HRH_ids))
 
 ## msm network
 msm_ids_in_net <- which(vnames %in% msm_ids)
