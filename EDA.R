@@ -17,7 +17,6 @@ ls()
 
 # Read data ---------------------------
 
-
 data_dir <- "/gpfs/data/rkantor/rtp/datasets/D30_20211013_V1"
 list.files(path=data_dir)
 net_dt <- read.csv(paste0(data_dir, "/ContactTracingNetwork.csv"))
@@ -206,6 +205,9 @@ length(StudyIDs_of_Seq_Individuals_in_ContactNetwork)
 
 unique(individuals_dt$ClusteredHIVTrace005) #161 unique clusters
 unique(individuals_dt$ClusteredHIVTrace015) #256 unique clusters
+
+sort(table(individuals_dt$ClusteredHIVTrace005, exclude = NULL)) #cluster sizes at 0.05% distance
+sort(table(individuals_dt$ClusteredHIVTrace015, exclude = NULL)) #cluster sizes at 0.15% distance
 
 
 # How many unique clusters have only one individual? ---------------------------
