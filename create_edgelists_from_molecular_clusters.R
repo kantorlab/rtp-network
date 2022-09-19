@@ -4,7 +4,8 @@ rm(list=ls())
 # Load libraries ---------------------------
 
 library(dplyr)
-library(network)
+library(utils)
+#library(network)
 
 # Setup ---------------------------
 
@@ -49,24 +50,11 @@ clusterIDs_015 <- clusters$ClusteredHIVTrace015[ids_in_015_clusters]
 length(clusterIDs_015)
 
 
-# Create edgelist ---------------------------
-
-
+# Create named list with study ids in each cluster ---------------------------
+ 
 ## 005
 (table(individuals_dt$ClusteredHIVTrace005, exclude = NULL))
 cluster_names_005 <- names((table(individuals_dt$ClusteredHIVTrace005, exclude = NULL)))[-1]
-
-ids_hivtrace99 <- which(individuals_dt$ClusteredHIVTrace005 == "HIVTRACE_99") #99
-list_studyids_at_hivtrace99 <- (individuals_dt$StudyID)[ids_hivtrace99]
-
-ids_hivtrace98 <- which(individuals_dt$ClusteredHIVTrace005 == "HIVTRACE_98") #98
-list_studyids_at_hivtrace98 <- (individuals_dt$StudyID)[ids_hivtrace98]
-
-empty_list = as.list(NULL)
-empty_list[["HIVTRACE99"]] =  list_studyids_at_hivtrace99
-empty_list[["HIVTRACE98"]] =  list_studyids_at_hivtrace98
-
-empty_list
 
 study_ids_at_clusterid_005 = as.list(rep(NA, length(cluster_names_005)))
 names(study_ids_at_clusterid_005) = cluster_names_005
@@ -74,13 +62,26 @@ names(study_ids_at_clusterid_005) = cluster_names_005
 for (i in 1:length(study_ids_at_clusterid_005)){
   study_ids_at_clusterid_005[[names(study_ids_at_clusterid_005)[i]]] <-  
     (individuals_dt$StudyID[(which(individuals_dt$ClusteredHIVTrace005 == names(study_ids_at_clusterid_005)[[i]]))])
-  #cat("\n")
 }
 
 study_ids_at_clusterid_005
+length(study_ids_at_clusterid_005)
 
 ## 015
 
 
+# Create edgelist ---------------------------
 
-# Save edgelists
+
+## 005
+el_matrix_005 <- NULL
+
+el_matrix_005 <- rbind(t(combn(as.character(study_ids_at_clusterid_005[[160]]), 2)))
+el_matrix_005 <- rbind(el_matrix_005, t(combn(as.character(study_ids_at_clusterid_005[["HIVTRACE_17"]]), 2)))
+
+### Automate 
+
+## 015
+
+
+# Save edgelists ---------------------------
