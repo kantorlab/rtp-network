@@ -15,11 +15,13 @@ ls()
 
 ### 
 
+
 # Read data ---------------------------
 
 data_dir <- "/gpfs/data/rkantor/rtp/datasets/D30_20211013_V1"
 list.files(path=data_dir)
 individuals_dt <- read.csv(paste0(data_dir, "/Individuals.csv"))
+
 
 # Create dictionary: cluster id, nodes ---------------------------
 
@@ -73,15 +75,30 @@ length(study_ids_at_clusterid_005)
 # Create edgelist ---------------------------
 
 
+
 ## 005
 el_matrix_005 <- NULL
 
-el_matrix_005 <- rbind(t(combn(as.character(study_ids_at_clusterid_005[[160]]), 2)))
-el_matrix_005 <- rbind(el_matrix_005, t(combn(as.character(study_ids_at_clusterid_005[["HIVTRACE_17"]]), 2)))
+for (i in 1:length(study_ids_at_clusterid_005)){
+  if (length(study_ids_at_clusterid_005[[i]]) > 1){
+    el_matrix_005 <- rbind(el_matrix_005, t(combn(as.character(study_ids_at_clusterid_005[[i]]), 2)))
+  }
+}
+ 
+dim(el_matrix_005) 
 
-### Automate 
+el_cluster_size <- NULL
+for (i in 1:length(study_ids_at_clusterid_005)){
+    el_cluster_size <- c(el_cluster_size, unlist(length(study_ids_at_clusterid_005[[i]])))
+  }
+sort(el_cluster_size)
 
-## 015
+n_ties <- unlist(lapply(el_cluster_size, function(x) choose(x, 2)))
+sum(n_ties)
+
+ ## 015
 
 
 # Save edgelists ---------------------------
+saveRDS(el_matrix_005, "el_matrix_005.RDS")
+
