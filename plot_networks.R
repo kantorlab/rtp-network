@@ -70,12 +70,8 @@ gplot(mol_net_005,
 
 # Highlight by race ---------------------------
 
-## Identity: RiskMSM, RiskHRH, RiskIDU
-## Race
-## Current Gender
-
 sort(colnames(individuals_dt_005))
-  table(individuals_dt_005$DemoRace)
+table(individuals_dt_005$DemoRace)
 
 vertex.col = rep("gray", nrow(individuals_dt_005))
 vertex.border = rep("black", nrow(individuals_dt_005))
@@ -109,3 +105,29 @@ legend("bottomright", c("Black", "White", "Not Reported"),
        title = "Race"
        )
 
+
+
+# Highlight by current gender ---------------------------
+table(individuals_dt_005$DemoGender)
+vertex.sides = rep(8, nrow(individuals_dt_005))
+vertex.sides[individuals_dt_005$DemoGender == "Male"] <- 3
+vertex.sides[individuals_dt_005$DemoGender == "Female"] <- 4
+gplot(mol_net_005,             
+      usearrows=FALSE,
+      edge.lwd=0.5,
+      edge.lty=3,
+      #usecurve=TRUE,
+      displayisolates = TRUE,
+      vertex.cex = 1.5,
+      vertex.col = vertex.col,
+      vertex.border = vertex.border,
+      vertex.sides = vertex.sides,
+      edge.col = edge.col
+)
+legend("bottomright", c("Male", "Female", "NB/Not Reported"),
+       pch=c(24, 22, 21),
+       title = "Gender"
+)
+
+
+# Highlight by behavior category ---------------------------
