@@ -56,7 +56,8 @@ mol_net_005 %v% "vertex.names"
 
 
 
-gplot(mol_net_005,             
+fix_coord <- 
+  gplot(mol_net_005,             
       usearrows=FALSE,
       edge.lwd=2,
       edge.lty=1,
@@ -98,11 +99,16 @@ gplot(mol_net_005,
       vertex.col = vertex.col,
       vertex.border = vertex.border,
       vertex.sides = vertex.sides,
-      edge.col = edge.col
+      edge.col = edge.col,
+      coord = fix_coord
 )
+
 legend("bottomright", c("Black", "White", "Not Reported"),
        pch=c(24, 22, 21),
-       title = "Race"
+       title = "Race",
+       col = "gray",
+       pt.bg = c("gray"),
+       pt.lwd = 1
        )
 
 
@@ -123,11 +129,43 @@ gplot(mol_net_005,
       vertex.col = vertex.col,
       vertex.border = vertex.border,
       vertex.sides = vertex.sides,
-      edge.col = edge.col
+      edge.col = edge.col,
+      coord = fix_coord
 )
 legend("bottomright", c("Male", "Female", "NB/Not Reported"),
        pch=c(24, 22, 21),
-       title = "Current Gender"
+       title = "Current Gender",
+       col = "gray",
+       pt.bg = c("gray"),
+       pt.lwd = 1
+)
+
+
+# Highlight by sex at birth ---------------------------
+
+table(individuals_dt_005$DemoBirthSex)
+vertex.sides = rep(8, nrow(individuals_dt_005))
+vertex.sides[individuals_dt_005$DemoBirthSex == "Male"] <- 3
+vertex.sides[individuals_dt_005$DemoBirthSex == "Female"] <- 4
+gplot(mol_net_005,             
+      usearrows=FALSE,
+      edge.lwd=0.1,
+      edge.lty=3,
+      #usecurve=TRUE,
+      displayisolates = TRUE,
+      vertex.cex = 1.5,
+      vertex.col = vertex.col,
+      vertex.border = vertex.border,
+      vertex.sides = vertex.sides,
+      edge.col = edge.col,
+      coord = fix_coord
+)
+legend("bottomright", c("Male", "Female", "NB/Not Reported"),
+       pch=c(24, 22, 21),
+       title = "Sex Assigned at Birth",
+       col = "gray",
+       pt.bg = c("gray"),
+       pt.lwd = 1
 )
 
 
@@ -159,6 +197,14 @@ gplot(mol_net_005,
       edge.col = edge.col,
       label = label,
       label.cex = 0.5,
-      label.pos = 4
+      label.pos = 4,
+      coord = fix_coord
+)
+legend("bottomright", c("MSM", "Non-MSM", "HRH"), 
+       pch=c(21, 21, 22),
+       title = "Behavior Category",
+       col = c("red", "gray", "gray"),
+       pt.bg = c("red", "gray", "gray"),
+       pt.lwd = 1
 )
 
