@@ -108,6 +108,7 @@ legend("bottomright", c("Black", "White", "Not Reported"),
 
 
 # Highlight by current gender ---------------------------
+
 table(individuals_dt_005$DemoGender)
 vertex.sides = rep(8, nrow(individuals_dt_005))
 vertex.sides[individuals_dt_005$DemoGender == "Male"] <- 3
@@ -126,8 +127,38 @@ gplot(mol_net_005,
 )
 legend("bottomright", c("Male", "Female", "NB/Not Reported"),
        pch=c(24, 22, 21),
-       title = "Gender"
+       title = "Current Gender"
 )
 
 
 # Highlight by behavior category ---------------------------
+
+table(individuals_dt_005$RiskMSM, exclude = NULL)
+table(individuals_dt_005$RiskHRH, exclude = NULL)
+table(individuals_dt_005$RiskIDU, exclude = NULL)
+
+vertex.col = rep("gray", nrow(individuals_dt_005))
+vertex.col[individuals_dt_005$RiskMSM == "True"] <- "red"
+
+vertex.sides = rep(8, nrow(individuals_dt_005))
+vertex.sides[individuals_dt_005$RiskHRH == "True"] <- 4
+
+label <- rep(NA, nrow(individuals_dt_005))
+label[individuals_dt_005$RiskIDU == "True"] <- "D"
+
+gplot(mol_net_005,             
+      usearrows=FALSE,
+      edge.lwd=0.5,
+      edge.lty=3,
+      #usecurve=TRUE,
+      displayisolates = TRUE,
+      vertex.cex = 1.5,
+      vertex.col = vertex.col,
+      vertex.border = vertex.border,
+      vertex.sides = vertex.sides,
+      edge.col = edge.col,
+      label = label,
+      label.cex = 0.5,
+      label.pos = 4
+)
+
