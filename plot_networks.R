@@ -4,14 +4,14 @@ rm(list=ls())
 # Load libraries ---------------------------
 library(sna)
 library(network)
-library(magrittr)
-
+library(dplyr)
 
 
 # Read data ---------------------------
 
 data_dir <- "/gpfs/data/rkantor/rtp/datasets/D30_20211013_V1"
 list.files(path=data_dir)
+
 individuals_dt <- read.csv(paste0(data_dir, "/Individuals.csv"))
 
 el_matrix_005 <- readRDS("el_matrix_005.RDS")
