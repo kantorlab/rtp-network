@@ -26,6 +26,7 @@ individuals_dt_005 <-
   filter(ClusteredHIVTrace005 != "")
 
 dim(individuals_dt_005)
+length(table(individuals_dt_005$ClusteredHIVTrace005))
 
 # Plot network ---------------------------
 
@@ -89,6 +90,7 @@ vertex.sides[individuals_dt_005$DemoRace == ""] <- 8
 
 #vertex.border[individuals_dt_005$DemoRace == ""] <- "blue"
 
+png("race_net.png")
 gplot(mol_net_005,             
       usearrows=FALSE,
       edge.lwd=0.5,
@@ -108,13 +110,16 @@ legend("bottomright", c("Black", "White", "Not Reported"),
        title = "Race",
        col = "gray",
        pt.bg = c("gray"),
-       pt.lwd = 1
+       pt.lwd = 1,
+       cex = 0.75
        )
 
+dev.off()
 
 
 # Highlight by current gender ---------------------------
 
+png(file="current_gender.png")
 table(individuals_dt_005$DemoGender)
 vertex.sides = rep(8, nrow(individuals_dt_005))
 vertex.sides[individuals_dt_005$DemoGender == "Male"] <- 3
@@ -137,9 +142,10 @@ legend("bottomright", c("Male", "Female", "NB/Not Reported"),
        title = "Current Gender",
        col = "gray",
        pt.bg = c("gray"),
-       pt.lwd = 1
+       pt.lwd = 1,
+       cex = 0.75
 )
-
+dev.off()
 
 # Highlight by sex at birth ---------------------------
 
@@ -147,6 +153,8 @@ table(individuals_dt_005$DemoBirthSex)
 vertex.sides = rep(8, nrow(individuals_dt_005))
 vertex.sides[individuals_dt_005$DemoBirthSex == "Male"] <- 3
 vertex.sides[individuals_dt_005$DemoBirthSex == "Female"] <- 4
+
+png(file="sex_at_birth.png")
 gplot(mol_net_005,             
       usearrows=FALSE,
       edge.lwd=0.1,
@@ -165,9 +173,10 @@ legend("bottomright", c("Male", "Female", "NB/Not Reported"),
        title = "Sex Assigned at Birth",
        col = "gray",
        pt.bg = c("gray"),
-       pt.lwd = 1
+       pt.lwd = 1,
+       cex = 0.75
 )
-
+dev.off()
 
 # Highlight by behavior category ---------------------------
 
@@ -205,6 +214,7 @@ legend("bottomright", c("MSM", "Non-MSM", "HRH"),
        title = "Behavior Category",
        col = c("red", "gray", "gray"),
        pt.bg = c("red", "gray", "gray"),
-       pt.lwd = 1
+       pt.lwd = 1,
+       cex = 0.75
 )
 

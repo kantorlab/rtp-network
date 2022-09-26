@@ -43,7 +43,6 @@ net
 length(net %v% "vertex.names")
 net %v% "vertex.names"
 
-
 # Filter by rank 1 ---------------------------
 
 net_dt_r1 <- net_dt %>% filter(InterviewRank == 1)
