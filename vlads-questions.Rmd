@@ -1,0 +1,40 @@
+---
+title: "XYZ"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+rm(list=ls())
+knitr::opts_chunk$set(echo = TRUE)
+library(data.table)
+```
+
+## Introduction
+
+Last time, we discussed the contact tracing dataset and my analysis thus far and questions on it. Vlad is interested in broadly knowing the factors of interest driving cluster growth: High VL, STI incidence, growing number of partners, etc.  To that end, we are interested in understanding if the 
+changing number of partners over time can be measured, for instance, 
+if we knew
+the number of reported partners per person per year (named or unnamed) 
+reported by the index cases (i.e., newly diagnosed persons). 
+
+There are two other related questions:
+  - If the recency of infection is [known]( https://docs.google.com/document/d/1j0uxP8P0DGefUEg8sr8ncT1GWIvz-6AOK42S8zcIans/edit#bookmark=id.yqp4tue4v2f).
+
+  - A minor question about who we mean as ["Third Party"](https://docs.google.com/document/d/1j0uxP8P0DGefUEg8sr8ncT1GWIvz-6AOK42S8zcIans/edit#bookmark=id.un9xszbe7gwi) as the Notifier.
+  
+```{r}
+data_dir <- "/gpfs/data/rkantor/rtp/datasets/D30_20211013_V1"
+list.files(path=data_dir)
+net_dt <- fread(paste0(data_dir, "/ContactTracingNetwork.csv"))
+individuals_dt <- fread(paste0(data_dir, "/Individuals.csv"))
+
+dim(net_dt)
+str(net_dt)
+sort(colnames(net_dt))
+View(net_dt)
+
+dim(individuals_dt)
+colnames(individuals_dt)
+```
+  
+  
