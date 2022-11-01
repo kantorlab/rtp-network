@@ -35,6 +35,11 @@ table(net_dt$InterviewRank, exclude = NULL)/
   sum(table(net_dt$InterviewRank, exclude = NULL))
 
 
+# Needed function ---------------------------
+substrRight <- function(x, n){
+  substr(x, nchar(x)-n+1, nchar(x))
+}
+
 #Create network object ---------------------------
 
 net_dt_mat <- cbind(as.character(net_dt[,1]), as.character(net_dt[,2]))
@@ -82,6 +87,23 @@ table(net_dt_r1$ClientReached, exclude = NULL)/sum(table(net_dt_r1$ClientReached
 
 # Properties of full network ---------------------------
 
+## Study ID From
+table(net_dt$StudyIDFrom, exclude = NULL)
+initial_study_id_from <- substr(net_dt$StudyIDFrom, 1, 1)
+table(initial_study_id_from, exclude = NULL)
+
+## Study ID To
+table(net_dt$StudyIDTo, exclude = NULL)
+initial_study_id_to <- substr(net_dt$StudyIDTo, 1, 1)
+table(initial_study_id_to, exclude = NULL)
+
+
+## Interview ID
+table(net_dt$InterviewID, exclude = NULL)
+interview_id_last_digit <- substrRight(as.character(net_dt$InterviewID), 2)
+table(interview_id_last_digit, exclude = NULL)
+
+
 ## Already Index Case
 table(net_dt$AlreadyIndexCase, exclude = NULL)
 table(net_dt$AlreadyIndexCase, exclude = NULL)/sum(table(net_dt$AlreadyIndexCase, exclude = NULL))
@@ -97,10 +119,121 @@ table(net_dt$InterviewType, exclude = NULL)/sum(table(net_dt$InterviewType, excl
 table(net_dt_r1$InterviewType, exclude = NULL)
 table(net_dt_r1$InterviewType, exclude = NULL)/sum(table(net_dt_r1$InterviewType, exclude = NULL))
 
+## Referral Date
+net_dt$ReferralDate <- as.Date(net_dt$ReferralDate)
+Referral_date_in_Year <- format(net_dt$ReferralDate, "%Y")
+table(Referral_date_in_Year, exclude = NULL)
+class(net_dt$ReferralDate)
+names(net_dt$ReferralDate)
+table(net_dt$ReferralDate, exclude = NULL)
 
+xtabs(~factor(Referral_date_in_Year, exclude = NULL) + 
+        factor(net_dt$InterviewType, exclude = NULL))
 
+## Reported
+table(net_dt$Reported, exclude = NULL)
+
+## Reported Data
+net_dt$ReportedDate <- as.Date(net_dt$ReportedDate)
+table(net_dt$ReportedDate, exclude = NULL)
+ReportedDate_in_Year <- format(net_dt$ReportedDate, "%Y")
+table(ReportedDate_in_Year, exclude = NULL)
+data.frame(table(ReportedDate_in_Year, exclude = NULL), byrow = T)
+
+## Index HIV Test Date
+net_dt$IndexHIVTestDate <- as.Date(net_dt$IndexHIVTestDate)
+table(net_dt$IndexHIVTestDate, exclude = NULL)
+Index_HIV_Test_Date_in_Year <- format(net_dt$IndexHIVTestDate, "%Y")
+table(Index_HIV_Test_Date_in_Year, exclude = NULL)
+data.frame(table(Index_HIV_Test_Date_in_Year, exclude = NULL), byrow = T)
+
+## Identified Date 
+net_dt$IdentifiedDate <- as.Date(net_dt$IdentifiedDate)
+table(net_dt$IdentifiedDate, exclude = NULL)
+IdentifiedDateinYear <- format(net_dt$IdentifiedDate, "%Y")
+table(IdentifiedDateinYear, exclude = NULL)
+data.frame(table(IdentifiedDateinYear, exclude = NULL), byrow = T)
+
+## Identified Risk
+table(net_dt$IdentifiedRisk, exclude = NULL)
+
+## Notify
+table(net_dt$Notify, exclude = NULL)
+
+## NotifyWho
+table(net_dt$NotifyWho, exclude = NULL)
+sort(table(net_dt$NotifyWho, exclude = NULL))
+
+## Notify Method
+sort(table(net_dt$NotifyMethod, exclude = NULL))
+
+## Already Index Case
+sort(table(net_dt$AlreadyIndexCase, exclude = NULL))
+
+## Client Reached
+sort(table(net_dt$ClientReached, exclude = NULL))
+
+## Client Not Reached
+sort(table(net_dt$ClientNotReached, exclude = NULL))
+
+## Partner Services Offered Date 
+PartnerServicesOfferedDate <- (net_dt$PartnerServicesOfferedDate) #as.Date command not working
+YYYY_PartnerServicesOfferedDate <- substr(PartnerServicesOfferedDate, 1, 4)
+data.frame(t(table(YYYY_PartnerServicesOfferedDate)), byrow=T)
+
+## Partner Services Accepted 
+table(net_dt$PartnerServicesAccepted, exclude = NULL)
+
+## Partner Services Not Accepted 
+sort(table(net_dt$PartnerServicesNotAccepted, exclude = NULL))
+table(table(net_dt$PartnerServicesNotAccepted, exclude = NULL))
+
+## Referred to HIV Test
+sort(table(net_dt$ReferredToHIVTest, exclude = NULL))
+
+## Final HIV Test Date
+FinalHIVTestDate <- (net_dt$FinalHIVTestDate) #as.Date command not working
+YYYY_FinalHIVTestDate <- substr(FinalHIVTestDate, 1, 4)
+data.frame(t(table(YYYY_FinalHIVTestDate)), byrow=T)
+
+## Final HIV Test
+sort(table(net_dt$FinalHIVTest, exclude = NULL))
+
+## ReferredPrep
+sort(table(net_dt$ReferredPrEP, exclude = NULL))
+
+# Network Diagrams
 plot(net)
+gplot(net,             
+      #usearrows=FALSE,
+      edge.lwd=0.5,
+      edge.lty=3,
+      #usecurve=TRUE,
+      displayisolates = FALSE,
+      vertex.cex = 1,
+      #mode = "mds"
+      #vertex.col = vertex.col,
+      #vertex.border = vertex.border,
+      #vertex.sides = vertex.sides,
+      #edge.col = edge.col,
+      #coord = fix_coord
+)
+
 plot(net_r1)
+gplot(net_r1,             
+      #usearrows=FALSE,
+      edge.lwd=0.5,
+      edge.lty=3,
+      #usecurve=TRUE,
+      displayisolates = FALSE,
+      vertex.cex = 1,
+      #mode = "mds"
+      #vertex.col = vertex.col,
+      #vertex.border = vertex.border,
+      #vertex.sides = vertex.sides,
+      #edge.col = edge.col,
+      #coord = fix_coord
+)
 
 #Examine network datasets ---------------------------
 
@@ -118,7 +251,7 @@ length(which(unique(net_dt_mat[,1]) %in% (unique(net %v% "vertex.names"))))
 
 # Measure network characteristics ---------------------------
 
-options(max.print = 5000)
+options(max.print = 10000)
 
 ## size of the contact tracing network?
 network.size(net) #nodes
@@ -209,13 +342,13 @@ sort(table(individuals_dt$ClusteredHIVTrace005, exclude = NULL)) #cluster sizes 
 sort(table(individuals_dt$ClusteredHIVTrace015, exclude = NULL)) #cluster sizes at 0.15% distance
 
 
-# How many unique clusters have only one individual? ---------------------------
+# How many unique molecular clusters have only one individual? ---------------------------
 
 length(which(table(individuals_dt$ClusteredHIVTrace005) == 1)) #34 clusters only have 1 member
 length(which(table(individuals_dt$ClusteredHIVTrace015) == 1)) #35 clusters only have 1 member
 
 
-# Which specific clusters have at least 2 individuals?
+# Which specific molecular clusters have at least 2 individuals?
 HIVTRACE005_ge2_members <- which(table(individuals_dt$ClusteredHIVTrace005) >= 2) 
 HIVTRACE015_ge2_members <- which(table(individuals_dt$ClusteredHIVTrace015) >= 2)
 
@@ -236,7 +369,7 @@ length(HIVTRACE015_ge2_members)+
   length(which(table(individuals_dt$ClusteredHIVTrace015) == 1)) ==
   length(unique(individuals_dt$ClusteredHIVTrace015)) 
 
-# For individuals in each of these defined clusters, how many are in the named list?
+# For individuals in each of these defined molecular clusters, how many are in the named list?
 
 named_pt_dt <- cbind(net_dt$StudyIDFrom, net_dt$StudyIDTo)
 
