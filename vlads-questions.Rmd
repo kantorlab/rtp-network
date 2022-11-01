@@ -1,5 +1,5 @@
 ---
-title: "XYZ"
+title: "Vlad's questions: Number of partners (named or unnamed) reported longitudinally by index persons"
 output: html_document
 ---
 
@@ -21,6 +21,11 @@ There are two other related questions:
   - If the recency of infection is [known]( https://docs.google.com/document/d/1j0uxP8P0DGefUEg8sr8ncT1GWIvz-6AOK42S8zcIans/edit#bookmark=id.yqp4tue4v2f).
 
   - A minor question about who we mean as ["Third Party"](https://docs.google.com/document/d/1j0uxP8P0DGefUEg8sr8ncT1GWIvz-6AOK42S8zcIans/edit#bookmark=id.un9xszbe7gwi) as the Notifier.
+  
+First, we will analyze the individuals dataset to try to answer this question.
+Next, we will analyze the contact tracing network dataset.
+
+## Individual Dataset
   
 ```{r}
 data_dir <- "/gpfs/data/rkantor/rtp/datasets/D30_20211013_V1"
@@ -58,13 +63,50 @@ individuals_dt[,.N, by=c("DemoBirthCountry")][,
 Year of HIV diagnosis:
 
 ```{r}
-individuals_dt[,.(
+dx_year_dt <- 
+  individuals_dt[,.(
   "dx_year" = substr(HIVDxDate, 1, 4)
   ), 
   ][,.N, by="dx_year"][, 
   "prop" := round(N/sum(N), 3)][order(-prop)][]
+dx_year_dt
+```
+Age of HIV diagnosis:
+
+```{r}
+summary(individuals_dt$HIVDxAge)
 ```
 
+Last HIV-negative year:
+
+
+```{r}
+last_neg_year <- 
+  individuals_dt[,.(
+  "last_neg_year" = substr(HIVLastNegativeYear, 1, 4)
+  ), 
+  ][,.N, by="last_neg_year"][, 
+  "prop" := round(N/sum(N), 3)][order(last_neg_year)][]
+last_neg_year
+```
+Crosstabs by date of diagnosis and last negative test:
+
+```{r}
+xtabs(data = individuals_dt, 
+      ~factor(substr(HIVDxDate, 1, 4), exclude = NULL) +
+        factor(HIVLastNegativeYear, exclude = NULL))
+```
+
+By sequence present:
+
+```{r}
+table(individuals_dt$Sequence, exclude = NULL)
+```
+
+By sequence subtype:
+```{r}
+table(individuals_dt$SequenceSubtype, exclude = NULL)
+```
 
 Columns 34-43 in the individuals database might be of preliminary interest:
 
@@ -81,5 +123,51 @@ Columns 34-43 look like they might be relevant, but they are all empty:
 ```{r}
 
 apply(individuals_dt[,34:43], 2, function(x) table(x, exclude = NULL))
+```
+
+## Network Dataset
+
+How many contacts are reported by each interviewed participant 
+(i.e., "StudyIDFrom") at each interview?
+
+
+```{r}
+net_dt[,.N, by=c("StudyIDFrom")][order(-N)]
+net_dt[,.N, by=c("StudyIDFrom", "ReferralDate")][order(-StudyIDFrom)]
+net_dt[,.N, by=c("StudyIDFrom", "ReferralDate", "StudyIDTo")][order(-StudyIDFrom)]
+```
+```{r}
+xtabs(data = net_dt, 
+      ~ factor(substr(StudyIDFrom, 1, 6), exclude = NULL) +
+  factor(substr(ReferralDate, 1, 4), exclude = NULL)
+)
+        
+```
+Using the referral date, how many contacts ("StudyIDTo") 
+were reported by the indexes ("StudyIDFrom") in each year?
+
+```{r}
+contacts_reported_peryear_by_indices <- 
+  dcast(net_dt[substr(StudyIDFrom, 1, 1) != "C"],
+      StudyIDTo ~ substr(ReferralDate, 1, 4),
+      value.var = "StudyIDFrom",
+      fun.aggregate = length
+      )[order(-StudyIDTo)]
+```
+
+Index persons reporting more than 1 partner (not necessarily in different years):
+
+```{r}
+num_ptns <- 
+  apply(contacts_reported_peryear_by_indices[,-c(1:2)], 1, function(x)
+  sum(x, na.rm = TRUE)
+)
+
+length(num_ptns) == nrow(contacts_reported_peryear_by_indices)
+names(num_ptns) <- contacts_reported_peryear_by_indices$StudyIDTo
+num_ptns <- num_ptns[-length(num_ptns)]
+summary(num_ptns)
+
+num_ptns[which(num_ptns > 1)]
 ```
 
