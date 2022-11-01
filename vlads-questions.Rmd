@@ -55,6 +55,15 @@ Birth Country:
 individuals_dt[,.N, by=c("DemoBirthCountry")][, 
   "prop" := round(N/sum(N), 3)][order(-prop)][]
 ```
+Year of HIV diagnosis:
+
+```{r}
+individuals_dt[,.(
+  "dx_year" = substr(HIVDxDate, 1, 4)
+  ), 
+  ][,.N, by="dx_year"][, 
+  "prop" := round(N/sum(N), 3)][order(-prop)][]
+```
 
 
 Columns 34-43 in the individuals database might be of preliminary interest:
