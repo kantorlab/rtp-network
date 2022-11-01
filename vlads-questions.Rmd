@@ -28,13 +28,49 @@ list.files(path=data_dir)
 net_dt <- fread(paste0(data_dir, "/ContactTracingNetwork.csv"))
 individuals_dt <- fread(paste0(data_dir, "/Individuals.csv"))
 
-dim(net_dt)
-str(net_dt)
-sort(colnames(net_dt))
+# dim(net_dt)
+# str(net_dt)
+# sort(colnames(net_dt))
 View(net_dt)
 
 dim(individuals_dt)
 colnames(individuals_dt)
 ```
   
-  
+Source of Referral:
+
+```{r}
+individuals_dt[,.N, by="Source"][, 
+  "prop" := round(N/sum(N), 3)][]
+```
+Race and Gender:
+
+```{r}
+individuals_dt[,.N, by=c("DemoGender", "DemoRace")][, 
+  "prop" := round(N/sum(N), 3)][]
+```
+Birth Country:
+
+```{r}
+individuals_dt[,.N, by=c("DemoBirthCountry")][, 
+  "prop" := round(N/sum(N), 3)][order(-prop)][]
+```
+
+
+Columns 34-43 in the individuals database might be of preliminary interest:
+
+```{r}
+table(individuals_dt$Outcome, exclude = NULL)
+```
+```{r}
+table(individuals_dt$Outcome_Pri01_NamedAnyPartners, exclude = NULL)
+
+```
+
+Columns 34-43 look like they might be relevant, but they are all empty:
+
+```{r}
+
+apply(individuals_dt[,34:43], 2, function(x) table(x, exclude = NULL))
+```
+
