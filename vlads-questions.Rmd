@@ -127,14 +127,25 @@ apply(individuals_dt[,34:43], 2, function(x) table(x, exclude = NULL))
 
 ## Network Dataset
 
+### StudyIDFrom 
+Table produced from the perspective of the StudyIDFrom (i.e., index persons)
+
 How many contacts are reported by each interviewed participant 
 (i.e., "StudyIDFrom") at each interview?
 
+Mutuality?? Cross-Naming - i.e., person who is nominated by someone also
+nominates them?
 
 ```{r}
 net_dt[,.N, by=c("StudyIDFrom")][order(-N)]
 net_dt[,.N, by=c("StudyIDFrom", "ReferralDate")][order(-StudyIDFrom)]
 net_dt[,.N, by=c("StudyIDFrom", "ReferralDate", "StudyIDTo")][order(-StudyIDFrom)]
+
+net_dt[,.N, by=c("StudyIDFrom", "ReferralDate", "StudyIDTo")][order(ReferralDate)]
+
+########
+# Organize this by year of referral as opposed to the full date
+########
 ```
 ```{r}
 xtabs(data = net_dt, 
@@ -143,8 +154,12 @@ xtabs(data = net_dt,
 )
         
 ```
+
 Using the referral date, how many contacts ("StudyIDTo") 
 were reported by the indexes ("StudyIDFrom") in each year?
+
+### StudyIDTo 
+Table produced from the perspective of the StudyIDTo (i.e., contacts nominated by index persons)
 
 ```{r}
 contacts_reported_peryear_by_indices <- 
@@ -153,9 +168,14 @@ contacts_reported_peryear_by_indices <-
       value.var = "StudyIDFrom",
       fun.aggregate = length
       )[order(-StudyIDTo)]
+
+contacts_reported_peryear_by_indices
+
+# In this case 0 indicates either missing information 
+# (i.e., peson was not in the dataset or may have not reported anybody.)
 ```
 
-Index persons reporting more than 1 partner (not necessarily in different years):
+Study IDs reported by more than 1 partner (not necessarily in different years):
 
 ```{r}
 num_ptns <- 
@@ -170,4 +190,4 @@ summary(num_ptns)
 
 num_ptns[which(num_ptns > 1)]
 ```
-
+** Send the data to Vlad at the link he shares later. I will need to create a data dictionary of the datasets that I create for him. **
