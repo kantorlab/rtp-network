@@ -17,7 +17,8 @@ if we knew
 the number of reported partners per person per year (named or unnamed) 
 reported by the index cases (i.e., newly diagnosed persons). 
 
-There are two other related questions:
+There are two other related questions:  
+
   - If the recency of infection is [known]( https://docs.google.com/document/d/1j0uxP8P0DGefUEg8sr8ncT1GWIvz-6AOK42S8zcIans/edit#bookmark=id.yqp4tue4v2f).
 
   - A minor question about who we mean as ["Third Party"](https://docs.google.com/document/d/1j0uxP8P0DGefUEg8sr8ncT1GWIvz-6AOK42S8zcIans/edit#bookmark=id.un9xszbe7gwi) as the Notifier.
@@ -36,7 +37,7 @@ individuals_dt <- fread(paste0(data_dir, "/Individuals.csv"))
 # dim(net_dt)
 # str(net_dt)
 # sort(colnames(net_dt))
-View(net_dt)
+#View(net_dt)
 
 dim(individuals_dt)
 colnames(individuals_dt)
@@ -97,7 +98,7 @@ xtabs(data = individuals_dt,
         factor(HIVLastNegativeYear, exclude = NULL))
 ```
 
-By sequence present:
+By presence of sequence:
 
 ```{r}
 table(individuals_dt$Sequence, exclude = NULL)
@@ -126,6 +127,11 @@ apply(individuals_dt[,34:43], 2, function(x) table(x, exclude = NULL))
 ```
 
 ## Network Dataset
+
+
+```{r}
+colnames(net_dt)
+```
 
 ### StudyIDFrom 
 Table produced from the perspective of the StudyIDFrom (i.e., index persons)
@@ -161,6 +167,8 @@ were reported by the indexes ("StudyIDFrom") in each year?
 ### StudyIDTo 
 Table produced from the perspective of the StudyIDTo (i.e., contacts nominated by index persons)
 
+
+
 ```{r}
 contacts_reported_peryear_by_indices <- 
   dcast(net_dt[substr(StudyIDFrom, 1, 1) != "C"],
@@ -169,11 +177,26 @@ contacts_reported_peryear_by_indices <-
       fun.aggregate = length
       )[order(-StudyIDTo)]
 
-contacts_reported_peryear_by_indices
+contacts_reported_peryear_by_indices <- 
+  contacts_reported_peryear_by_indices[-nrow(contacts_reported_peryear_by_indices),]
+
+# contacts_reported_peryear_by_indices_wfill <- 
+#   dcast(net_dt[substr(StudyIDFrom, 1, 1) != "C"],
+#       StudyIDTo ~ substr(ReferralDate, 1, 4),
+#       value.var = "StudyIDFrom",
+#       fun.aggregate = length,
+#       fill = NA
+#       )[order(-StudyIDTo)]
+# 
+# contacts_reported_peryear_by_indices_wfill
 
 # In this case 0 indicates either missing information 
 # (i.e., peson was not in the dataset or may have not reported anybody.)
 ```
+
+The matrix `contacts_reported_peryear_by_indices` creates the number of index persons that nominate a given
+contact in a year. (The zeros do niot differentiate between "no one reported" and 
+"contact not in the database".)
 
 Study IDs reported by more than 1 partner (not necessarily in different years):
 
@@ -183,11 +206,77 @@ num_ptns <-
   sum(x, na.rm = TRUE)
 )
 
-length(num_ptns) == nrow(contacts_reported_peryear_by_indices)
-names(num_ptns) <- contacts_reported_peryear_by_indices$StudyIDTo
-num_ptns <- num_ptns[-length(num_ptns)]
-summary(num_ptns)
+#length(num_ptns) == nrow(contacts_reported_peryear_by_indices)
+#names(num_ptns) <- contacts_reported_peryear_by_indices$StudyIDTo
+#num_ptns <- num_ptns[-length(num_ptns)]
+#summary(num_ptns)
 
+num_ptns
 num_ptns[which(num_ptns > 1)]
 ```
-** Send the data to Vlad at the link he shares later. I will need to create a data dictionary of the datasets that I create for him. **
+
+Study IDs reported by at least one index person in multiple years: 
+```{r}
+num_ptns_agg_by_nonzero <- 
+  apply(contacts_reported_peryear_by_indices[,-c(1:2)], 1, function(x)
+  length(which(x > 0))
+)
+
+num_ptns_agg_by_nonzero
+
+identical(num_ptns, num_ptns_agg_by_nonzero)
+
+
+# length(num_ptns) == nrow(contacts_reported_peryear_by_indices)
+# names(num_ptns) <- contacts_reported_peryear_by_indices$StudyIDTo
+# num_ptns <- num_ptns[-length(num_ptns)]
+# summary(num_ptns)
+# 
+# num_ptns
+# num_ptns[which(num_ptns > 1)]
+```
+
+```{r}
+class(num_ptns); head(num_ptns); head(names(num_ptns)); length(num_ptns)
+class(num_ptns_agg_by_nonzero); head(num_ptns_agg_by_nonzero); head(names(num_ptns_agg_by_nonzero)); length(num_ptns_agg_by_nonzero)
+
+
+```
+
+
+Compare the nums of index persons who report a given contact 
+(take `r contacts_reported_peryear_by_indices[1,]$StudyIDTo` as an example:
+
+```{r}
+contacts_reported_peryear_by_indices[1,]
+```
+We see that `r contacts_reported_peryear_by_indices[1,]$StudyIDTo` was reported by
+index persons in 2019 and 2020. Thus, we would expect `num_ptns[1]` and 
+`num_ptns_agg_by_nonzero[1]`
+to be identical.
+
+```{r}
+identical(num_ptns[1], num_ptns_agg_by_nonzero[1])
+
+num_ptns[1]
+num_ptns_agg_by_nonzero[1]
+```
+
+Let us now identify the positions where `num_ptns` and `num_ptns_agg_by_nonzero`
+are not the same. The number of persons reporting these Study IDs 
+as partners in a given year are not the same as the number of years in which
+these Study IDs are reported as a partners, i.e., multiple persons report these 
+Study IDs as partners in at least one year.
+
+```{r}
+which(num_ptns != num_ptns_agg_by_nonzero)
+contacts_reported_peryear_by_indices[13,]
+num_ptns[13]
+num_ptns_agg_by_nonzero[13]
+```
+
+**Next Steps**:    
+  - Identify the same for Study Id From.   
+  - Before recruitment date of Study ID To, Study ID From, code as NAs.  
+
+**Send the data to Vlad at the link he shares later. I will need to create a data dictionary of the datasets that I create for him.**
