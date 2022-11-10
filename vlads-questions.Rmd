@@ -1,6 +1,8 @@
 ---
-title: "Vlad's questions: Longitudinal partner data analysis"
-output: html_document
+title: 'Vlad''s questions: Longitudinal partner data analysis'
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -35,11 +37,11 @@ have come from the network data analysis. We present our analysis of the
 networks dataset first, below. This allows us to consider the:  
 
  - Annual number of contacts reported by each index person (reported in our data folder as 
-"contacts_reported_peryear_by_indices.csv")": This dataset lists the `StudyIDTo`
+`contacts_reported_peryear_by_indices.csv`): This dataset lists the `StudyIDTo`
 for each contact  and the years in which they were nominated by an index person.
 
 
-- Number of index persons reporting contacts each year ("index_persons_reporting_contacts.csv"):
+- Number of index persons reporting contacts each year (`index_persons_reporting_contacts.csv`):
 This dataset lists the `StudyIDFrom` for each index person and the number of 
 contacts that they nominated each year.  
 
@@ -47,8 +49,8 @@ Both datasets are located at `/gpfs/data/rkantor/rtp/datasets/D41_20220915_unifi
 
 The Individuals Dataset might have some pertinent information, but the 
 columns that would be relevant to answering our questions appear to be blank. 
-An analysis of this dataset is provided towards the end of this document, though it does not provide much useful 
-information.
+An analysis of this dataset is provided towards the end of this document, 
+though it does not provide much useful information.
 
 The source code to reproduce this file is [here](https://github.com/kantorlab/rtp-network/blob/main/vlads-questions.Rmd).
 
