@@ -1,0 +1,135 @@
+{
+  "R": {
+    "Version": "4.2.0",
+    "Repositories": [
+      {
+        "Name": "CRAN",
+        "URL": "https://cran.rstudio.com"
+      }
+    ]
+  },
+  "Packages": {
+    "coda": {
+      "Package": "coda",
+      "Version": "0.19-4",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "24b6d006b8b2343876cf230687546932",
+      "Requirements": [
+        "lattice"
+      ]
+    },
+    "evaluate": {
+      "Package": "evaluate",
+      "Version": "0.18",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "6b6c0f8467cd4ce0b500cabbc1bd1763",
+      "Requirements": []
+    },
+    "glue": {
+      "Package": "glue",
+      "Version": "1.6.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "4f2596dfb05dac67b9dc558e5c6fba2e",
+      "Requirements": []
+    },
+    "lattice": {
+      "Package": "lattice",
+      "Version": "0.20-45",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "b64cdbb2b340437c4ee047a1f4c4377b",
+      "Requirements": []
+    },
+    "magrittr": {
+      "Package": "magrittr",
+      "Version": "2.0.3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "7ce2733a9826b3aeb1775d56fd305472",
+      "Requirements": []
+    },
+    "network": {
+      "Package": "network",
+      "Version": "1.17.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "a3a94709afe998d2745847ce69c6c5d9",
+      "Requirements": [
+        "magrittr",
+        "statnet.common"
+      ]
+    },
+    "renv": {
+      "Package": "renv",
+      "Version": "0.16.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "c9e8442ab69bc21c9697ecf856c1e6c7",
+      "Requirements": []
+    },
+    "rmarkdown": {
+      "Package": "rmarkdown",
+      "Version": "2.13",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "ac78f4d2e0289d4cba73b88af567b8b1",
+      "Requirements": [
+        "evaluate",
+        "stringr",
+        "tinytex",
+        "xfun"
+      ]
+    },
+    "statnet.common": {
+      "Package": "statnet.common",
+      "Version": "4.6.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "4c1387839f4770332fe1ce2f79ba982e",
+      "Requirements": [
+        "coda"
+      ]
+    },
+    "stringi": {
+      "Package": "stringi",
+      "Version": "1.7.8",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "a68b980681bcbc84c7a67003fa796bfb",
+      "Requirements": []
+    },
+    "stringr": {
+      "Package": "stringr",
+      "Version": "1.4.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "a66ad12140cd34d4f9dfcc19e84fc2a5",
+      "Requirements": [
+        "glue",
+        "magrittr",
+        "stringi"
+      ]
+    },
+    "tinytex": {
+      "Package": "tinytex",
+      "Version": "0.38",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "759d047596ac173433985deddf313450",
+      "Requirements": [
+        "xfun"
+      ]
+    },
+    "xfun": {
+      "Package": "xfun",
+      "Version": "0.30",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "e83f48136b041845e50a6658feffb197",
+      "Requirements": []
+    }
+  }
+}
