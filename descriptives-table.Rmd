@@ -1,0 +1,101 @@
+---
+title: "Table `1`: Descriptives of Index and Partner Cases"
+output: html_notebook
+---
+
+### Objective 
+
+The purpose here is to create a prototype of Table 1 - summarizing demographic
+and behavioral characteristics of index persons and their contacts.
+
+
+
+```{r setup, include=FALSE}
+rm(list=ls())
+knitr::opts_chunk$set(echo = TRUE,
+                      root.dir = '~/code/rtp-network/out/')
+
+library(data.table)
+library(dplyr)
+library(network)
+```
+
+
+
+```{r read_data, include=FALSE}
+data_dir <- "/gpfs/data/rkantor/rtp/datasets/D30_20211013_V1"
+list.files(path=data_dir)
+net_dt <- read.csv(paste0(data_dir, "/ContactTracingNetwork.csv"))
+individuals_dt <- read.csv(paste0(data_dir, "/Individuals.csv"))
+```
+
+### Structure of the Individual Database 
+
+How many unique persons in the individuals database?
+
+```{r}
+
+head(individuals_dt)
+
+nrow(individuals_dt)
+length(unique(individuals_dt$StudyID))
+
+table(substr(individuals_dt$StudyID, 1, 3))
+```
+**Note**: There are no persons with "CONTACT" Study ID in the individuals
+database. 
+
+What is the source of the information of persons in the individuals database?
+
+```{r}
+table(individuals_dt$Source, exclude = NULL)
+```
+
+
+## Structure of the Partner Database
+
+What is the structure of the StudyIDFrom and StudyIDTo columns in the 
+partner database?
+
+```{r, studyidfrom}
+head(net_dt)
+
+nrow(net_dt)
+length(unique(net_dt$StudyIDFrom))
+
+table(substr(net_dt$StudyIDFrom, 1, 3), exclude = NULL)
+
+#table(substr(net_dt$StudyIDFrom, 1, 3), exclude = NULL)[["CON"]] + length(unique(net_dt$StudyIDFrom))
+```
+```{r, studyidto}
+nrow(net_dt)
+length(unique(net_dt$StudyIDTo))
+
+table(substr(net_dt$StudyIDTo, 1, 3), exclude = NULL)
+```
+
+How many of the `r length(unique(individuals_dt$StudyID))` individuals appear 
+in the partner database?
+
+```{r}
+individuals_in_net_dt_studyidfrom <- which(individuals_dt$StudyID %in% net_dt$StudyIDFrom)
+length(individuals_in_net_dt_studyidfrom)
+
+individuals_in_net_dt_studyidto <- which(individuals_dt$StudyID %in% net_dt$StudyIDTo)
+length(individuals_in_net_dt_studyidto)
+```
+
+There are `r length(individuals_in_net_dt_studyidfrom)` unique individuals in the
+StudyIDFrom column in the partner contact database. 
+
+### Describe the demographic and behavioral characteristics of the index persons 
+i.e., individuals in the partner database (n = `r length(individuals_in_net_dt_studyidfrom)`)
+
+
+### Describe the demographic and behavioral characteristics of partner contacts 
+
+
+
+### Consolidate Table 1.
+
+
