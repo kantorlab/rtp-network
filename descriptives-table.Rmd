@@ -185,7 +185,7 @@ table(net_dt$AlreadyIndexCase, exclude = NULL)
 table(net_dt$ClientReached, exclude = NULL)
 table(net_dt$ClientNotReached, exclude = NULL)
 length(which(net_dt$PartnerServicesOfferedDate != ""))
-View(net_dt[which(net_dt$PartnerServicesOfferedDate != ""),,])
+#View(net_dt[which(net_dt$PartnerServicesOfferedDate != ""),,])
 net_dt[which(net_dt$PartnerServicesOfferedDate!=""), .N,
        by="PartnerServicesAccepted"][]
 ```
@@ -305,8 +305,8 @@ sum(hivdxage_cat_dt$N)
 ## Who are the people here who do not have a reported age for diagnosis?
 na_hivdxage_cat_dt <- individuals_dt[intersect(individuals_in_net_dt_studyidfrom, which(is.na(individuals_dt$hivdxage_cat))),]
 dim(na_hivdxage_cat_dt)
-View(na_hivdxage_cat_dt)
-View(individuals_dt[individuals_in_net_dt_studyidfrom, .SD, .SDcols=c("StudyID", "Source", "HIVDxDate", "HIVDxAge", "hivdxage_cat")])
+#View(na_hivdxage_cat_dt)
+#View(individuals_dt[individuals_in_net_dt_studyidfrom, .SD, .SDcols=c("StudyID", "Source", "HIVDxDate", "HIVDxAge", "hivdxage_cat")])
 
 ```
 
