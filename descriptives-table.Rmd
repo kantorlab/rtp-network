@@ -36,7 +36,7 @@ individuals_dt <- as.data.table(read.csv(paste0(data_dir, "/Individuals.csv")))
 
 ```
 
-### Structure of the Individual Database 
+### Structure of the **Unified** Individuals' Database 
 
 How many unique persons in the individuals database?
 
@@ -208,6 +208,10 @@ StudyIDFrom column in the partner contact database.
 
 ### Describe the demographic and behavioral characteristics of the index persons 
 This would include individuals who are also in the partner database (n = `r length(individuals_in_net_dt_studyidfrom)`)
+
+### [Table "1"](https://docs.google.com/document/d/12g9p5gsKfzjGl-hP524krx7GwZPHGY1UBvMf_7cMo8I/edit#bookmark=id.tc8pri6l7bee)  
+**Descriptive Characteristics of Index Persons and Partner Contacts**
+
 
 #### By source
 
@@ -516,4 +520,155 @@ partner_contacts_dt[, .(.N), by=RiskHRH][,
                  ][]
 ```
 
+### [Table 2]()  
+**Mean number of named, diagnosed and sequenced partners by index case characteristics**
 
+```{r}
+#knitr::kable(net_dt)
+```
+
+To focus on index persons with a named person, 
+filter out rows with missing `StudyIDTo`:
+
+```{r}
+no_missing_rows_in_net_dt <- net_dt[StudyIDTo != "", , ]
+class(no_missing_rows_in_net_dt)
+```
+
+
+
+- Start by computing the mean number of *named partners* for all index persons?
+- Then break down this list by index person behavioral and demographic characteristics?
+
+Number of contacts reported by each index person: 
+
+
+#### Analysis of named partners for all index persons
+
+```{r}
+net_dt[, .N, by = StudyIDFrom] #full dataset
+#net_dt[StudyIDFrom == "S20000441296", ]
+
+no_missing_rows_in_net_dt[, .N, by = StudyIDFrom] #IPs with named partners only
+#no_missing_rows_in_net_dt[StudyIDFrom == "S20000441296", ]
+```
+
+Number of unique contacts reported by each index person:
+
+```{r}
+net_dt[, .(UniqueContacts = uniqueN(StudyIDTo)), by = StudyIDFrom]
+
+unique_contacts_counts <- no_missing_rows_in_net_dt[, .(UniqueContacts = uniqueN(StudyIDTo)), by = StudyIDFrom]
+
+sum(unique_contacts_counts$UniqueContacts)
+```
+Count the number of times each contact has been reported:
+
+```{r}
+summary(as.numeric(table(net_dt$StudyIDTo)[-1]))
+
+summary(as.numeric(table(no_missing_rows_in_net_dt$StudyIDTo)))
+```
+
+```{r}
+individuals_in_net_dt_studyidfrom_nomiss <- which(individuals_dt$StudyID %in% no_missing_rows_in_net_dt$StudyIDFrom)
+length(individuals_in_net_dt_studyidfrom_nomiss)
+
+individuals_in_net_dt_studyidto_nomiss <- which(individuals_dt$StudyID %in% no_missing_rows_in_net_dt$StudyIDTo)
+length(individuals_in_net_dt_studyidto_nomiss)
+```
+
+How many unique partners are reported by indexed persons with named partners?
+
+```{r}
+length(no_missing_rows_in_net_dt$StudyIDTo)
+length(unique(no_missing_rows_in_net_dt$StudyIDTo))
+```
+
+What is the distribution of unique partners reported by indexed persons with named partners?
+
+```{r}
+pts_reported_by_IPs_with_named_pts <- no_missing_rows_in_net_dt[,.N,by=StudyIDFrom]
+dim(pts_reported_by_IPs_with_named_pts)
+summary(pts_reported_by_IPs_with_named_pts$N)
+
+idxs <- which(pts_reported_by_IPs_with_named_pts$StudyIDFrom %in% individuals_dt$StudyID == TRUE)
+IPs_reporting_partners_in_unified_dt <- pts_reported_by_IPs_with_named_pts$StudyIDFrom[idxs]
+```
+
+Of these `length(unique(no_missing_rows_in_net_dt$StudyIDTo))`, how many appear
+in the unified individuals data set and how many are diagnosed?
+
+**N.B.**: Date of HIV Diagnosis is used to indicate whether a person is diagnosed.
+
+```{r}
+unique_named_pt_contacts_reported_by_IPs <- unique(no_missing_rows_in_net_dt$StudyIDTo)
+
+which(unique_named_pt_contacts_reported_by_IPs %in% individuals_dt$StudyID)
+
+named_contacts_in_unified_dataset <- unique_named_pt_contacts_reported_by_IPs[which(unique_named_pt_contacts_reported_by_IPs %in% individuals_dt$StudyID)]
+
+
+named_contacts_rows_from_unified_dt <- individuals_dt[StudyID %in% named_contacts_in_unified_dataset,,]
+named_contacts_rows_from_unified_dt$HIVDxDate
+length(named_contacts_rows_from_unified_dt$HIVDxDate)
+length(which(named_contacts_rows_from_unified_dt$HIVDxDate == ""))
+table(individuals_dt[StudyID %in% named_contacts_in_unified_dataset,,]$HIVDxDate, exclude = NULL)
+```
+
+How many are sequenced?
+
+```{r}
+table(named_contacts_rows_from_unified_dt$Sequence, exclude = NULL)
+```
+
+#### Analysis of named partners for index persons stratified by behavior,
+race, ethnicity.
+
+**MSM**:
+
+Number of index persons (with named partners) who identify as MSM:
+
+```{r}
+individuals_dt_of_msm_who_named_partners <-
+  individuals_dt[StudyID %in% IPs_reporting_partners_in_unified_dt & RiskMSM == "True",,]
+nrow(individuals_dt_of_msm_who_named_partners)
+```
+
+**How many partners are reported by the `r nrow(individuals_dt_of_msm_who_named_partners)` MSM persons who named partners?**
+
+```{r}
+net_dt_of_msm_who_named_partners <- net_dt[StudyIDFrom %in% individuals_dt_of_msm_who_named_partners$StudyID,,] 
+
+pt_counts_msm_who_named_partners <- net_dt_of_msm_who_named_partners[,.(N=.N),by=StudyIDFrom]
+
+nrow(pt_counts_msm_who_named_partners)
+pt_counts_msm_who_named_partners[,sum(N)]
+pt_counts_msm_who_named_partners[,summary(N)]
+```
+
+**Ans: `r pt_counts_msm_who_named_partners[,sum(N)]`**.
+
+**How many of these partners are in the individuals dataset, diagnosed, and sequenced?**
+
+```{r}
+idx <- which(net_dt_of_msm_who_named_partners$StudyIDTo %in% individuals_dt$StudyID)
+msm_reported_partners_in_individuals_dt <- net_dt_of_msm_who_named_partners$StudyIDTo[idx] 
+unique(msm_reported_partners_in_individuals_dt)
+
+msm_partners_in_individuals_full_dt <- individuals_dt[StudyID %in% msm_reported_partners_in_individuals_dt,,]
+table(msm_partners_in_individuals_full_dt$HIVDxDate, exclude = NULL)
+table(msm_partners_in_individuals_full_dt$Sequence, exclude = NULL)
+```
+
+
+**IDU**:
+
+```{r}
+nrow(individuals_dt[StudyID %in% IPs_reporting_partners_in_unified_dt & RiskIDU == "True",,])
+```
+**HRH**:
+
+```{r}
+nrow(individuals_dt[StudyID %in% IPs_reporting_partners_in_unified_dt & RiskHRH == "True",,])
+```
