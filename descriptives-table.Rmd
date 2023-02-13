@@ -164,9 +164,9 @@ not_reported_dt <- net_dt[which(Reported == ""),,]
 
 reported_true_dt$IndexHIVTestDate
 nohivtestdt_among_reported_idx <- which(reported_true_dt$IndexHIVTestDate == "")
-reported_true_dt[nohivtestdt_among_reported,]
+reported_true_dt[nohivtestdt_among_reported_idx,]
 
-table(substr(reported_true_dt[nohivtestdt_among_reported,]$StudyIDFrom, 1, 1), 
+table(substr(reported_true_dt[nohivtestdt_among_reported_idx,]$StudyIDFrom, 1, 1), 
       exclude = NULL)
 
 
