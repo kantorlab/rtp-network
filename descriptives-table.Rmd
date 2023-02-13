@@ -218,6 +218,13 @@ individuals_dt[individuals_in_net_dt_studyidfrom, .(n_source=.N),
                  "prop":=round(n_source/sum(n_source), 3)
                  ][
                  ]
+
+individuals_dt[individuals_in_net_dt_studyidto, .(n_source=.N), 
+               by=.(Source)
+               ][,
+                 "prop":=round(n_source/sum(n_source), 3)
+                 ][
+                 ]
 ```
 
 #### Gender and Birth Sex
@@ -231,6 +238,20 @@ individuals_dt[individuals_in_net_dt_studyidfrom, .(.N),
                  ]
 
 individuals_dt[individuals_in_net_dt_studyidfrom, .(.N), 
+               by=.(DemoBirthSex)
+               ][,
+                 "prop":=round(N/sum(N), 3)
+                 ][
+                 ]
+
+individuals_dt[individuals_in_net_dt_studyidto, .(.N), 
+               by=.(DemoGender)
+               ][,
+                 "prop":=round(N/sum(N), 3)
+                 ][
+                 ]
+
+individuals_dt[individuals_in_net_dt_studyidto, .(.N), 
                by=.(DemoBirthSex)
                ][,
                  "prop":=round(N/sum(N), 3)
@@ -255,16 +276,33 @@ individuals_dt[individuals_in_net_dt_studyidfrom, .(.N),
                  ][
                  ]
 
-individuals_dt[individuals_in_net_dt_studyidfrom, .(.N), 
-               by=.(DemoRace, DemoHispanic)
+# individuals_dt[individuals_in_net_dt_studyidfrom, .(.N), 
+#                by=.(DemoRace, DemoHispanic)
+#                ][,
+#                  "prop":=round(N/sum(N), 3)
+#                  ][
+#                  ][order(DemoRace)]
+
+
+individuals_dt[individuals_in_net_dt_studyidto, .(.N), 
+               by=.(DemoRace)
                ][,
                  "prop":=round(N/sum(N), 3)
                  ][
-                 ][order(DemoRace)]
+                 ]
+
+individuals_dt[individuals_in_net_dt_studyidto, .(.N), 
+               by=.(DemoHispanic)
+               ][,
+                 "prop":=round(N/sum(N), 3)
+                 ][
+                 ]
+
 ```
 
 #### Year of HIV Diagnosis 
 
+**Index Persons**
 ```{r}
 individuals_dt[individuals_in_net_dt_studyidfrom, .(.N), 
                by=.(hiv_diag_year=substr(HIVDxDate, 1, 4))
@@ -273,7 +311,21 @@ individuals_dt[individuals_in_net_dt_studyidfrom, .(.N),
                  ][order(hiv_diag_year)
                  ]
 ```
-#### Age of HIV Diagnosis
+
+
+**Partner Contacts**
+```{r}
+individuals_dt[individuals_in_net_dt_studyidto, .(.N), 
+               by=.(hiv_diag_year=substr(HIVDxDate, 1, 4))
+               ][,
+                 "prop":=round(N/sum(N), 3)
+                 ][order(hiv_diag_year)
+                 ]
+```
+
+#### Age at HIV Diagnosis
+
+**Index Persons** 
 
 ```{r}
 individuals_dt[individuals_in_net_dt_studyidfrom, 
@@ -305,8 +357,44 @@ sum(hivdxage_cat_dt$N)
 ## Who are the people here who do not have a reported age for diagnosis?
 na_hivdxage_cat_dt <- individuals_dt[intersect(individuals_in_net_dt_studyidfrom, which(is.na(individuals_dt$hivdxage_cat))),]
 dim(na_hivdxage_cat_dt)
-#View(na_hivdxage_cat_dt)
-#View(individuals_dt[individuals_in_net_dt_studyidfrom, .SD, .SDcols=c("StudyID", "Source", "HIVDxDate", "HIVDxAge", "hivdxage_cat")])
+knitr::kable(na_hivdxage_cat_dt)
+knitr::kable(individuals_dt[individuals_in_net_dt_studyidfrom, .SD, .SDcols=c("StudyID", "Source", "HIVDxDate", "HIVDxAge", "hivdxage_cat")])
+
+```
+**Partner Contacts**
+
+```{r}
+individuals_dt[individuals_in_net_dt_studyidto, 
+               .(mean=mean(HIVDxAge, na.rm=T), 
+                 median=median(HIVDxAge, na.rm = T), 
+                 sd=sd(HIVDxAge, na.rm = T), 
+                 min=min(HIVDxAge, na.rm = TRUE), 
+                 max=max(HIVDxAge, na.rm=TRUE))
+               ][
+                 ]
+
+## discretized
+breaks = c(0, 19, 25, 35, 45, 55, 100)
+labels = c("<=18", "19-24", "25-34", "35-44", "45-54", ">=55")
+
+individuals_dt[individuals_in_net_dt_studyidto, 
+               hivdxage_cat := 
+                        cut(HIVDxAge, breaks = breaks, 
+                            labels = labels)]
+
+hivdxage_cat_dt <- 
+  individuals_dt[individuals_in_net_dt_studyidto, 
+               .(.N), by=hivdxage_cat][,
+                 "prop":=round(N/sum(N), 3)
+                 ][order(hivdxage_cat)]
+hivdxage_cat_dt
+sum(hivdxage_cat_dt$N)
+
+## Who are the people here who do not have a reported age for diagnosis?
+na_hivdxage_cat_dt <- individuals_dt[intersect(individuals_in_net_dt_studyidto, which(is.na(individuals_dt$hivdxage_cat))),]
+dim(na_hivdxage_cat_dt)
+knitr::kable(na_hivdxage_cat_dt)
+knitr::kable(individuals_dt[individuals_in_net_dt_studyidto, .SD, .SDcols=c("StudyID", "Source", "HIVDxDate", "HIVDxAge", "hivdxage_cat")])
 
 ```
 
@@ -316,6 +404,7 @@ individuals_dt[individuals_in_net_dt_studyidfrom, lapply(.SD, function (x) lengt
 
 #### HIV Diagnosis Year
 
+**Index Persons**
 ```{r}
 index_persons_dt <- individuals_dt[individuals_in_net_dt_studyidfrom,]
 index_persons_dt[, hivdiagnosis_year := as.numeric(substr(HIVDxDate, 1, 4))]
@@ -334,13 +423,33 @@ index_persons_dt[, .(.N), by=hivdiagnosis_year_group][,
                  ][order(hivdiagnosis_year_group)]
 ```
 
-
-There are 40 individuals who do not have a reported year of HIV Diagnosis. 
-All of these are persons whose source is RIDOH. 
-
 ```{r}
 index_persons_dt[which(is.na(hivdiagnosis_year)), .SD, .SDcols=c("StudyID", "Source", "DemoGender", "HIVDxDate", "HIVDxAge", "hivdiagnosis_year", "hivdiagnosis_year_group")]
 ```
+
+There are 40 index persons who do not have a reported year of HIV Diagnosis. 
+All of these are persons whose source is RIDOH. 
+
+**Partner Contacts**
+```{r}
+partner_contacts_dt <- individuals_dt[individuals_in_net_dt_studyidto,]
+partner_contacts_dt[, hivdiagnosis_year := as.numeric(substr(HIVDxDate, 1, 4))]
+table(partner_contacts_dt$hivdiagnosis_year)
+
+breaks = c(0, 2000, 2006, 2011, 2021)
+labels = c("<2000", "2001-2005", "2006-2010", "2011-2020")
+
+partner_contacts_dt[, hivdiagnosis_year_group := 
+                        cut(hivdiagnosis_year, breaks = breaks, 
+                            labels = labels)]
+table(partner_contacts_dt$hivdiagnosis_year_group, exclude = NULL)
+
+partner_contacts_dt[, .(.N), by=hivdiagnosis_year_group][,
+                 "prop":=round(N/sum(N), 3)
+                 ][order(hivdiagnosis_year_group)]
+```
+
+
 
 
 #### Last HIV Negative Test Year
@@ -377,6 +486,7 @@ lasthivneg_by_year_dt[, .(.N), by=hivlastnegativeyear_group][,
 ```
 #### Behavioral Characteristics: MSM, IDU, HRH
 
+**Index Persons**
 ```{r}
 index_persons_dt[, .(.N), by=RiskMSM][,
                  "prop":=round(N/sum(N), 3)
@@ -391,12 +501,19 @@ index_persons_dt[, .(.N), by=RiskHRH][,
                  ][]
 ```
 
+**Partner Contacts**
+```{r}
+partner_contacts_dt[, .(.N), by=RiskMSM][,
+                 "prop":=round(N/sum(N), 3)
+                 ][]
 
-### Describe the demographic and behavioral characteristics of partner contacts 
+partner_contacts_dt[, .(.N), by=RiskIDU][,
+                 "prop":=round(N/sum(N), 3)
+                 ][]
 
-
-
-
-### Consolidate Table 1.
+partner_contacts_dt[, .(.N), by=RiskHRH][,
+                 "prop":=round(N/sum(N), 3)
+                 ][]
+```
 
 
