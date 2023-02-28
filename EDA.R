@@ -337,36 +337,45 @@ length(StudyIDs_of_Seq_Individuals_in_ContactNetwork)
 
 unique(individuals_dt$ClusteredHIVTrace005) #161 unique clusters
 unique(individuals_dt$ClusteredHIVTrace015) #256 unique clusters
+unique(individuals_dt$ClusteredPhyloAny) #351 unique clusters
 
 sort(table(individuals_dt$ClusteredHIVTrace005, exclude = NULL)) #cluster sizes at 0.05% distance
 sort(table(individuals_dt$ClusteredHIVTrace015, exclude = NULL)) #cluster sizes at 0.15% distance
+sort(table(individuals_dt$ClusteredPhyloAny, exclude = NULL)) #ClusteredPhyloAny
 
 
 # How many unique molecular clusters have only one individual? ---------------------------
 
 length(which(table(individuals_dt$ClusteredHIVTrace005) == 1)) #34 clusters only have 1 member
 length(which(table(individuals_dt$ClusteredHIVTrace015) == 1)) #35 clusters only have 1 member
+length(which(table(individuals_dt$ClusteredPhyloAny) == 1)) #35 clusters only have 1 member
 
 cluster_sizes_005 <- table(individuals_dt$ClusteredHIVTrace005)
 cluster_sizes_015 <- table(individuals_dt$ClusteredHIVTrace015)
+cluster_sizes_clusteredphyloany <- table(individuals_dt$ClusteredPhyloAny)
 
 cluster_sizes_005 <- cluster_sizes_005[which(names(table(individuals_dt$ClusteredHIVTrace005)) != "")]
 cluster_sizes_015 <- cluster_sizes_015[which(names(table(individuals_dt$ClusteredHIVTrace015)) != "")]
+cluster_sizes_clusteredphyloany <- cluster_sizes_clusteredphyloany[which(names(table(individuals_dt$ClusteredPhyloAny)) != "")]
   
 summary(as.numeric(cluster_sizes_005[which(as.numeric(cluster_sizes_005) > 1)]))
 summary(as.numeric(cluster_sizes_015[which(as.numeric(cluster_sizes_015) > 1)]))
+summary(as.numeric(cluster_sizes_clusteredphyloany[which(as.numeric(cluster_sizes_clusteredphyloany) > 1)]))
 
 length(as.numeric(cluster_sizes_005[which(as.numeric(cluster_sizes_005) > 1)]))
 length(as.numeric(cluster_sizes_015[which(as.numeric(cluster_sizes_015) > 1)]))
+length(as.numeric(cluster_sizes_clusteredphyloany[which(as.numeric(cluster_sizes_clusteredphyloany) > 1)]))
 
 theoretical_max_ties_HIVTRACE005_ge2_members <- 
   lapply(cluster_sizes_005[which(as.numeric(cluster_sizes_005) > 1)], function(x) choose(x, 2)*2)
 theoretical_max_ties_HIVTRACE015_ge2_members <- 
   lapply(cluster_sizes_015[which(as.numeric(cluster_sizes_015) > 1)], function(x) choose(x, 2)*2)
+theoretical_max_ties_CLUSTEREDPHYLOANY_ge2_members <- 
+  lapply(cluster_sizes_clusteredphyloany[which(as.numeric(cluster_sizes_clusteredphyloany) > 1)], function(x) choose(x, 2)*2)
 
 summary(as.numeric(theoretical_max_ties_HIVTRACE005_ge2_members))
 summary(as.numeric(theoretical_max_ties_HIVTRACE015_ge2_members))
-
+summary(as.numeric(theoretical_max_ties_CLUSTEREDPHYLOANY_ge2_members))
 
 # For individuals in each of these defined molecular clusters, how many are in the named list?
 
@@ -430,37 +439,36 @@ class(cluster_sizes_015)
 names(cluster_sizes_015)
 
 calc_num_in_named_partners <- 
+  # FOR HIV TRACE 005 and 015
   function(distance="005"){
     
     named_pt_num_list <- NULL
-  
+    
     if (distance == "005"){
       clusters_List = cluster_sizes_005
     } else if (distance == "015")
       clusters_List = cluster_sizes_015
     
     for (i in names(clusters_List)){
-
-        label_col <- paste0("ClusteredHIVTrace", distance)
-        
-        cluster_distance <- which(individuals_dt[[label_col]] == i) 
-        studyids_cluster_distance <- individuals_dt$StudyID[cluster_distance] 
-        
-        identify_p1_rows <- which(net_dt$StudyIDFrom %in% studyids_cluster_distance)
-        identify_p2_rows <- which(net_dt$StudyIDTo %in% studyids_cluster_distance)
-        
-        named_pt_num <- intersect(identify_p1_rows, identify_p2_rows)       
-        named_pt_num_list <- c(named_pt_num_list, length(named_pt_num))
-        
+      
+      label_col <- paste0("ClusteredHIVTrace", distance)
+      
+      cluster_distance <- which(individuals_dt[[label_col]] == i) 
+      studyids_cluster_distance <- individuals_dt$StudyID[cluster_distance] 
+      
+      identify_p1_rows <- which(net_dt$StudyIDFrom %in% studyids_cluster_distance)
+      identify_p2_rows <- which(net_dt$StudyIDTo %in% studyids_cluster_distance)
+      
+      named_pt_num <- intersect(identify_p1_rows, identify_p2_rows)       
+      named_pt_num_list <- c(named_pt_num_list, length(named_pt_num))
+      
     }
     
     return(named_pt_num_list)
   }
 
 a <- calc_num_in_named_partners(distance="005")
-
 b <- calc_num_in_named_partners(distance="015")
-
 
 length(a)
 table(a[-1], exclude = NULL)
@@ -472,8 +480,11 @@ named_partner_nums_005 <- cbind(a[-1])
 named_partner_nums_015 <- cbind(b[-1])
 
 summary(named_partner_nums_005[which(as.numeric(cluster_sizes_005) > 1)])      
-summary(named_partner_nums_015[which(as.numeric(cluster_sizes_015) > 1)])      
+summary(named_partner_nums_015[which(as.numeric(cluster_sizes_015) > 1)])     
 
+
+## Function for ClusteredPhlyoAny
+phyloany_cluster_ids <- individuals_dt$ClusteredPhyloAny
 
 # Testing --
 
@@ -521,6 +532,9 @@ named_pt_dt[identify_p1_rows,]
 named_pt_dt[identify_p2_rows,]
 
 ## EXPECTATION MATCHED
+
+#Repeat named partnership/cluster size distribution with "ClusteredPhyloAny" sequence ---------------------------
+
 
 #Save Object ---------------------------
 
