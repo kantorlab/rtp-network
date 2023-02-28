@@ -347,10 +347,23 @@ sort(table(individuals_dt$ClusteredHIVTrace015, exclude = NULL)) #cluster sizes 
 length(which(table(individuals_dt$ClusteredHIVTrace005) == 1)) #34 clusters only have 1 member
 length(which(table(individuals_dt$ClusteredHIVTrace015) == 1)) #35 clusters only have 1 member
 
+cluster_sizes_005 <- table(individuals_dt$ClusteredHIVTrace005)
+cluster_sizes_015 <- table(individuals_dt$ClusteredHIVTrace015)
+
+cluster_sizes_005 <- cluster_sizes_005[which(names(table(individuals_dt$ClusteredHIVTrace005)) != "")]
+cluster_sizes_015 <- cluster_sizes_015[which(names(table(individuals_dt$ClusteredHIVTrace015)) != "")]
+  
+summary(as.numeric(cluster_sizes_005[which(as.numeric(cluster_sizes_005) > 1)]))
+summary(as.numeric(cluster_sizes_015[which(as.numeric(cluster_sizes_015) > 1)]))
+
+length(as.numeric(cluster_sizes_005[which(as.numeric(cluster_sizes_005) > 1)]))
+length(as.numeric(cluster_sizes_015[which(as.numeric(cluster_sizes_015) > 1)]))
 
 # Which specific molecular clusters have at least 2 individuals?
 HIVTRACE005_ge2_members <- which(table(individuals_dt$ClusteredHIVTrace005) >= 2) 
 HIVTRACE015_ge2_members <- which(table(individuals_dt$ClusteredHIVTrace015) >= 2)
+
+
 
 cluster_members_005 <- table(individuals_dt$ClusteredHIVTrace005)[HIVTRACE005_ge2_members]
 cluster_members_015 <- table(individuals_dt$ClusteredHIVTrace015)[HIVTRACE015_ge2_members]
