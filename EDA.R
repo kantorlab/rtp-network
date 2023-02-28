@@ -359,28 +359,14 @@ summary(as.numeric(cluster_sizes_015[which(as.numeric(cluster_sizes_015) > 1)]))
 length(as.numeric(cluster_sizes_005[which(as.numeric(cluster_sizes_005) > 1)]))
 length(as.numeric(cluster_sizes_015[which(as.numeric(cluster_sizes_015) > 1)]))
 
-# Which specific molecular clusters have at least 2 individuals?
-HIVTRACE005_ge2_members <- which(table(individuals_dt$ClusteredHIVTrace005) >= 2) 
-HIVTRACE015_ge2_members <- which(table(individuals_dt$ClusteredHIVTrace015) >= 2)
-
-
-
-cluster_members_005 <- table(individuals_dt$ClusteredHIVTrace005)[HIVTRACE005_ge2_members]
-cluster_members_015 <- table(individuals_dt$ClusteredHIVTrace015)[HIVTRACE015_ge2_members]
-
 theoretical_max_ties_HIVTRACE005_ge2_members <- 
-  lapply(cluster_members_005, function(x) choose(x, 2)*2)
+  lapply(cluster_sizes_005[which(as.numeric(cluster_sizes_005) > 1)], function(x) choose(x, 2)*2)
 theoretical_max_ties_HIVTRACE015_ge2_members <- 
-  lapply(cluster_members_015, function(x) choose(x, 2)*2)
+  lapply(cluster_sizes_015[which(as.numeric(cluster_sizes_015) > 1)], function(x) choose(x, 2)*2)
 
+summary(as.numeric(theoretical_max_ties_HIVTRACE005_ge2_members))
+summary(as.numeric(theoretical_max_ties_HIVTRACE015_ge2_members))
 
-length(HIVTRACE005_ge2_members)+
-  length(which(table(individuals_dt$ClusteredHIVTrace005) == 1)) ==
-  length(unique(individuals_dt$ClusteredHIVTrace005)) 
-  
-length(HIVTRACE015_ge2_members)+
-  length(which(table(individuals_dt$ClusteredHIVTrace015) == 1)) ==
-  length(unique(individuals_dt$ClusteredHIVTrace015)) 
 
 # For individuals in each of these defined molecular clusters, how many are in the named list?
 
