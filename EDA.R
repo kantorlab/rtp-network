@@ -471,21 +471,10 @@ table(b[-1], exclude = NULL)
 named_partner_nums_005 <- cbind(a[-1])
 named_partner_nums_015 <- cbind(b[-1])
 
-summary(named_partner_nums_005)      
-summary(named_partner_nums_015)      
+summary(named_partner_nums_005[which(as.numeric(cluster_sizes_005) > 1)])      
+summary(named_partner_nums_015[which(as.numeric(cluster_sizes_015) > 1)])      
 
-#write.csv(cbind(named_partner_nums_005, cluster_sizes_005[-1], theoretical_max_ties_HIVTRACE005_ge2_members[-1]), 
-#          "named_partner_nums_005.csv")
-#write.csv(cbind(named_partner_nums_015, cluster_members_015[-1], theoretical_max_ties_HIVTRACE015_ge2_members[-1]),
-#                "named_partner_nums_015.csv")
 
-#named_partner_nums_005
-# cluster_sizes_005
-
-#summary(as.integer(named_partner_nums_005)/as.integer(theoretical_max_ties_HIVTRACE005_ge2_members[-1]))
-#summary(as.integer(as.integer(named_partner_nums_015)/
-#                     as.integer(theoretical_max_ties_HIVTRACE015_ge2_members[-1])))
-           
 # Testing --
 
 ## Distance = 015
