@@ -1,0 +1,163 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Start by converting the unified individuals dataset
+to an edgelist depending on cluster identity.  
+
+```{r}
+# Filter the data frame to only include Cluster Y
+df_y <- individuals_dt[individuals_dt$ClusteredPhyloAny == "Y", ]
+
+# Get a list of unique StudyID for Cluster Y
+y_nodes <- unique(df_y$StudyID)
+
+# Use combn() to get all combinations of StudyID within Cluster Y
+y_edges <- combn(y_nodes, 2) %>%
+  t() %>%
+  as.data.frame() %>%
+  filter(V1 != V2) %>%
+  distinct() 
+
+colnames(y_edges) <- c("from", "to")
+```
+
+```{r}
+# Get a list of unique cluster IDs from the "ClusteredPhyloAny" column of the individuals_dt data frame
+unique_clusters <- unique(na.omit(individuals_dt$ClusteredPhyloAny))
+
+# Loop through the unique clusters and create an edgelist for each
+edgelists <- list()
+for (i in 1:length(unique_clusters)) {
+  # Get the cluster ID
+  cluster_id <- unique_clusters[i]
+  
+   # Print the cluster ID
+  #print(paste("Processing cluster", cluster_id))
+  
+  # Filter the data frame to include only the rows corresponding to the current cluster ID
+  df_cluster <- individuals_dt[individuals_dt$ClusteredPhyloAny == cluster_id, ]
+  
+  # Get a list of unique nodes in the current cluster
+  nodes <- unique(df_cluster$StudyID)
+  
+  # Use combn() to get all combinations of nodes within the current cluster
+  edges <- combn(nodes, 2) %>%
+    t() %>%
+    as.data.frame() %>%
+    filter(V1 != V2) %>%
+    distinct()
+  
+  # Rename columns
+  colnames(edges) <- c("from", "to")
+  
+  # Store the edgelist in the list of edgelists
+  edgelists[[i]] <- edges
+}
+
+# Combine all edgelists into a single edgelist
+all_edges <- do.call(rbind, edgelists)
+
+```
+
+```{r}
+# Get a list of unique cluster IDs from the "ClusteredPhyloAny" column of the individuals_dt data frame
+unique_clusters <- unique(na.omit(individuals_dt$ClusteredPhyloAny))
+
+# Loop through the unique clusters and create an edgelist for each
+edgelists <- list()
+for (i in 1:length(unique_clusters)) {
+  # Get the cluster ID
+  cluster_id <- unique_clusters[i]
+  
+  # Print the cluster ID
+  print(paste("Processing cluster", cluster_id))
+  
+  # Filter the data frame to include only the rows corresponding to the current cluster ID
+  df_cluster <- individuals_dt[individuals_dt$ClusteredPhyloAny == cluster_id, ]
+  
+  # Get a list of unique nodes in the current cluster
+  nodes <- unique(df_cluster$StudyID)
+  
+  # Use combn() to get all combinations of nodes within the current cluster
+  edges <- combn(nodes, 2) %>%
+    t() %>%
+    as.data.frame() %>%
+    filter(V1 != V2) %>%
+    distinct() %>%
+    rename(source = V1, target = V2)
+  
+  # Add a column indicating the cluster ID for each edge, but only if the edges data frame is not empty
+  if (!nrow(edges) == 0) {
+    edges$cluster_id <- cluster_id
+    # Store the edgelist in the list of edgelists
+    edgelists[[i]] <- edges
+  }
+}
+
+# Combine all edgelists into a single edgelist
+all_edges <- do.call(rbind, edgelists)
+
+```
+
+```{r}
+# Get a list of unique cluster IDs from the "ClusteredHIVTrace015" column of the individuals_dt data frame
+unique_clusters <- unique(na.omit(individuals_dt$ClusteredHIVTrace015))
+
+# Loop through the unique clusters and create an edgelist for each
+edgelists <- list()
+for (i in 1:length(unique_clusters)) {
+  # Get the cluster ID
+  cluster_id <- unique_clusters[i]
+  
+  # Skip to next iteration if cluster_id is empty
+  if (cluster_id == "") {
+    next
+  }
+  
+  # Print the cluster ID
+  print(paste("Processing cluster", cluster_id))
+  
+  # Filter the data frame to include only the rows corresponding to the current cluster ID
+  df_cluster <- individuals_dt[individuals_dt$ClusteredHIVTrace015 == cluster_id, ]
+  
+  # Get a list of unique nodes in the current cluster
+  nodes <- unique(df_cluster$StudyID)
+  
+  # Skip to next iteration if nodes is empty
+  if (length(nodes) <= 1) {
+    next
+  }
+  
+  # Use combn() to get all combinations of nodes within the current cluster
+  edges <- combn(nodes, 2) %>%
+    t() %>%
+    as.data.frame() %>%
+    filter(V1 != V2) %>%
+    distinct() %>%
+    rename(source = V1, target = V2)
+  
+  # Add a column indicating the cluster ID for each edge
+  edges$cluster_id <- cluster_id
+  
+  # Store the edgelist in the list of edgelists
+  edgelists[[i]] <- edges
+}
+
+# Combine all edgelists into a single edgelist
+all_edges <- do.call(rbind, edgelists)
+
+```
+
+
+Test:
+```{r}
+x <- as.numeric(table(individuals_dt$ClusteredHIVTrace015)[-1])
+y <- lapply(x, function (x) choose(x, 2))
+sum(unlist(y))
+
+(sum(unlist(y)) == nrow(all_edges))
+```
+
+
