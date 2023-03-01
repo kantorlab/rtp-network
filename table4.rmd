@@ -230,22 +230,48 @@ xtabs(~ factor(named_partner_indicator, exclude = NULL)+
 rowSums(xtabs(~ factor(named_partner_indicator, exclude = NULL)+
       factor(SequenceSubtype, exclude = NULL),
       data = individuals_dt_w_index_persons_in_015))
-m3 <- glm(named_partner_indicator ~ SequenceSubtype,
+
+# recode sequence
+original_sequences <- individuals_dt_w_index_persons_in_015$SequenceSubtype
+recoded_sequences <- ifelse(grepl("^B", original_sequences), "B", "non-B")
+cbind(original_sequences, recoded_sequences)
+individuals_dt_w_index_persons_in_015$recoded_sequence_subtype <- recoded_sequences
+
+table(individuals_dt_w_index_persons_in_015$recoded_sequence_subtype)
+xtabs(~ factor(named_partner_indicator, exclude = NULL)+
+      factor(recoded_sequence_subtype, exclude = NULL),
+      data = individuals_dt_w_index_persons_in_015)
+rowSums(xtabs(~ factor(named_partner_indicator, exclude = NULL)+
+      factor(recoded_sequence_subtype, exclude = NULL),
+      data = individuals_dt_w_index_persons_in_015))
+
+m3 <- glm(named_partner_indicator ~ recoded_sequence_subtype,
   data = individuals_dt_w_index_persons_in_015,
   family = "binomial")
 summary(m3)
 
-table(individuals_dt_w_index_persons_in_015$SequenceSubtype)
+table(individuals_dt_w_index_persons_in_015$RiskMSM)
+xtabs(~ factor(named_partner_indicator, exclude = NULL)+
+      factor(RiskMSM, exclude = NULL),
+      data = individuals_dt_w_index_persons_in_015)
 m4 <- glm(named_partner_indicator ~ RiskMSM,
   data = individuals_dt_w_index_persons_in_015,
   family = "binomial")
 summary(m4)
 
+table(individuals_dt_w_index_persons_in_015$RiskHRH)
+xtabs(~ factor(named_partner_indicator, exclude = NULL)+
+      factor(RiskHRH, exclude = NULL),
+      data = individuals_dt_w_index_persons_in_015)
 m5 <- glm(named_partner_indicator ~ RiskHRH,
   data = individuals_dt_w_index_persons_in_015,
   family = "binomial")
 summary(m5)
 
+table(individuals_dt_w_index_persons_in_015$RiskIDU)
+xtabs(~ factor(named_partner_indicator, exclude = NULL)+
+      factor(RiskIDU, exclude = NULL),
+      data = individuals_dt_w_index_persons_in_015)
 m6 <- glm(named_partner_indicator ~ RiskIDU,
   data = individuals_dt_w_index_persons_in_015,
   family = "binomial")
@@ -256,9 +282,35 @@ m7 <- glm(named_partner_indicator ~ HIVDxAge,
   family = "binomial")
 summary(m7)
 
+summary(individuals_dt_w_index_persons_in_015$HIVDxAge)
+tapply(individuals_dt_w_index_persons_in_015$HIVDxAge, 
+       individuals_dt_w_index_persons_in_015$named_partner_indicator, 
+       summary)
 model <- glm(named_partner_indicator ~ DemoGender+DemoRace+SequenceSubtype,
   data = individuals_dt_w_index_persons_in_015,
   family = "binomial")
 summary(model)
+```
+
+How many persons appear in the named partner dataset?
+
+```{r}
+length(unique(named_pt_net%v% "vertex.names"))
+```
+
+How many of these named persons are in 015 cluster sequence?
+
+```{r}
+named_pt_net%v% "vertex.names"
+named_pts_in_015_clusters_idx <- which((named_pt_net %v% "vertex.names") %in% index_persons_in_015)
+length(named_pts_in_015_clusters_idx)
+
+individuals_dt_w_index_persons_in_015$named_partner_indicator <- 0
+individuals_dt_w_index_persons_in_015$named_partner_indicator[sequence015_persons_in_named_pt_net_idx] <- 1
+
+individuals_dt_w_index_persons_in_015$named_partner_indicator <-
+  as.factor(individuals_dt_w_index_persons_in_015$named_partner_indicator)
+
+table(individuals_dt_w_index_persons_in_015$named_partner_indicator, exclude = NULL)
 ```
 
