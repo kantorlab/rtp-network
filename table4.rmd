@@ -22,9 +22,9 @@ eda_env <- readRDS("/users/akhann16/code/rtp-network/out/eda_objects.rds")
 
 individuals_dt <- eda_env$individuals_dt
 net_dt <- eda_env$net_dt 
+named_pt_net <- eda_env$named_pt_net
 named_pt_idx_005 <- eda_env$named_pt_idx_005 
 named_pt_idx_015 <- eda_env$named_pt_idx_015
-
 ```
 
 # Create edgelists from molecular clusters
@@ -174,4 +174,91 @@ For now, let's use the HIV Trace 015 dataset. (Next round, I will add
 `phyloany` and `015`).
 
 # Prepare data for regression analysis
+
+How many index persons in the HIVTrace015 dataset?
+
+```{r}
+index_person_idx_in_015 <- which(individuals_dt$ClusteredHIVTrace015 != "")
+index_persons_in_015 <- individuals_dt$StudyID[index_person_idx_in_015]
+length(index_person_idx_in_015)
+
+individuals_dt_w_index_persons_in_015 <- individuals_dt[index_person_idx_in_015,]
+dim(individuals_dt_w_index_persons_in_015)
+```
+
+How many of these index persons are in the named partner list?
+
+```{r}
+named_pt_net%v% "vertex.names"
+sequence015_persons_in_named_pt_net_idx <- which((index_persons_in_015) %in% (named_pt_net %v% "vertex.names"))
+
+individuals_dt_w_index_persons_in_015$named_partner_indicator <- 0
+individuals_dt_w_index_persons_in_015$named_partner_indicator[sequence015_persons_in_named_pt_net_idx] <- 1
+
+individuals_dt_w_index_persons_in_015$named_partner_indicator <-
+  as.factor(individuals_dt_w_index_persons_in_015$named_partner_indicator)
+
+table(individuals_dt_w_index_persons_in_015$named_partner_indicator, exclude = NULL)
+```
+
+Run the regression model:
+
+```{r}
+
+table(individuals_dt_w_index_persons_in_015$DemoGender, exclude = NULL)
+xtabs(~ factor(named_partner_indicator, exclude = NULL)+
+      factor(DemoGender, exclude = NULL),
+      data = individuals_dt_w_index_persons_in_015)
+m1 <- glm(named_partner_indicator ~ DemoGender,
+  data = individuals_dt_w_index_persons_in_015,
+  family = "binomial")
+summary(m1)
+
+table(individuals_dt_w_index_persons_in_015$DemoRace)
+xtabs(~ factor(named_partner_indicator, exclude = NULL)+
+      factor(DemoRace, exclude = NULL),
+      data = individuals_dt_w_index_persons_in_015)
+m2 <- glm(named_partner_indicator ~ DemoRace,
+  data = individuals_dt_w_index_persons_in_015,
+  family = "binomial")
+summary(m2)
+
+table(individuals_dt_w_index_persons_in_015$SequenceSubtype)
+xtabs(~ factor(named_partner_indicator, exclude = NULL)+
+      factor(SequenceSubtype, exclude = NULL),
+      data = individuals_dt_w_index_persons_in_015)
+rowSums(xtabs(~ factor(named_partner_indicator, exclude = NULL)+
+      factor(SequenceSubtype, exclude = NULL),
+      data = individuals_dt_w_index_persons_in_015))
+m3 <- glm(named_partner_indicator ~ SequenceSubtype,
+  data = individuals_dt_w_index_persons_in_015,
+  family = "binomial")
+summary(m3)
+
+table(individuals_dt_w_index_persons_in_015$SequenceSubtype)
+m4 <- glm(named_partner_indicator ~ RiskMSM,
+  data = individuals_dt_w_index_persons_in_015,
+  family = "binomial")
+summary(m4)
+
+m5 <- glm(named_partner_indicator ~ RiskHRH,
+  data = individuals_dt_w_index_persons_in_015,
+  family = "binomial")
+summary(m5)
+
+m6 <- glm(named_partner_indicator ~ RiskIDU,
+  data = individuals_dt_w_index_persons_in_015,
+  family = "binomial")
+summary(m6)
+
+m7 <- glm(named_partner_indicator ~ HIVDxAge,
+  data = individuals_dt_w_index_persons_in_015,
+  family = "binomial")
+summary(m7)
+
+model <- glm(named_partner_indicator ~ DemoGender+DemoRace+SequenceSubtype,
+  data = individuals_dt_w_index_persons_in_015,
+  family = "binomial")
+summary(model)
+```
 
