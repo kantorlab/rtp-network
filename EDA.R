@@ -551,6 +551,7 @@ named_pt_dt[identify_p2_rows,]
 eda_env <- new.env()
 eda_env$individuals_dt <- individuals_dt
 eda_env$net_dt <- net_dt
+eda_env$named_pt_net <- net
 eda_env$named_pt_idx_005 <- a
 eda_env$named_pt_idx_015 <- b
 
