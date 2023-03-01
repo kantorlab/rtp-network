@@ -3,25 +3,35 @@ title: "R Notebook"
 output: html_notebook
 ---
 
+# Setup
+
+```{r setup, include=FALSE}
+rm(list=ls())
+knitr::opts_chunk$set(echo = TRUE,
+                      root.dir = '~/code/rtp-network/out/')
+library(data.table)
+library(dplyr)
+library(stringi)
+library(network)
+```
+
+# Load the data
+
+```{r}
+eda_env <- readRDS("/users/akhann16/code/rtp-network/out/eda_objects.rds")
+
+individuals_dt <- eda_env$individuals_dt
+net_dt <- eda_env$net_dt 
+named_pt_idx_005 <- eda_env$named_pt_idx_005 
+named_pt_idx_015 <- eda_env$named_pt_idx_015
+
+```
+
+# Create edgelists from molecular clusters
+
 Start by converting the unified individuals dataset
 to an edgelist depending on cluster identity.  
 
-```{r}
-# Filter the data frame to only include Cluster Y
-df_y <- individuals_dt[individuals_dt$ClusteredPhyloAny == "Y", ]
-
-# Get a list of unique StudyID for Cluster Y
-y_nodes <- unique(df_y$StudyID)
-
-# Use combn() to get all combinations of StudyID within Cluster Y
-y_edges <- combn(y_nodes, 2) %>%
-  t() %>%
-  as.data.frame() %>%
-  filter(V1 != V2) %>%
-  distinct() 
-
-colnames(y_edges) <- c("from", "to")
-```
 
 ```{r}
 # Get a list of unique cluster IDs from the "ClusteredPhyloAny" column of the individuals_dt data frame
@@ -160,4 +170,8 @@ sum(unlist(y))
 (sum(unlist(y)) == nrow(all_edges))
 ```
 
+For now, let's use the HIV Trace 015 dataset. (Next round, I will add 
+`phyloany` and `015`).
+
+# Prepare data for regression analysis
 
