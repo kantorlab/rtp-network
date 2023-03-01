@@ -205,7 +205,7 @@ sort(table(net_dt$ReferredPrEP, exclude = NULL))
 # Network Diagrams
 plot(net)
 gplot(net,             
-      #usearrows=FALSE,
+        #usearrows=FALSE,
       edge.lwd=0.5,
       edge.lty=3,
       #usecurve=TRUE,
@@ -451,10 +451,17 @@ calc_num_in_named_partners <-
     
     for (i in names(clusters_List)){
       
+      #cat("Clusters list: ", clusters_List, "\n")
+      
       label_col <- paste0("ClusteredHIVTrace", distance)
+      #cat("Label col: ", label_col, "\n")
       
       cluster_distance <- which(individuals_dt[[label_col]] == i) 
+      
+      #cat("Cluster distance: ", cluster_distance, "\n")
+      
       studyids_cluster_distance <- individuals_dt$StudyID[cluster_distance] 
+      #print("Study IDs cluster distance: ", class(studyids_cluster_distance), "\n", "\n")
       
       identify_p1_rows <- which(net_dt$StudyIDFrom %in% studyids_cluster_distance)
       identify_p2_rows <- which(net_dt$StudyIDTo %in% studyids_cluster_distance)
@@ -540,3 +547,12 @@ named_pt_dt[identify_p2_rows,]
 
 #save.image(file="EDA.RData")
 
+# # Create an environment and assign the objects to it
+eda_env <- new.env()
+eda_env$individuals_dt <- individuals_dt
+eda_env$net_dt <- net_dt
+eda_env$named_pt_idx_005 <- a
+eda_env$named_pt_idx_015 <- b
+
+# Save the environment as an RDS file
+saveRDS(eda_env, "eda_objects.rds")
