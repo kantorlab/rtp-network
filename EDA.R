@@ -444,17 +444,26 @@ calc_num_in_named_partners <-
     
     named_pt_num_list <- NULL
     
-    if (distance == "005"){
+    if (distance == "005") {
       clusters_List = cluster_sizes_005
-    } else if (distance == "015")
+    }
+    else if (distance == "015") {
       clusters_List = cluster_sizes_015
+    }
+    else if (distance == "clusteredphyloany") {
+      clusters_List = cluster_sizes_clusteredphyloany
+    }
     
     for (i in names(clusters_List)){
       
       #cat("Clusters list: ", clusters_List, "\n")
       
+      if (distance != "clusteredphyloany"){
       label_col <- paste0("ClusteredHIVTrace", distance)
-      #cat("Label col: ", label_col, "\n")
+      }
+      else if (distance == "clusteredphyloany"){
+        label_col <- "ClusteredPhyloAny"
+      }
       
       cluster_distance <- which(individuals_dt[[label_col]] == i) 
       
@@ -476,6 +485,7 @@ calc_num_in_named_partners <-
 
 a <- calc_num_in_named_partners(distance="005")
 b <- calc_num_in_named_partners(distance="015")
+c <- calc_num_in_named_partners(distance="clusteredphyloany")
 
 length(a)
 table(a[-1], exclude = NULL)
@@ -483,15 +493,18 @@ table(a[-1], exclude = NULL)
 length(b)
 table(b[-1], exclude = NULL)
 
+length(c)
+table(c[-1], exclude = NULL)
+
 named_partner_nums_005 <- cbind(a[-1])
 named_partner_nums_015 <- cbind(b[-1])
+named_partner_nums_clusteredphyloany <- cbind(c[-1])
 
 summary(named_partner_nums_005[which(as.numeric(cluster_sizes_005) > 1)])      
-summary(named_partner_nums_015[which(as.numeric(cluster_sizes_015) > 1)])     
+summary(named_partner_nums_015[which(as.numeric(cluster_sizes_015) > 1)]) 
+summary(named_partner_nums_clusteredphyloany[which(as.numeric(cluster_sizes_clusteredphyloany) > 1)]) 
 
 
-## Function for ClusteredPhlyoAny
-phyloany_cluster_ids <- individuals_dt$ClusteredPhyloAny
 
 # Testing --
 
