@@ -480,6 +480,7 @@ calc_num_in_named_partners <-
       
     }
     
+    
     return(named_pt_num_list)
   }
 
@@ -567,6 +568,7 @@ eda_env$net_dt <- net_dt
 eda_env$named_pt_net <- net
 eda_env$named_pt_idx_005 <- a
 eda_env$named_pt_idx_015 <- b
+eda_env$named_pt_idx_clusteredphyloany <- c
 
 # Save the environment as an RDS file
 saveRDS(eda_env, "eda_objects.rds")
