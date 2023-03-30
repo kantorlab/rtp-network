@@ -1,0 +1,60 @@
+File: ../create_edgelists_from_molecular_clusters.R
+Package Dependencies:
+dplyr
+utils
+network
+File Dependencies:
+data_dir, /Individuals.csv)
+------
+File: ../EDA.R
+Package Dependencies:
+dplyr
+network
+sna
+File Dependencies:
+data_dir, /ContactTracingNetwork.csv)
+data_dir, /Individuals.csv)
+## unique sources and receivers in the contact tracing network?
+------
+File: ../plot_mol_networks.R
+Package Dependencies:
+sna
+network
+dplyr
+File Dependencies:
+data_dir, /Individuals.csv)
+el_matrix_005.RDS
+------
+File: ../descriptives-table.Rmd
+Package Dependencies:
+data.table
+dplyr
+stringi
+network
+File Dependencies:
+data_dir, /ContactTracingNetwork.csv))
+data_dir, /Individuals.csv))
+What is the source of the information of persons in the individuals database?
+idx_client_highvl_dt <- net_dt[InterviewType == Index Client - In care, high viral load]
+#### By source
+n_source=.N
+n_source), 3
+n_source=.N
+n_source), 3
+All of these are persons whose source is RIDOH. 
+------
+File: ../ri-phylo-network-creation.Rmd
+Package Dependencies:
+File Dependencies:
+------
+File: ../transmission-risk-assessment.Rmd
+Package Dependencies:
+data.table
+File Dependencies:
+------
+File: ../vlads-questions.Rmd
+Package Dependencies:
+data.table
+File Dependencies:
+https://github.com/kantorlab/rtp-network/blob/main/vlads-questions.Rmd
+------
