@@ -215,12 +215,19 @@ clusteredphyloany_persons_in_named_pt_net_idx <- which((index_persons_in_015) %i
 
 individuals_dt_w_index_persons_in_005$named_partner_indicator <- 0
 individuals_dt_w_index_persons_in_005$named_partner_indicator[trace005_persons_in_named_pt_net_idx] <- 1
+individuals_dt_w_index_persons_in_005$named_partner_indicator <- as.factor(individuals_dt_w_index_persons_in_005$named_partner_indicator)
 
 individuals_dt_w_index_persons_in_015$named_partner_indicator <- 0
 individuals_dt_w_index_persons_in_015$named_partner_indicator[trace015_persons_in_named_pt_net_idx] <- 1
-
 individuals_dt_w_index_persons_in_015$named_partner_indicator <-
   as.factor(individuals_dt_w_index_persons_in_015$named_partner_indicator)
+
+individuals_dt_w_index_persons_in_clusteredphyloany$named_partner_indicator <- 0
+individuals_dt_w_index_persons_in_clusteredphyloany$named_partner_indicator[
+  clusteredphyloany_persons_in_named_pt_net_idx
+  ] <-  1
+individuals_dt_w_index_persons_in_clusteredphyloany$named_partner_indicator <-
+  as.factor(individuals_dt_w_index_persons_in_clusteredphyloany$named_partner_indicator)
 
 #table(individuals_dt_w_index_persons_in_015$named_partner_indicator, exclude = NULL)
 ```
@@ -228,90 +235,68 @@ individuals_dt_w_index_persons_in_015$named_partner_indicator <-
 
 
 
-- Run the regression model:
+- Write a function to run the regression model:
 
 ```{r}
+run_analysis <- function(dataset) {
+  # Model 1: DemoGender
+  m1 <- glm(named_partner_indicator ~ DemoGender, data = dataset, family = "binomial")
+  m1_summary <- summary(m1)
+  xtabs1 <- xtabs(~ factor(named_partner_indicator, exclude = NULL) + factor(DemoGender, exclude = NULL), data = dataset)
+  
+  # Model 2: DemoRace
+  m2 <- glm(named_partner_indicator ~ DemoRace, data = dataset, family = "binomial")
+  m2_summary <- summary(m2)
+  xtabs2 <- xtabs(~ factor(named_partner_indicator, exclude = NULL) + factor(DemoRace, exclude = NULL), data = dataset)
+  
+  # Model 3: RecodedSequenceSubtype
+  m3 <- glm(named_partner_indicator ~ RecodedSequenceSubtype, data = dataset, family = "binomial")
+  m3_summary <- summary(m3)
+  xtabs3 <- xtabs(~ factor(named_partner_indicator, exclude = NULL) + factor(RecodedSequenceSubtype, exclude = NULL), data = dataset)
 
-table(individuals_dt_w_index_persons_in_015$DemoGender, exclude = NULL)
-xtabs(~ factor(named_partner_indicator, exclude = NULL)+
-      factor(DemoGender, exclude = NULL),
-      data = individuals_dt_w_index_persons_in_015)
-m1 <- glm(named_partner_indicator ~ DemoGender,
-  data = individuals_dt_w_index_persons_in_015,
-  family = "binomial")
-summary(m1)
+  # Model 4: RiskMSM
+  m4 <- glm(named_partner_indicator ~ RiskMSM, data = dataset, family = "binomial")
+  m4_summary <- summary(m4)
+  xtabs4 <- xtabs(~ factor(named_partner_indicator, exclude = NULL) + factor(RiskMSM, exclude = NULL), data = dataset)
 
-table(individuals_dt_w_index_persons_in_015$DemoRace)
-xtabs(~ factor(named_partner_indicator, exclude = NULL)+
-      factor(DemoRace, exclude = NULL),
-      data = individuals_dt_w_index_persons_in_015)
-m2 <- glm(named_partner_indicator ~ DemoRace,
-  data = individuals_dt_w_index_persons_in_015,
-  family = "binomial")
-summary(m2)
+  # Model 5: RiskHRH
+  m5 <- glm(named_partner_indicator ~ RiskHRH, data = dataset, family = "binomial")
+  m5_summary <- summary(m5)
+  xtabs5 <- xtabs(~ factor(named_partner_indicator, exclude = NULL) + factor(RiskHRH, exclude = NULL), data = dataset)
 
-table(individuals_dt_w_index_persons_in_015$SequenceSubtype)
-xtabs(~ factor(named_partner_indicator, exclude = NULL)+
-      factor(SequenceSubtype, exclude = NULL),
-      data = individuals_dt_w_index_persons_in_015)
-rowSums(xtabs(~ factor(named_partner_indicator, exclude = NULL)+
-      factor(SequenceSubtype, exclude = NULL),
-      data = individuals_dt_w_index_persons_in_015))
+  # Model 6: RiskIDU
+  m6 <- glm(named_partner_indicator ~ RiskIDU, data = dataset, family = "binomial")
+  m6_summary <- summary(m6)
+  xtabs6 <- xtabs(~ factor(named_partner_indicator, exclude = NULL) + factor(RiskIDU, exclude = NULL), data = dataset)
 
-table(individuals_dt_w_index_persons_in_015$RecodedSequenceSubtype)
-xtabs(~ factor(named_partner_indicator, exclude = NULL)+
-      factor(RecodedSequenceSubtype, exclude = NULL),
-      data = individuals_dt_w_index_persons_in_015)
-rowSums(xtabs(~ factor(named_partner_indicator, exclude = NULL)+
-      factor(RecodedSequenceSubtype, exclude = NULL),
-      data = individuals_dt_w_index_persons_in_015))
+  # Model 7: HIVDxAge
+  m7 <- glm(named_partner_indicator ~ HIVDxAge, data = dataset, family = "binomial")
+  m7_summary <- summary(m7)
+  
+  return(list(
+    DemoGender_summary = m1_summary,
+    DemoGender_xtabs = xtabs1,
+    DemoRace_summary = m2_summary,
+    DemoRace_xtabs = xtabs2,
+    RecodedSequenceSubtype_summary = m3_summary,
+    RecodedSequenceSubtype_xtabs = xtabs3,
+    RiskMSM_summary = m4_summary,
+    RiskMSM_xtabs = xtabs4,
+    RiskHRH_summary = m5_summary,
+    RiskHRH_xtabs = xtabs5,
+    RiskIDU_summary = m6_summary,
+    RiskIDU_xtabs = xtabs6,
+    HIVDxAge_summary = m7_summary
+  ))
+}
+```
 
-m3 <- glm(named_partner_indicator ~ RecodedSequenceSubtype,
-  data = individuals_dt_w_index_persons_in_015,
-  family = "binomial")
-summary(m3)
 
-table(individuals_dt_w_index_persons_in_015$RiskMSM)
-xtabs(~ factor(named_partner_indicator, exclude = NULL)+
-      factor(RiskMSM, exclude = NULL),
-      data = individuals_dt_w_index_persons_in_015)
-m4 <- glm(named_partner_indicator ~ RiskMSM,
-  data = individuals_dt_w_index_persons_in_015,
-  family = "binomial")
-summary(m4)
 
-table(individuals_dt_w_index_persons_in_015$RiskHRH)
-xtabs(~ factor(named_partner_indicator, exclude = NULL)+
-      factor(RiskHRH, exclude = NULL),
-      data = individuals_dt_w_index_persons_in_015)
-m5 <- glm(named_partner_indicator ~ RiskHRH,
-  data = individuals_dt_w_index_persons_in_015,
-  family = "binomial")
-summary(m5)
-
-table(individuals_dt_w_index_persons_in_015$RiskIDU)
-xtabs(~ factor(named_partner_indicator, exclude = NULL)+
-      factor(RiskIDU, exclude = NULL),
-      data = individuals_dt_w_index_persons_in_015)
-m6 <- glm(named_partner_indicator ~ RiskIDU,
-  data = individuals_dt_w_index_persons_in_015,
-  family = "binomial")
-summary(m6)
-
-m7 <- glm(named_partner_indicator ~ HIVDxAge,
-  data = individuals_dt_w_index_persons_in_015,
-  family = "binomial")
-summary(m7)
-
-summary(individuals_dt_w_index_persons_in_015$HIVDxAge)
-tapply(individuals_dt_w_index_persons_in_015$HIVDxAge, 
-       individuals_dt_w_index_persons_in_015$named_partner_indicator, 
-       summary)
-
-model <- glm(named_partner_indicator ~ DemoGender+DemoRace+SequenceSubtype,
-  data = individuals_dt_w_index_persons_in_015,
-  family = "binomial")
-summary(model)
+```{r}
+result_005 <- run_analysis(individuals_dt_w_index_persons_in_005)
+result_015 <- run_analysis(individuals_dt_w_index_persons_in_015)
+result_clusteredphyloany <- run_analysis(individuals_dt_w_index_persons_in_clusteredphyloany)
 ```
 
 How many persons appear in the named partner dataset?
