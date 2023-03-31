@@ -27,6 +27,18 @@ named_pt_idx_005 <- eda_env$named_pt_idx_005
 named_pt_idx_015 <- eda_env$named_pt_idx_015
 ```
 
+# Recode Sequence Subtype as B/non-B (needed for regressions):
+
+```{r}
+individuals_dt$RecodedSequenceSubtype <- 
+  ifelse(individuals_dt$SequenceSubtype == "" | individuals_dt$SequenceSubtype == "B", 
+         individuals_dt$SequenceSubtype, 
+         "non-B")
+
+```
+
+
+
 # Create edgelists from molecular clusters
 
 Start by converting the unified individuals dataset
@@ -162,35 +174,61 @@ sum(unlist(y)) #number of edges across all molecular clusters
 For now, let's use the HIV Trace 015 dataset. (Next round, I will add 
 `phyloany` and `015`).
 
-# Prepare data for regression analysis
+## Prepare data for regression analysis
 
-How many index persons in the HIVTrace015 dataset?
+- How many index persons are  the HIVTrace005, HIVTrace015 and ClusteredPhyloAny datasets?
 
 ```{r}
+index_person_idx_in_005 <- which(individuals_dt$ClusteredHIVTrace005 != "")
+index_persons_in_005 <- individuals_dt$StudyID[index_person_idx_in_005]
+length(index_person_idx_in_005)
+length(which(individuals_dt$ClusteredHIVTrace005 == ""))
+length(which(individuals_dt$ClusteredHIVTrace005 == "")) == 
+         table(individuals_dt$ClusteredHIVTrace005)[[]]
+individuals_dt_w_index_persons_in_005 <- individuals_dt[index_person_idx_in_005,]
+dim(individuals_dt_w_index_persons_in_005)
+
 index_person_idx_in_015 <- which(individuals_dt$ClusteredHIVTrace015 != "")
 index_persons_in_015 <- individuals_dt$StudyID[index_person_idx_in_015]
 length(index_person_idx_in_015)
-
+length(which(individuals_dt$ClusteredHIVTrace015 == ""))
+length(which(individuals_dt$ClusteredHIVTrace015 == "")) == 
+         table(individuals_dt$ClusteredHIVTrace015)[[]]
 individuals_dt_w_index_persons_in_015 <- individuals_dt[index_person_idx_in_015,]
 dim(individuals_dt_w_index_persons_in_015)
+
+index_person_idx_in_clusteredphyloany <- which(individuals_dt$ClusteredPhyloAny != "")
+index_persons_in_clusteredphyloany <- individuals_dt$StudyID[index_person_idx_in_clusteredphyloany]
+length(index_person_idx_in_clusteredphyloany)
+length(which(is.na(individuals_dt$ClusteredPhyloAny)))
+individuals_dt_w_index_persons_in_clusteredphyloany <- individuals_dt[index_person_idx_in_clusteredphyloany,]
+dim(individuals_dt_w_index_persons_in_clusteredphyloany)
 ```
 
-How many of these index persons are in the named partner list?
+- How many of these index persons from each molecular clustering variable are in the named partner list?
 
 ```{r}
 named_pt_net%v% "vertex.names"
-sequence015_persons_in_named_pt_net_idx <- which((index_persons_in_015) %in% (named_pt_net %v% "vertex.names"))
+trace005_persons_in_named_pt_net_idx <- which((index_persons_in_005) %in% (named_pt_net %v% "vertex.names"))
+trace015_persons_in_named_pt_net_idx <- which((index_persons_in_015) %in% (named_pt_net %v% "vertex.names"))
+clusteredphyloany_persons_in_named_pt_net_idx <- which((index_persons_in_015) %in% (named_pt_net %v% "vertex.names"))
+
+individuals_dt_w_index_persons_in_005$named_partner_indicator <- 0
+individuals_dt_w_index_persons_in_005$named_partner_indicator[trace005_persons_in_named_pt_net_idx] <- 1
 
 individuals_dt_w_index_persons_in_015$named_partner_indicator <- 0
-individuals_dt_w_index_persons_in_015$named_partner_indicator[sequence015_persons_in_named_pt_net_idx] <- 1
+individuals_dt_w_index_persons_in_015$named_partner_indicator[trace015_persons_in_named_pt_net_idx] <- 1
 
 individuals_dt_w_index_persons_in_015$named_partner_indicator <-
   as.factor(individuals_dt_w_index_persons_in_015$named_partner_indicator)
 
-table(individuals_dt_w_index_persons_in_015$named_partner_indicator, exclude = NULL)
+#table(individuals_dt_w_index_persons_in_015$named_partner_indicator, exclude = NULL)
 ```
 
-Run the regression model:
+
+
+
+- Run the regression model:
 
 ```{r}
 
@@ -220,21 +258,15 @@ rowSums(xtabs(~ factor(named_partner_indicator, exclude = NULL)+
       factor(SequenceSubtype, exclude = NULL),
       data = individuals_dt_w_index_persons_in_015))
 
-# recode sequence
-original_sequences <- individuals_dt_w_index_persons_in_015$SequenceSubtype
-recoded_sequences <- ifelse(grepl("^B", original_sequences), "B", "non-B")
-cbind(original_sequences, recoded_sequences)
-individuals_dt_w_index_persons_in_015$recoded_sequence_subtype <- recoded_sequences
-
-table(individuals_dt_w_index_persons_in_015$recoded_sequence_subtype)
+table(individuals_dt_w_index_persons_in_015$RecodedSequenceSubtype)
 xtabs(~ factor(named_partner_indicator, exclude = NULL)+
-      factor(recoded_sequence_subtype, exclude = NULL),
+      factor(RecodedSequenceSubtype, exclude = NULL),
       data = individuals_dt_w_index_persons_in_015)
 rowSums(xtabs(~ factor(named_partner_indicator, exclude = NULL)+
-      factor(recoded_sequence_subtype, exclude = NULL),
+      factor(RecodedSequenceSubtype, exclude = NULL),
       data = individuals_dt_w_index_persons_in_015))
 
-m3 <- glm(named_partner_indicator ~ recoded_sequence_subtype,
+m3 <- glm(named_partner_indicator ~ RecodedSequenceSubtype,
   data = individuals_dt_w_index_persons_in_015,
   family = "binomial")
 summary(m3)
@@ -275,6 +307,7 @@ summary(individuals_dt_w_index_persons_in_015$HIVDxAge)
 tapply(individuals_dt_w_index_persons_in_015$HIVDxAge, 
        individuals_dt_w_index_persons_in_015$named_partner_indicator, 
        summary)
+
 model <- glm(named_partner_indicator ~ DemoGender+DemoRace+SequenceSubtype,
   data = individuals_dt_w_index_persons_in_015,
   family = "binomial")
@@ -295,7 +328,7 @@ named_pts_in_015_clusters_idx <- which((named_pt_net %v% "vertex.names") %in% in
 length(named_pts_in_015_clusters_idx)
 
 individuals_dt_w_index_persons_in_015$named_partner_indicator <- 0
-individuals_dt_w_index_persons_in_015$named_partner_indicator[sequence015_persons_in_named_pt_net_idx] <- 1
+individuals_dt_w_index_persons_in_015$named_partner_indicator[trace005_persons_in_named_pt_net_idx] <- 1
 
 individuals_dt_w_index_persons_in_015$named_partner_indicator <-
   as.factor(individuals_dt_w_index_persons_in_015$named_partner_indicator)
