@@ -170,13 +170,12 @@ sum(unlist(y)) #number of edges across all molecular clusters
 
 # Regresssions
 
-## Table "4A":
-For now, let's use the HIV Trace 015 dataset. (Next round, I will add 
-`phyloany` and `015`).
+## Table 4A: Logistic regression on index case being genetically 
+linked to at least one of their named partners
 
-## Prepare data for regression analysis
+### Prepare data for regression analysis
 
-- How many index persons are  the HIVTrace005, HIVTrace015 and ClusteredPhyloAny datasets?
+- How many index persons are in the HIVTrace005, HIVTrace015 and ClusteredPhyloAny datasets?
 
 ```{r}
 index_person_idx_in_005 <- which(individuals_dt$ClusteredHIVTrace005 != "")
@@ -208,7 +207,7 @@ dim(individuals_dt_w_index_persons_in_clusteredphyloany)
 - How many of these index persons from each molecular clustering variable are in the named partner list?
 
 ```{r}
-named_pt_net%v% "vertex.names"
+#named_pt_net%v% "vertex.names"
 trace005_persons_in_named_pt_net_idx <- which((index_persons_in_005) %in% (named_pt_net %v% "vertex.names"))
 trace015_persons_in_named_pt_net_idx <- which((index_persons_in_015) %in% (named_pt_net %v% "vertex.names"))
 clusteredphyloany_persons_in_named_pt_net_idx <- which((index_persons_in_015) %in% (named_pt_net %v% "vertex.names"))
@@ -234,8 +233,7 @@ individuals_dt_w_index_persons_in_clusteredphyloany$named_partner_indicator <-
 
 
 
-
-- Write a function to run the regression model:
+### Write a function to run the regression model:
 
 ```{r}
 run_analysis <- function(dataset) {
@@ -291,7 +289,7 @@ run_analysis <- function(dataset) {
 }
 ```
 
-
+### Run the regressions:
 
 ```{r}
 result_005 <- run_analysis(individuals_dt_w_index_persons_in_005)
@@ -299,25 +297,140 @@ result_015 <- run_analysis(individuals_dt_w_index_persons_in_015)
 result_clusteredphyloany <- run_analysis(individuals_dt_w_index_persons_in_clusteredphyloany)
 ```
 
-How many persons appear in the named partner dataset?
+
+## Table 4B: Logistic regression on named partners being genetically linked to the
+index case. 
+
+### Prepare the data
+
+- How many persons appear in the named partner dataset?
 
 ```{r}
 length(unique(named_pt_net%v% "vertex.names"))
 ```
 
-How many of these named persons are in 015 cluster sequence?
+- How many of these named persons are in each of the three clusters? 
 
 ```{r}
-named_pt_net%v% "vertex.names"
+head(named_pt_net%v% "vertex.names", 25)
+named_pt_net
+
+named_pts_in_005_clusters_idx <- which((named_pt_net %v% "vertex.names") %in% index_persons_in_005)
+length(named_pts_in_005_clusters_idx)
+named_pts_in_005_clusters_vname <- (named_pt_net %v% "vertex.names")[named_pts_in_005_clusters_idx]
+
 named_pts_in_015_clusters_idx <- which((named_pt_net %v% "vertex.names") %in% index_persons_in_015)
 length(named_pts_in_015_clusters_idx)
+named_pts_in_015_clusters_vname <- (named_pt_net %v% "vertex.names")[named_pts_in_015_clusters_idx]
 
-individuals_dt_w_index_persons_in_015$named_partner_indicator <- 0
-individuals_dt_w_index_persons_in_015$named_partner_indicator[trace005_persons_in_named_pt_net_idx] <- 1
+named_pts_in_clusteredphyloany <- which((named_pt_net %v% "vertex.names") %in% index_persons_in_clusteredphyloany)
+length(named_pts_in_clusteredphyloany)
+named_pts_in_phyloany_clusters_vname <- (named_pt_net %v% "vertex.names")[named_pts_in_clusteredphyloany]
 
-individuals_dt_w_index_persons_in_015$named_partner_indicator <-
-  as.factor(individuals_dt_w_index_persons_in_015$named_partner_indicator)
+```
 
-table(individuals_dt_w_index_persons_in_015$named_partner_indicator, exclude = NULL)
+- For each clustering algorithm, if named partner appears in its cluster,
+code it 1. Else code it 0.
+
+```{r}
+individuals_idx_in_named_pt_net <- which(individuals_dt$StudyID %in% (named_pt_net %v% "vertex.names"))
+individuals_in_named_pt_net_dt <- individuals_dt[individuals_idx_in_named_pt_net,]
+dim(individuals_in_named_pt_net_dt)
+
+individuals_in_named_pt_net_dt$indicator_005_cluster <- 0
+individuals_in_named_pt_net_dt$indicator_015_cluster <- 0
+individuals_in_named_pt_net_dt$indicator_phyloany_cluster <- 0
+
+individuals_in_named_pt_net_dt$indicator_005_cluster[which(
+  named_pts_in_005_clusters_vname %in% individuals_in_named_pt_net_dt$StudyID)] <-1
+
+individuals_in_named_pt_net_dt$indicator_015_cluster[which(
+  named_pts_in_015_clusters_vname %in% individuals_in_named_pt_net_dt$StudyID)] <-1
+
+individuals_in_named_pt_net_dt$indicator_phyloany_cluster[which(
+  named_pts_in_phyloany_clusters_vname %in% individuals_in_named_pt_net_dt$StudyID)] <-1
+
+```
+
+### Write a function to run the converse analysis:
+
+```{r}
+run_analysis_clustering <- function(dataset, clustering_type) {
+  # Choose the appropriate clustering indicator variable based on the input clustering type
+  if (clustering_type == "005") {
+    clustering_indicator <- "indicator_005_cluster"
+  } else if (clustering_type == "015") {
+    clustering_indicator <- "indicator_015_cluster"
+  } else if (clustering_type == "phyloany") {
+    clustering_indicator <- "indicator_phyloany_cluster"
+  } else {
+    stop("Invalid clustering_type. Choose one of '005', '015', or 'phyloany'.")
+  }
+
+  # Model 1: DemoGender
+  m1 <- glm(as.formula(paste(clustering_indicator, "~ DemoGender")), data = dataset, family = "binomial")
+  m1_summary <- summary(m1)
+  xtabs1 <- xtabs(as.formula(paste("~ factor(", clustering_indicator, ", exclude = NULL) + factor(DemoGender, exclude = NULL)")), data = dataset)
+
+  # Model 2: DemoRace
+  m2 <- glm(as.formula(paste(clustering_indicator, "~ DemoRace")), data = dataset, family = "binomial")
+  m2_summary <- summary(m2)
+  xtabs2 <- xtabs(as.formula(paste("~ factor(", clustering_indicator, ", exclude = NULL) + factor(DemoRace, exclude = NULL)")), data = dataset)
+
+  # Model 3: RecodedSequenceSubtype
+  m3 <- glm(as.formula(paste(clustering_indicator, "~ RecodedSequenceSubtype")), data = dataset, family = "binomial")
+  m3_summary <- summary(m3)
+  xtabs3 <- xtabs(as.formula(paste("~ factor(", clustering_indicator, ", exclude = NULL) + factor(RecodedSequenceSubtype, exclude = NULL)")), data = dataset)
+
+  # Model 4: RiskMSM
+  m4 <- glm(as.formula(paste(clustering_indicator, "~ RiskMSM")), data = dataset, family = "binomial")
+  m4_summary <- summary(m4)
+  xtabs4 <- xtabs(as.formula(paste("~ factor(", clustering_indicator, ", exclude = NULL) + factor(RiskMSM, exclude = NULL)")), data = dataset)
+
+  # Model 5: RiskHRH
+  m5 <- glm(as.formula(paste(clustering_indicator, "~ RiskHRH")), data = dataset, family = "binomial")
+  m5_summary <- summary(m5)
+  xtabs5 <- xtabs(as.formula(paste("~ factor(", clustering_indicator, ", exclude = NULL) + factor(RiskHRH, exclude = NULL)")), data = dataset)
+
+  # Model 6: RiskIDU
+  m6 <- glm(as.formula(paste(clustering_indicator, "~ RiskIDU")), data = dataset, family = "binomial")
+  m6_summary <- summary(m6)
+  xtabs6 <- xtabs(as.formula(paste("~ factor(", clustering_indicator, ", exclude = NULL) + factor(RiskIDU, exclude = NULL)")), data = dataset)
+
+  # Model 7: HIVDxAge
+  m7 <- glm(as.formula(paste(clustering_indicator, "~ HIVDxAge")), data = dataset, family = "binomial")
+  m7_summary <- summary(m7)
+  hivdxage_summary <- tapply(dataset$HIVDxAge, dataset[[clustering_indicator]], summary)
+
+    return(list(
+    DemoGender_summary = m1_summary,
+    DemoGender_xtabs = xtabs1,
+    DemoRace_summary = m2_summary,
+    DemoRace_xtabs = xtabs2,
+    RecodedSequenceSubtype_summary = m3_summary,
+    RecodedSequenceSubtype_xtabs = xtabs3,
+    RiskMSM_summary = m4_summary,
+    RiskMSM_xtabs = xtabs4,
+    RiskHRH_summary = m5_summary,
+    RiskHRH_xtabs = xtabs5,
+    RiskIDU_summary = m6_summary,
+    RiskIDU_xtabs = xtabs6,
+    HIVDxAge_summary = m7_summary
+  ))
+}
+
+```
+
+### Apply the function
+
+```{r}
+# Run the analysis for the 005 clustering case
+results_005_converse <- run_analysis_clustering(individuals_in_named_pt_net_dt, "005")
+
+# Run the analysis for the 015 clustering case
+results_015_converse <- run_analysis_clustering(individuals_in_named_pt_net_dt, "015")
+
+# Run the analysis for the phyloany clustering case
+results_phyloany_converse <- run_analysis_clustering(individuals_in_named_pt_net_dt, "phyloany")
 ```
 
