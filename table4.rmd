@@ -298,8 +298,7 @@ result_clusteredphyloany <- run_analysis(individuals_dt_w_index_persons_in_clust
 ```
 
 
-## Table 4B: Logistic regression on named partners being genetically linked to the
-index case. 
+## Table 4B: Logistic regression on named partners being genetically linked to the index case. 
 
 ### Prepare the data
 
@@ -329,26 +328,49 @@ named_pts_in_phyloany_clusters_vname <- (named_pt_net %v% "vertex.names")[named_
 
 ```
 
-- For each clustering algorithm, if named partner appears in its cluster,
-code it 1. Else code it 0.
+- For each clustering algorithm, we want to add an indicator column to 
+individuals_in_named_pt_net_dt. 
+The indicator is coded 1 if  individuals_in_named_pt_net_dt$StudyID appears in 
+named_pts_in_005_clusters_vname (for instance), and 0 otherwise. 
 
 ```{r}
 individuals_idx_in_named_pt_net <- which(individuals_dt$StudyID %in% (named_pt_net %v% "vertex.names"))
 individuals_in_named_pt_net_dt <- individuals_dt[individuals_idx_in_named_pt_net,]
 dim(individuals_in_named_pt_net_dt)
 
-individuals_in_named_pt_net_dt$indicator_005_cluster <- 0
-individuals_in_named_pt_net_dt$indicator_015_cluster <- 0
-individuals_in_named_pt_net_dt$indicator_phyloany_cluster <- 0
+individuals_in_named_pt_net_dt <- individuals_in_named_pt_net_dt %>%
+  mutate(indicator_005_cluster = as.numeric(StudyID %in% named_pts_in_005_clusters_vname))
 
-individuals_in_named_pt_net_dt$indicator_005_cluster[which(
-  named_pts_in_005_clusters_vname %in% individuals_in_named_pt_net_dt$StudyID)] <-1
+individuals_in_named_pt_net_dt <- individuals_in_named_pt_net_dt %>%
+  mutate(indicator_015_cluster = as.numeric(StudyID %in% named_pts_in_015_clusters_vname))
 
-individuals_in_named_pt_net_dt$indicator_015_cluster[which(
-  named_pts_in_015_clusters_vname %in% individuals_in_named_pt_net_dt$StudyID)] <-1
+individuals_in_named_pt_net_dt <- individuals_in_named_pt_net_dt %>%
+  mutate(indicator_phyloany_cluster = as.numeric(StudyID %in% named_pts_in_phyloany_clusters_vname))
 
-individuals_in_named_pt_net_dt$indicator_phyloany_cluster[which(
-  named_pts_in_phyloany_clusters_vname %in% individuals_in_named_pt_net_dt$StudyID)] <-1
+```
+
+- Test that the 3 indicator columns are correctly coded/
+
+```{r}
+test_indicator_columns <- function(data, column_name, comparison_vector) {
+  false_positives <- data[data[[column_name]] == 1 & !data$StudyID %in% comparison_vector,]
+  false_negatives <- data[data[[column_name]] == 0 & data$StudyID %in% comparison_vector,]
+  total_indicator_ones <- nrow(data[data[[column_name]] == 1, ])
+  length_of_vname <- length(comparison_vector)
+  
+  cat("Testing:", column_name, "\n")
+  if (nrow(false_positives) == 0 && nrow(false_negatives) == 0 && total_indicator_ones == length_of_vname) {
+    cat("All tests passed for", column_name, "\n\n")
+  } else {
+    cat("There are", nrow(false_positives), "false positives and", nrow(false_negatives), "false negatives.\n")
+    cat("The number of 1's in the", column_name, "column is", total_indicator_ones, "which is not equal to the length of the comparison vector", length_of_vname, "\n\n")
+  }
+}
+
+# Test each indicator column
+test_indicator_columns(individuals_in_named_pt_net_dt, "indicator_005_cluster", named_pts_in_005_clusters_vname)
+test_indicator_columns(individuals_in_named_pt_net_dt, "indicator_015_cluster", named_pts_in_015_clusters_vname)
+test_indicator_columns(individuals_in_named_pt_net_dt, "indicator_phyloany_cluster", named_pts_in_phyloany_clusters_vname)
 
 ```
 
