@@ -349,7 +349,12 @@ individuals_in_named_pt_net_dt <- individuals_in_named_pt_net_dt %>%
 
 ```
 
-- Test that the 3 indicator columns are correctly coded/
+- Test that the 3 indicator columns are correctly coded. 
+The test checks for the following: 
+(1) False positives: StudyIDs marked with an indicator of 1 but not present in the corresponding indicator;
+(2) False negatives: StudyIDs marked with an indicator of 0 but present in the corresponding indicator;
+(3) Length Check: If the total number of rows marked as 1 in the indicator column, which should be equal to the length of named_pts_in_005_clusters_vname.
+
 
 ```{r}
 test_indicator_columns <- function(data, column_name, comparison_vector) {
