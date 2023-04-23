@@ -7,7 +7,7 @@ editor_options:
   chunk_output_type: inline
 ---
 
-### Objective 
+# Objective 
 
 The purpose here is to create a prototype of Table 1 - summarizing demographic
 and behavioral characteristics of index persons and their contacts.
@@ -36,7 +36,37 @@ individuals_dt <- as.data.table(read.csv(paste0(data_dir, "/Individuals.csv")))
 
 ```
 
-### Structure of the **Unified** Individuals' Database 
+## Structure of the Partner Contact Database
+
+```{r}
+dim(net_dt)
+```
+
+The partner data are 4070 observations and 24 variables.
+
+
+How many unique index persons are in the partner database?
+
+```{r}
+# Identify all unique StudyIDFroms 
+unique_persons_dt <- unique(net_dt[,1, with=FALSE])
+nrow(unique_persons_dt)
+
+# Filter the data where StudyIDTo is not empty
+net_dt_without_empty_StudyIDTo <- net_dt[StudyIDTo != ""]
+nrow(net_dt_without_empty_StudyIDTo)
+
+# Count the unique persons in StudyIDFrom column in the filtered dataset
+length(unique(net_dt_without_empty_StudyIDTo$StudyIDFrom))
+
+# Count the unique persons in StudyIDTo column in the filtered dataset
+length(unique(net_dt_without_empty_StudyIDTo$StudyIDTo))
+```
+Number of unique persons in StudyIDFrom column: `r nrow(unique_persons_dt)`.
+
+Number of unique StudyIDFrom's without an empty StudyIDTo: `r length(unique(net_dt_without_empty_StudyIDTo$StudyIDFrom))`. 
+
+## Structure of the **Unified** Individuals' Database 
 
 How many unique persons in the individuals database?
 
@@ -47,9 +77,9 @@ head(individuals_dt)
 nrow(individuals_dt)
 length(unique(individuals_dt$StudyID))
 
-table(substr(individuals_dt$StudyID, 1, 3))
+table(substr(individuals_dt$StudyID, 1, 1))
 ```
-**Note**: There are no persons with "CONTACT" Study ID in the individuals
+**Note**: There are no persons with "CONTACT" Study ID in the unified individuals
 database. 
 
 What is the source of the information of persons in the individuals database?
@@ -59,164 +89,66 @@ table(individuals_dt$Source, exclude = NULL)
 table(individuals_dt$Source, exclude = NULL)/sum(table(individuals_dt$Source, exclude = NULL))
 ```
 
-```{r}
-colnames(individuals_dt)
-#matrix(cbind(1:ncol(individuals_dt), colnames(individuals_dt)), nrow=22, ncol=4)
-```
+
+
+
+
+## Intersection of Two Databases
 
 ```{r}
-individuals_dt[Source=="RIDOH", .SD, .SDcols=c(1:34)]
-lapply(individuals_dt, summary)
-
-summarize_cols <- function(x){
-  if(is.numeric(x)) {
-    summary(x)
-    } else if (!is.numeric(x)) { 
-      table(x)
-    }
-}
-
-#lapply(individuals_dt, summarize_cols)
-```
-
-```{r}
-summary(individuals_dt$HIVDxAge)
-
-individuals_dt[, summary(.SD), .SDcols = "HIVDxAge"]
-
-individuals_dt[Source=="ICDB", summary(.SD), .SDcols = "HIVDxAge"]
-individuals_dt[Source=="RIDOH", summary(.SD), .SDcols = "HIVDxAge"]
-```
-
-```{r}
-individuals_dt[, table(.SD), .SDcols = "Outcome"]
-```
-
-## Structure of the Partner Database
-
-```{r}
-dim(net_dt)
-```
-
-The partner data are 4070 observations and 24 variables.
-
-
-What is the structure of the StudyIDFrom and StudyIDTo columns in the 
-partner database?
-
-The first column is “StudyIDFrom” - persons who are interviewed to obtain partner information. This column includes persons who are recruited because they are reported on by an index person. This column is distributed as: persons who come from ICDB (assigned S numbers, n=1841); who come from the RIDOH database (assigned RIDOH numbers, n= 356), and Contacts (n=1873).
-
-```{r, studyidfrom}
-head(net_dt)
-
-nrow(net_dt)
-length(unique(net_dt$StudyIDFrom))
-
-table(substr(net_dt$StudyIDFrom, 1, 3), exclude = NULL)
-
-table(substr(net_dt$StudyIDFrom, 1, 1), exclude = NULL)
-
-#table(substr(net_dt$StudyIDFrom, 1, 3), exclude = NULL)[["CON"]] + length(unique(net_dt$StudyIDFrom))
-```
-What is the structure of the persons (i.e., "STUDYIDTos") that the StudyIDFrom's 
-are reporting on?
-
-
-```{r, studyidto}
-nrow(net_dt)
-length(unique(net_dt$StudyIDTo))
-
-table(substr(net_dt$StudyIDTo, 1, 1), exclude = NULL)
-```
-
-Distribution of "StudyIDTos" reported by S persons, RIDOH persons, and contacts:
-
-```{r}
-# Reported by S persons
-table(substr(net_dt[which(substr(StudyIDFrom, 1, 1) == "S")]$StudyIDTo, 1, 1), exclude = NULL)
-
-# Reported by R persons
-table(substr(net_dt[which(substr(StudyIDFrom, 1, 1) == "R")]$StudyIDTo, 1, 1), exclude = NULL)
-
-# Reported by Contacts
-table(substr(net_dt[which(substr(StudyIDFrom, 1, 1) == "C")]$StudyIDTo, 1, 1), exclude = NULL)
-```
-
-Characterize the other variables appearing the partner dataset:
-
-### Interview Characteristics
-
-```{r}
-table(stri_sub(net_dt$InterviewID, -1, -1), exclude = NULL)
-table(net_dt$InterviewRank, exclude = NULL)
-table(stri_sub(net_dt$InterviewRank, -1, -1), exclude = NULL)
-table(net_dt$InterviewType, exclude = NULL)
-
-idx_client_newdiag_dt <- net_dt[InterviewType == "Index Client - New diagnosis"]
-idx_client_highvl_dt <- net_dt[InterviewType == "Index Client - In care, high viral load"]
-```
-
-### Referral/Reporting Characteristics of Index Persons
-
-```{r}
-reported_true_dt <- net_dt[which(Reported == "True"),,]
-not_reported_dt <- net_dt[which(Reported == ""),,]
-
-reported_true_dt$IndexHIVTestDate
-nohivtestdt_among_reported_idx <- which(reported_true_dt$IndexHIVTestDate == "")
-reported_true_dt[nohivtestdt_among_reported_idx,]
-
-table(substr(reported_true_dt[nohivtestdt_among_reported_idx,]$StudyIDFrom, 1, 1), 
-      exclude = NULL)
-
-
-```
-
-
-### Characteristics of reported partner contacts
-
-```{r}
-table(net_dt$IdentifiedDate, exclude = NULL)
-table(net_dt$IdentifiedRisk, exclude = NULL)
-table(net_dt$Notify, exclude = NULL)
-table(net_dt$NotifyWho, exclude = NULL)
-table(net_dt$NotifyMethod, exclude = NULL)
-table(net_dt$AlreadyIndexCase, exclude = NULL)
-table(net_dt$ClientReached, exclude = NULL)
-table(net_dt$ClientNotReached, exclude = NULL)
-length(which(net_dt$PartnerServicesOfferedDate != ""))
-#View(net_dt[which(net_dt$PartnerServicesOfferedDate != ""),,])
-net_dt[which(net_dt$PartnerServicesOfferedDate!=""), .N,
-       by="PartnerServicesAccepted"][]
-```
-
-
-### Analyze the individuals who are intervewed in the partner dataset
-How many of the `r length(unique(individuals_dt$StudyID))` individuals appear 
-in the partner database, as ``StudyIDFrom'' or ``StudyIDTo''?
-
-```{r}
-individuals_in_net_dt_studyidfrom <- which(individuals_dt$StudyID %in% net_dt$StudyIDFrom)
+individuals_in_net_dt_studyidfrom <- 
+  which(individuals_dt$StudyID %in% unique_persons_dt$StudyIDFrom)
 length(individuals_in_net_dt_studyidfrom)
 
 individuals_in_net_dt_studyidto <- which(individuals_dt$StudyID %in% net_dt$StudyIDTo)
 length(individuals_in_net_dt_studyidto)
+
+individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo <- 
+  which(individuals_dt$StudyID %in% net_dt_without_empty_StudyIDTo$StudyIDFrom)
+length(individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo)
+
+individuals_in_net_dt_studyidto_witout_empty_StudyIDTo <- 
+  which(individuals_dt$StudyID %in% net_dt_without_empty_StudyIDTo$StudyIDTo)
+length(individuals_in_net_dt_studyidto_witout_empty_StudyIDTo)
 ```
 
-There are `r length(individuals_in_net_dt_studyidfrom)` unique individuals in the
-StudyIDFrom column in the partner contact database. 
+- There are `r length(unique(individuals_dt[individuals_in_net_dt_studyidfrom,]$StudyID))` unique individuals in the Unified Individuals dataset who appear in the Partner 
+Contact database (including with empty StudyIDTos).
 
-### Describe the demographic and behavioral characteristics of the index persons 
-This would include individuals who are also in the partner database (n = `r length(individuals_in_net_dt_studyidfrom)`)
+- There are  `r length(unique(individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo))`
+unique individuals in the Unified Individuals dataset who appear in the Partner 
+Contact database (without any empty StudyIDTos, i.e. they reported on at least 
+one partner).
 
-### [Table "1"](https://docs.google.com/document/d/12g9p5gsKfzjGl-hP524krx7GwZPHGY1UBvMf_7cMo8I/edit#bookmark=id.tc8pri6l7bee)  
+- There are `r length(unique(individuals_in_net_dt_studyidto))` reported 
+unique partners of persons in the Unified Individuals dataset who appear in the 
+partner contact dataset (including StudyIDTos with empty strings).
+
+- There are `r length(unique(individuals_in_net_dt_studyidto_witout_empty_StudyIDTo))` reported 
+unique partners of persons in the Unified Individuals dataset who appear in the 
+Partner Contact dataset  (excluding StudyIDTos with empty strings).
+
+
+
+
+
+## [Table "1"](https://docs.google.com/document/d/12g9p5gsKfzjGl-hP524krx7GwZPHGY1UBvMf_7cMo8I/edit#bookmark=id.tc8pri6l7bee)  
 **Descriptive Characteristics of Index Persons and Partner Contacts**
 
 
 #### By source
 
 ```{r, include=TRUE, echo=TRUE}
-individuals_dt[individuals_in_net_dt_studyidfrom, .(n_source=.N), 
+
+  individuals_dt[individuals_in_net_dt_studyidfrom, .(n_source=.N), 
+               by=.(Source)
+               ][,
+                 "prop":=round(n_source/sum(n_source), 3)
+                 ][
+                 ]
+
+
+  individuals_dt[individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo, .(n_source=.N), 
                by=.(Source)
                ][,
                  "prop":=round(n_source/sum(n_source), 3)
@@ -229,6 +161,7 @@ individuals_dt[individuals_in_net_dt_studyidto, .(n_source=.N),
                  "prop":=round(n_source/sum(n_source), 3)
                  ][
                  ]
+
 ```
 
 #### Gender and Birth Sex
@@ -247,6 +180,21 @@ individuals_dt[individuals_in_net_dt_studyidfrom, .(.N),
                  "prop":=round(N/sum(N), 3)
                  ][
                  ]
+
+individuals_dt[individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo, .(.N), 
+               by=.(DemoGender)
+               ][,
+                 "prop":=round(N/sum(N), 3)
+                 ][
+                 ]
+
+individuals_dt[individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo, .(.N), 
+               by=.(DemoBirthSex)
+               ][,
+                 "prop":=round(N/sum(N), 3)
+                 ][
+                 ]
+
 
 individuals_dt[individuals_in_net_dt_studyidto, .(.N), 
                by=.(DemoGender)
@@ -280,13 +228,17 @@ individuals_dt[individuals_in_net_dt_studyidfrom, .(.N),
                  ][
                  ]
 
-# individuals_dt[individuals_in_net_dt_studyidfrom, .(.N), 
-#                by=.(DemoRace, DemoHispanic)
-#                ][,
-#                  "prop":=round(N/sum(N), 3)
-#                  ][
-#                  ][order(DemoRace)]
+individuals_dt[individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo, .(.N), 
+               by=.(DemoRace)
+               ][,
+                 "prop":=round(N/sum(N), 3)
+                 ][]
 
+individuals_dt[individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo, .(.N), 
+               by=.(DemoHispanic)
+               ][,
+                 "prop":=round(N/sum(N), 3)
+                 ][]
 
 individuals_dt[individuals_in_net_dt_studyidto, .(.N), 
                by=.(DemoRace)
@@ -304,28 +256,6 @@ individuals_dt[individuals_in_net_dt_studyidto, .(.N),
 
 ```
 
-#### Year of HIV Diagnosis 
-
-**Index Persons**
-```{r}
-individuals_dt[individuals_in_net_dt_studyidfrom, .(.N), 
-               by=.(hiv_diag_year=substr(HIVDxDate, 1, 4))
-               ][,
-                 "prop":=round(N/sum(N), 3)
-                 ][order(hiv_diag_year)
-                 ]
-```
-
-
-**Partner Contacts**
-```{r}
-individuals_dt[individuals_in_net_dt_studyidto, .(.N), 
-               by=.(hiv_diag_year=substr(HIVDxDate, 1, 4))
-               ][,
-                 "prop":=round(N/sum(N), 3)
-                 ][order(hiv_diag_year)
-                 ]
-```
 
 #### Age at HIV Diagnosis
 
@@ -365,6 +295,44 @@ knitr::kable(na_hivdxage_cat_dt)
 knitr::kable(individuals_dt[individuals_in_net_dt_studyidfrom, .SD, .SDcols=c("StudyID", "Source", "HIVDxDate", "HIVDxAge", "hivdxage_cat")])
 
 ```
+
+**Index Persons (reporting at least one partner)** 
+
+```{r}
+individuals_dt[individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo, 
+               .(mean=mean(HIVDxAge, na.rm=T), 
+                 median=median(HIVDxAge, na.rm = T), 
+                 sd=sd(HIVDxAge, na.rm = T), 
+                 min=min(HIVDxAge, na.rm = TRUE), 
+                 max=max(HIVDxAge, na.rm=TRUE))
+               ][
+                 ]
+
+## discretized
+breaks = c(0, 19, 25, 35, 45, 55, 100)
+labels = c("<=18", "19-24", "25-34", "35-44", "45-54", ">=55")
+
+individuals_dt[individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo, 
+               hivdxage_cat := 
+                        cut(HIVDxAge, breaks = breaks, 
+                            labels = labels)]
+
+hivdxage_cat_dt <- 
+  individuals_dt[individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo, 
+               .(.N), by=hivdxage_cat][,
+                 "prop":=round(N/sum(N), 3)
+                 ][order(hivdxage_cat)]
+hivdxage_cat_dt
+sum(hivdxage_cat_dt$N)
+
+## Who are the people here who do not have a reported age for diagnosis?
+na_hivdxage_cat_dt <- individuals_dt[intersect(individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo, which(is.na(individuals_dt$hivdxage_cat))),]
+dim(na_hivdxage_cat_dt)
+knitr::kable(na_hivdxage_cat_dt)
+knitr::kable(individuals_dt[individuals_in_net_dt_studyidfrom, .SD, .SDcols=c("StudyID", "Source", "HIVDxDate", "HIVDxAge", "hivdxage_cat")])
+
+```
+
 **Partner Contacts**
 
 ```{r}
@@ -434,6 +402,29 @@ index_persons_dt[which(is.na(hivdiagnosis_year)), .SD, .SDcols=c("StudyID", "Sou
 There are 40 index persons who do not have a reported year of HIV Diagnosis. 
 All of these are persons whose source is RIDOH. 
 
+** Index Persons (reporting at least one contact) **
+
+```{r}
+index_persons_ge1contact_dt <- 
+  individuals_dt[individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo,]
+index_persons_ge1contact_dt[, hivdiagnosis_year := 
+                              as.numeric(substr(HIVDxDate, 1, 4))]
+table(index_persons_ge1contact_dt$hivdiagnosis_year)
+
+breaks = c(0, 2000, 2006, 2011, 2021)
+labels = c("<2000", "2001-2005", "2006-2010", "2011-2020")
+
+index_persons_ge1contact_dt[, hivdiagnosis_year_group := 
+                        cut(hivdiagnosis_year, breaks = breaks, 
+                            labels = labels)]
+table(index_persons_ge1contact_dt$hivdiagnosis_year_group, exclude = NULL)
+
+index_persons_ge1contact_dt[, .(.N), 
+                            by=hivdiagnosis_year_group][,
+                 "prop":=round(N/sum(N), 3)
+                 ][order(hivdiagnosis_year_group)]
+```
+
 **Partner Contacts**
 ```{r}
 partner_contacts_dt <- individuals_dt[individuals_in_net_dt_studyidto,]
@@ -454,40 +445,6 @@ partner_contacts_dt[, .(.N), by=hivdiagnosis_year_group][,
 ```
 
 
-
-
-#### Last HIV Negative Test Year
-
-```{r}
-
-notna_hivlastnegyear <- which(!is.na(individuals_dt$HIVLastNegativeYear))
-
-individuals_dt[intersect(individuals_in_net_dt_studyidfrom, notna_hivlastnegyear), 
-               .(.N), 
-               by=.(HIVLastNegativeYear)
-               ][]
-                 
-
-
-lasthivneg_by_year_dt <-
-  individuals_dt[intersect(individuals_in_net_dt_studyidfrom, notna_hivlastnegyear), .(.N), 
-               by=.(HIVLastNegativeYear)
-               ][,
-                 "prop":=round(N/sum(N), 3)
-                 ][order(HIVLastNegativeYear)
-                 ]
-lasthivneg_by_year_dt
-breaks = c(0, 2000, 2006, 2011, 2021)
-labels = c("<2000", "2001-2005", "2006-2010", "2011-2020")
-
-lasthivneg_by_year_dt[, hivlastnegativeyear_group := 
-                        cut(HIVLastNegativeYear, breaks = breaks, 
-                            labels = labels)]
-
-lasthivneg_by_year_dt[, .(.N), by=hivlastnegativeyear_group][,
-                 "prop":=round(N/sum(N), 3)
-                 ][]
-```
 #### Behavioral Characteristics: MSM, IDU, HRH
 
 **Index Persons**
@@ -504,6 +461,23 @@ index_persons_dt[, .(.N), by=RiskHRH][,
                  "prop":=round(N/sum(N), 3)
                  ][]
 ```
+
+
+**Index Persons (reporting at least one partner)**
+```{r}
+index_persons_ge1contact_dt[, .(.N), by=RiskMSM][,
+                 "prop":=round(N/sum(N), 3)
+                 ][]
+
+index_persons_ge1contact_dt[, .(.N), by=RiskIDU][,
+                 "prop":=round(N/sum(N), 3)
+                 ][]
+
+index_persons_ge1contact_dt[, .(.N), by=RiskHRH][,
+                 "prop":=round(N/sum(N), 3)
+                 ][]
+```
+
 
 **Partner Contacts**
 ```{r}
