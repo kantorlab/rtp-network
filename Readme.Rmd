@@ -1,7 +1,12 @@
 
 ## Descriptive analysis of intersection of Partner Contact and Unified Individual Dataset
 
-This table is currently known as "Table 1". Code to produce the table is at 
+- This table is currently labeled "Table 1". 
+- Code to produce the table is at 
 [descriptives-table.Rmd](https://github.com/kantorlab/rtp-network/blob/69a8cf06cb5f135cb524847e0c5e35e5600eb546/descriptives-table.Rmd).
+- This code does not depend on any other R/Rmd files. It builds straight 
+from the datasets.
+
+
 
 
