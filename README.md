@@ -16,3 +16,11 @@ from the datasets.
 - As above, this code does not depend on any other R/Rmd files. It builds straight 
 from the datasets.
 
+
+## Transmission Clusters and Distribution of Named Partners 
+
+- These data are in the current "Table 3".
+- Code to produce the table is in the 
+[molecular-cluster-analysis.R](https://github.com/kantorlab/rtp-network/blob/9ab426e60e91d5d84730a6f71e8327d6b577c4cf/molecular-cluster-analysis.R#L46-L263) file.
+- This code does not depend on any R/Rmd files.
+
