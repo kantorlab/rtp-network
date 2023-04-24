@@ -24,3 +24,13 @@ from the datasets.
 [molecular-cluster-analysis.R](https://github.com/kantorlab/rtp-network/blob/9ab426e60e91d5d84730a6f71e8327d6b577c4cf/molecular-cluster-analysis.R#L46-L263) file.
 - This code does not depend on any R/Rmd files.
 
+
+## Factors associated with linked partners being named and vice versa.
+
+- These data are in the current "Table 4".
+- Table 4A: Logistic regression on index case being genetically linked to at least one of their named partners.
+- Table 4B:  Logistic regression on index case reporting a named partnership in its genetic cluster(s). 
+- This code uses RDS objects generated in the [molecular-cluster-analysis.R](https://github.com/kantorlab/rtp-network/blob/d051ca218896064a5bbb23aa9eeda4b8e3ecb278/molecular-cluster-analysis.R#L274-L280) file.
+- [Code](https://github.com/kantorlab/rtp-network/blob/d051ca218896064a5bbb23aa9eeda4b8e3ecb278/table4.rmd#L308) for Table 4A.
+- [Code](https://github.com/kantorlab/rtp-network/blob/d051ca218896064a5bbb23aa9eeda4b8e3ecb278/table4.rmd#L311-L471) for Table 4B.
+
