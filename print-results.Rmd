@@ -1,0 +1,38 @@
+---
+title: "Table 4: Regression Results"
+output: 
+  html_notebook
+---
+
+
+```{r setup, include=FALSE}
+rm(list=ls())
+knitr::opts_chunk$set(echo = FALSE,
+                      results = 'hide',
+                      message = FALSE,
+                      root.dir = '~/code/rtp-network/out/')
+library(data.table)
+library(dplyr)
+library(stringi)
+library(network)
+```
+
+```{r}
+results_env <- readRDS("/users/akhann16/code/rtp-network/out/results_objects.rds")
+table4A <- results_env$table4A
+table4B <- results_env$table4B
+```
+
+
+## Correlates of index case being genetically linked to at least one of their named partners
+
+```{r, echo=TRUE, results='markup', echo=TRUE, message=TRUE}
+table4A
+```
+
+## Correlates of index case reporting a named partnership in its genetic cluster(s).
+
+```{r, echo=TRUE, results='markup', echo=TRUE, message=TRUE}
+table4B
+```
+
