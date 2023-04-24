@@ -22,10 +22,20 @@ eda_env <- readRDS("/users/akhann16/code/rtp-network/out/eda_objects.rds")
 
 individuals_dt <- eda_env$individuals_dt
 net_dt <- eda_env$net_dt 
-named_pt_net <- eda_env$named_pt_net
 named_pt_idx_005 <- eda_env$named_pt_idx_005 
 named_pt_idx_015 <- eda_env$named_pt_idx_015
 ```
+# Create a named partner network object
+
+```{r}
+net_dt_mat <- cbind(as.character(net_dt[,1]), as.character(net_dt[,2]))
+net <- as.network(net_dt_mat, bipartite = F, directed = T)
+net
+length(net %v% "vertex.names")
+net %v% "vertex.names"
+named_pt_net <- net
+```
+
 
 # Recode Sequence Subtype as B/non-B (needed for regressions):
 
@@ -460,5 +470,4 @@ results_015_converse <- run_analysis_clustering(individuals_in_named_pt_net_dt, 
 # Run the analysis for the phyloany clustering case
 results_phyloany_converse <- run_analysis_clustering(individuals_in_named_pt_net_dt, "phyloany")
 ```
-
 
