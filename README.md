@@ -32,5 +32,4 @@ from the datasets.
 - Table 4B:  Logistic regression on index case reporting a named partnership in its genetic cluster(s). 
 - This code uses RDS objects generated in the [molecular-cluster-analysis.R](https://github.com/kantorlab/rtp-network/blob/d051ca218896064a5bbb23aa9eeda4b8e3ecb278/molecular-cluster-analysis.R#L274-L280) file.
 - [Code](https://github.com/kantorlab/rtp-network/blob/d051ca218896064a5bbb23aa9eeda4b8e3ecb278/table4.rmd#L308) for Table 4A.
-- [Code](https://github.com/kantorlab/rtp-network/blob/d051ca218896064a5bbb23aa9eeda4b8e3ecb278/table4.rmd#L311-L471) for Table 4B.
-
+- Created a `print-results.Rmd` to make it easier to extract results for writing. Depends on `table4.rmd`.
