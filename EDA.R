@@ -7,6 +7,7 @@ library(dplyr)
 library(network)
 library(sna)
 
+
 # Setup ---------------------------
 
 setwd("/users/akhann16/code/rtp-network/out") #on rstudio (VIA OOD)
@@ -25,7 +26,8 @@ individuals_dt <- read.csv(paste0(data_dir, "/Individuals.csv"))
 dim(net_dt)
 str(net_dt)
 sort(colnames(net_dt))
-View(net_dt)
+#View(net_dt)
+#kntir::kable(net_dt)
 
 dim(individuals_dt)
 colnames(individuals_dt)
@@ -54,7 +56,10 @@ net_dt_r1 <- net_dt %>% filter(InterviewRank == 1)
 
 dim(net_dt_r1)
 str(net_dt_r1)
-View(net_dt_r1)
+#View(net_dt_r1)
+#knitr::kable(net_dt_r1)
+
+
 
 table(net_dt_r1$InterviewRank, exclude = NULL)
 table(net_dt_r1$InterviewRank, exclude = NULL)/sum(table(net_dt_r1$InterviewRank, 
