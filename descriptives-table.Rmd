@@ -44,11 +44,25 @@ dim(net_dt)
 
 The partner data are 4070 observations and 24 variables.
 
+How many unique persons (sources of targets) are in the partner database?
+
+```{r}
+ind_in_partner_db <- unique(c(net_dt$StudyIDFrom, net_dt$StudyIDTo))
+length(ind_in_partner_db)
+```
 
 How many unique index persons are in the partner database?
 
 ```{r}
 # Identify all unique StudyIDFroms 
+length(unique(net_dt$StudyIDFrom))
+
+# Identify all unique StudyIDTos 
+length(unique(net_dt$StudyIDTo))
+
+length(union(unique(net_dt$StudyIDFrom), unique(net_dt$StudyIDTo)))
+
+# Partition the data
 unique_persons_dt <- unique(net_dt[,1, with=FALSE])
 nrow(unique_persons_dt)
 
@@ -66,7 +80,19 @@ Number of unique persons in StudyIDFrom column: `r nrow(unique_persons_dt)`.
 
 Number of unique StudyIDFrom's without an empty StudyIDTo: `r length(unique(net_dt_without_empty_StudyIDTo$StudyIDFrom))`. 
 
-## Structure of the **Unified** Individuals' Database 
+When were the data collected?
+
+```{r}
+table(substr(net_dt$IdentifiedDate, 1, 4), exclude = NULL)
+```
+
+
+
+
+
+
+
+## Structure of the Statewide Unified Individuals' Genomic Database 
 
 How many unique persons in the individuals database?
 
@@ -90,10 +116,20 @@ table(individuals_dt$Source, exclude = NULL)/sum(table(individuals_dt$Source, ex
 ```
 
 
+How many unique clusters are the individuals in? 
+```{r}
+length(unique(individuals_dt$ClusteredHIVTrace005)) 
+length(unique(individuals_dt$ClusteredHIVTrace015)) 
+length(unique(individuals_dt$ClusteredPhyloAny)) 
+```
+
 
 
 
 ## Intersection of Two Databases
+
+How many individuals from the genomics database appear in the partner database,
+as StudyIDFrom, and StudyIDTo?
 
 ```{r}
 individuals_in_net_dt_studyidfrom <- 
@@ -112,6 +148,7 @@ individuals_in_net_dt_studyidto_witout_empty_StudyIDTo <-
 length(individuals_in_net_dt_studyidto_witout_empty_StudyIDTo)
 ```
 
+
 - There are `r length(unique(individuals_dt[individuals_in_net_dt_studyidfrom,]$StudyID))` unique individuals in the Unified Individuals dataset who appear in the Partner 
 Contact database (including with empty StudyIDTos).
 
@@ -128,9 +165,85 @@ partner contact dataset (including StudyIDTos with empty strings).
 unique partners of persons in the Unified Individuals dataset who appear in the 
 Partner Contact dataset  (excluding StudyIDTos with empty strings).
 
+#### How many persons for whom we have sequences appear as both 
+index persons and partners?
+
+```{r}
+intersection_set_from_and_to <- sort(
+  intersect(
+  individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo,
+  individuals_in_net_dt_studyidto_witout_empty_StudyIDTo
+))
+  
+length(intersection_set_from_and_to)
+```
+
+
+#### For how many persons (reported as
+index cases or partners in the PCRS dataset) do we have  
+sequences? 
+
+```{r}
+study_id_from_and_to_in_individuals_dt <- 
+  sort(union(
+  individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo,
+  individuals_in_net_dt_studyidto_witout_empty_StudyIDTo
+  )
+  )
+which(duplicated(study_id_from_and_to_in_individuals_dt) == TRUE)
+length(study_id_from_and_to_in_individuals_dt)
+```
+
+- There are `r length(unique(study_id_from_and_to_in_individuals_dt))` unique
+persons (reported as
+index cases or partners in the PCRS dataset) for whom we have  
+sequences.
+
+Note that these `r length(unique(study_id_from_and_to_in_individuals_dt))`  are comprised of 
+`r length(individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo)` 
+who appear as index cases who are interviewed for PCRS, 
+`r length(individuals_in_net_dt_studyidto_witout_empty_StudyIDTo)` 
+appeared as reported partners and are in the genomics database, and 
+`r length(intersection_set_from_and_to)`
+ appeared as both index persons and partners. 
+
+Note that 
+```{r}
+identical(length(unique(study_id_from_and_to_in_individuals_dt)),
+           (length(individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo) +
+              length(individuals_in_net_dt_studyidto_witout_empty_StudyIDTo) -
+              length(intersection_set_from_and_to)
+            )
+)
+```
+
+567 = 509 + 156 – 98. 
+
+#### How many persons are in the genomic database but not in the PCRS database?
+
+```{r}
+
+length(which(individuals_dt$StudyID %in% ind_in_partner_db == FALSE))
+```
+
+
+#### How many persons are in the PCRS database but not in the genomic database?
+
+```{r}
+length(which(ind_in_partner_db %in% individuals_dt$StudyID == FALSE))
+```
+
+
+#### What are the cluster sizes per the three sequencing techniques 
+of persons who appear in the partner database? 
 
 
 
+```{r}
+length(unique(individuals_dt$ClusteredHIVTrace005[study_id_from_and_to_in_individuals_dt])) 
+length(unique(individuals_dt$ClusteredHIVTrace015[study_id_from_and_to_in_individuals_dt])) 
+length(unique(individuals_dt$ClusteredPhyloAny[study_id_from_and_to_in_individuals_dt])) 
+```
 
 ## [Table "1"](https://docs.google.com/document/d/12g9p5gsKfzjGl-hP524krx7GwZPHGY1UBvMf_7cMo8I/edit#bookmark=id.tc8pri6l7bee)  
 **Descriptive Characteristics of Index Persons and Partner Contacts**
