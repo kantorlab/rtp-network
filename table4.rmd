@@ -307,6 +307,26 @@ result_005 <- run_analysis(individuals_dt_w_index_persons_in_005)
 result_015 <- run_analysis(individuals_dt_w_index_persons_in_015)
 result_clusteredphyloany <- run_analysis(individuals_dt_w_index_persons_in_clusteredphyloany)
 ```
+Display the results for the write-up.
+
+Trace 005: 
+
+```{r, echo=TRUE, message=TRUE, results='markup'}
+result_005
+```
+
+Trace 005: 
+```{r, echo=TRUE, message=TRUE, results='markup'}
+result_015
+```
+
+Clustered Phylo Any:
+```{r, echo=TRUE, message=TRUE, results='markup'}
+result_clusteredphyloany
+```
+
+
+
 
 
 ## Table 4B: Logistic regression on named partners being genetically linked to the index case. 
@@ -471,6 +491,29 @@ results_015_converse <- run_analysis_clustering(individuals_in_named_pt_net_dt, 
 # Run the analysis for the phyloany clustering case
 results_phyloany_converse <- run_analysis_clustering(individuals_in_named_pt_net_dt, "phyloany")
 ```
+
+### Show the results
+
+Trace 005: 
+
+```{r, results='markup'}
+results_005_converse
+```
+
+Trace 015: 
+
+```{r, results='markup'}
+results_015_converse
+```
+
+
+Clustered Phylo Any:
+
+```{r, results='markup'}
+results_phyloany_converse
+```
+
+
 
 # Create a regression results environment and assign the objects to it:
 
