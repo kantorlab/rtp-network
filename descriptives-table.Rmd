@@ -60,7 +60,19 @@ length(unique(net_dt$StudyIDFrom))
 # Identify all unique StudyIDTos 
 length(unique(net_dt$StudyIDTo))
 
+# Identify the union of the two above
 length(union(unique(net_dt$StudyIDFrom), unique(net_dt$StudyIDTo)))
+
+# Identify their intersection
+length(intersect(unique(net_dt$StudyIDFrom), unique(net_dt$StudyIDTo)))
+
+# Test the cardinality of the above sets
+len_studyidfrom <- length(unique(net_dt$StudyIDFrom))
+len_studyidto <- length(unique(net_dt$StudyIDTo))
+len_union <- length(union(unique(net_dt$StudyIDFrom), unique(net_dt$StudyIDTo)))
+len_intersection <- length(intersect(unique(net_dt$StudyIDFrom), unique(net_dt$StudyIDTo)))
+
+len_union == len_studyidfrom + len_studyidto - len_intersection
 
 # Partition the data
 unique_persons_dt <- unique(net_dt[,1, with=FALSE])
@@ -126,15 +138,23 @@ length(unique(individuals_dt$ClusteredPhyloAny))
 
 
 
-## Intersection of Two Databases
+## Intersection of the Two Databases
+
 
 How many individuals from the genomics database appear in the partner database,
 as StudyIDFrom, and StudyIDTo?
 
 ```{r}
 individuals_in_net_dt_studyidfrom <- 
-  which(individuals_dt$StudyID %in% unique_persons_dt$StudyIDFrom)
+  which(individuals_dt$StudyID %in% net_dt$StudyIDFrom)
 length(individuals_in_net_dt_studyidfrom)
+
+individuals_in_net_dt_studyidto <- which(individuals_dt$StudyID %in% net_dt$StudyIDTo)
+length(individuals_in_net_dt_studyidto)
+
+individuals_in_net_dt_studyidfrom_or_to <- 
+  which(individuals_dt$StudyID %in% c(net_dt$StudyIDFrom, net_dt$StudyIDTo))
+length(individuals_in_net_dt_studyidfrom_or_to)
 
 individuals_in_net_dt_studyidto <- which(individuals_dt$StudyID %in% net_dt$StudyIDTo)
 length(individuals_in_net_dt_studyidto)
@@ -178,8 +198,47 @@ intersection_set_from_and_to <- sort(
 length(intersection_set_from_and_to)
 ```
 
+Of the newly diagnosed persons in the contact tracing database, 
+for how many do we have sequences and how many are in clusters? 
+How many are clustered with someone who named them?
 
-#### For how many persons (reported as
+```{r}
+table(individuals_dt[individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo]$ClusteredPhyloAny, 
+      exclude = NULL)
+sum(table(individuals_dt[individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo]$ClusteredPhyloAny, 
+      exclude = NULL))
+```
+
+
+Of the partners of the newly diagnosed persons in the contact tracing database, 
+how many are clustered? How many are clustered with someone who named them?
+
+```{r}
+table(individuals_dt[individuals_in_net_dt_studyidto_witout_empty_StudyIDTo]$ClusteredPhyloAny, 
+      exclude = NULL)
+sum(table(individuals_dt[individuals_in_net_dt_studyidto_witout_empty_StudyIDTo]$ClusteredPhyloAny, 
+      exclude = NULL))
+```
+
+
+
+
+What is the Jaccard Similarity Coefficient for the individuals database and partner contact tracing database?
+
+```{r}
+study_ids_ctdb <- unique(c(net_dt$StudyIDFrom, net_dt$StudyIDTo))
+study_ids_gdb <- individuals_dt$StudyID
+
+intersection <- length(intersect(study_ids_ctdb, study_ids_gdb))
+union <- length(unique(c(study_ids_ctdb, study_ids_gdb)))
+
+jaccard_similarity <- intersection / union
+
+```
+
+The Jaccard Similarity Index is `r jaccard_similarity`.
+
+For how many persons (reported as
 index cases or partners in the PCRS dataset) do we have  
 sequences? 
 
