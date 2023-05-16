@@ -312,75 +312,75 @@ length(unique(individuals_dt$ClusteredPhyloAny[study_id_from_and_to_in_individua
 
 ```{r, include=TRUE, echo=TRUE}
 
-  individuals_dt[individuals_in_net_dt_studyidfrom, .(n_source=.N), 
-               by=.(Source)
-               ][,
-                 "prop":=round(n_source/sum(n_source), 3)
-                 ][
-                 ]
-
-
-  individuals_dt[individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo, .(n_source=.N), 
-               by=.(Source)
-               ][,
-                 "prop":=round(n_source/sum(n_source), 3)
-                 ][
-                 ]
-
-individuals_dt[individuals_in_net_dt_studyidto, .(n_source=.N), 
-               by=.(Source)
-               ][,
-                 "prop":=round(n_source/sum(n_source), 3)
-                 ][
-                 ]
+#   individuals_dt[individuals_in_net_dt_studyidfrom, .(n_source=.N), 
+#                by=.(Source)
+#                ][,
+#                  "prop":=round(n_source/sum(n_source), 3)
+#                  ][
+#                  ]
+# 
+# 
+#   individuals_dt[individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo, .(n_source=.N), 
+#                by=.(Source)
+#                ][,
+#                  "prop":=round(n_source/sum(n_source), 3)
+#                  ][
+#                  ]
+# 
+# individuals_dt[individuals_in_net_dt_studyidto, .(n_source=.N), 
+#                by=.(Source)
+#                ][,
+#                  "prop":=round(n_source/sum(n_source), 3)
+#                  ][
+#                  ]
 
 ```
 
 #### Gender and Birth Sex
 
 ```{r, include=TRUE, echo=TRUE}
-individuals_dt[individuals_in_net_dt_studyidfrom, .(.N), 
-               by=.(DemoGender)
-               ][,
-                 "prop":=round(N/sum(N), 3)
-                 ][
-                 ]
-
-individuals_dt[individuals_in_net_dt_studyidfrom, .(.N), 
-               by=.(DemoBirthSex)
-               ][,
-                 "prop":=round(N/sum(N), 3)
-                 ][
-                 ]
-
-individuals_dt[individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo, .(.N), 
-               by=.(DemoGender)
-               ][,
-                 "prop":=round(N/sum(N), 3)
-                 ][
-                 ]
-
-individuals_dt[individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo, .(.N), 
-               by=.(DemoBirthSex)
-               ][,
-                 "prop":=round(N/sum(N), 3)
-                 ][
-                 ]
-
-
-individuals_dt[individuals_in_net_dt_studyidto, .(.N), 
-               by=.(DemoGender)
-               ][,
-                 "prop":=round(N/sum(N), 3)
-                 ][
-                 ]
-
-individuals_dt[individuals_in_net_dt_studyidto, .(.N), 
-               by=.(DemoBirthSex)
-               ][,
-                 "prop":=round(N/sum(N), 3)
-                 ][
-                 ]
+# individuals_dt[individuals_in_net_dt_studyidfrom, .(.N), 
+#                by=.(DemoGender)
+#                ][,
+#                  "prop":=round(N/sum(N), 3)
+#                  ][
+#                  ]
+# 
+# individuals_dt[individuals_in_net_dt_studyidfrom, .(.N), 
+#                by=.(DemoBirthSex)
+#                ][,
+#                  "prop":=round(N/sum(N), 3)
+#                  ][
+#                  ]
+# 
+# individuals_dt[individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo, .(.N), 
+#                by=.(DemoGender)
+#                ][,
+#                  "prop":=round(N/sum(N), 3)
+#                  ][
+#                  ]
+# 
+# individuals_dt[individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo, .(.N), 
+#                by=.(DemoBirthSex)
+#                ][,
+#                  "prop":=round(N/sum(N), 3)
+#                  ][
+#                  ]
+# 
+# 
+# individuals_dt[individuals_in_net_dt_studyidto, .(.N), 
+#                by=.(DemoGender)
+#                ][,
+#                  "prop":=round(N/sum(N), 3)
+#                  ][
+#                  ]
+# 
+# individuals_dt[individuals_in_net_dt_studyidto, .(.N), 
+#                by=.(DemoBirthSex)
+#                ][,
+#                  "prop":=round(N/sum(N), 3)
+#                  ][
+#                  ]
 ```
 
 #### Race and Ethnicity
@@ -464,7 +464,11 @@ sum(hivdxage_cat_dt$N)
 na_hivdxage_cat_dt <- individuals_dt[intersect(individuals_in_net_dt_studyidfrom, which(is.na(individuals_dt$hivdxage_cat))),]
 dim(na_hivdxage_cat_dt)
 knitr::kable(na_hivdxage_cat_dt)
-knitr::kable(individuals_dt[individuals_in_net_dt_studyidfrom, .SD, .SDcols=c("StudyID", "Source", "HIVDxDate", "HIVDxAge", "hivdxage_cat")])
+knitr::kable(individuals_dt[individuals_in_net_dt_studyidfrom, .SD, .SDcols=c("StudyID", 
+                                                                              #"Source", 
+                                                                              "HIVDxDate", 
+                                                                              "HIVDxAge", 
+                                                                              "hivdxage_cat")])
 
 ```
 
@@ -501,7 +505,11 @@ sum(hivdxage_cat_dt$N)
 na_hivdxage_cat_dt <- individuals_dt[intersect(individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo, which(is.na(individuals_dt$hivdxage_cat))),]
 dim(na_hivdxage_cat_dt)
 knitr::kable(na_hivdxage_cat_dt)
-knitr::kable(individuals_dt[individuals_in_net_dt_studyidfrom, .SD, .SDcols=c("StudyID", "Source", "HIVDxDate", "HIVDxAge", "hivdxage_cat")])
+knitr::kable(individuals_dt[individuals_in_net_dt_studyidfrom, .SD, .SDcols=c("StudyID", 
+                                                                              #"Source", 
+                                                                              "HIVDxDate", 
+                                                                              "HIVDxAge", 
+                                                                              "hivdxage_cat")])
 
 ```
 
@@ -538,12 +546,16 @@ sum(hivdxage_cat_dt$N)
 na_hivdxage_cat_dt <- individuals_dt[intersect(individuals_in_net_dt_studyidto, which(is.na(individuals_dt$hivdxage_cat))),]
 dim(na_hivdxage_cat_dt)
 knitr::kable(na_hivdxage_cat_dt)
-knitr::kable(individuals_dt[individuals_in_net_dt_studyidto, .SD, .SDcols=c("StudyID", "Source", "HIVDxDate", "HIVDxAge", "hivdxage_cat")])
+knitr::kable(individuals_dt[individuals_in_net_dt_studyidto, .SD, .SDcols=c("StudyID", 
+                                                                            #"Source", 
+                                                                            "HIVDxDate", 
+                                                                            "HIVDxAge", 
+                                                                            "hivdxage_cat")])
 
 ```
 
 ```{r}
-individuals_dt[individuals_in_net_dt_studyidfrom, lapply(.SD, function (x) length(x)), by=Source]
+#individuals_dt[individuals_in_net_dt_studyidfrom, lapply(.SD, function (x) length(x)), by=Source]
 ```
 
 #### HIV Diagnosis Year
@@ -568,7 +580,13 @@ index_persons_dt[, .(.N), by=hivdiagnosis_year_group][,
 ```
 
 ```{r}
-index_persons_dt[which(is.na(hivdiagnosis_year)), .SD, .SDcols=c("StudyID", "Source", "DemoGender", "HIVDxDate", "HIVDxAge", "hivdiagnosis_year", "hivdiagnosis_year_group")]
+index_persons_dt[which(is.na(hivdiagnosis_year)), .SD, .SDcols=c("StudyID", 
+                                                                 #"Source", 
+                                                                 "DemoGender", 
+                                                                 "HIVDxDate", 
+                                                                 "HIVDxAge", 
+                                                                 "hivdiagnosis_year", 
+                                                                 "hivdiagnosis_year_group")]
 ```
 
 There are 40 index persons who do not have a reported year of HIV Diagnosis. 
@@ -629,7 +647,7 @@ index_persons_dt[, .(.N), by=RiskIDU][,
                  "prop":=round(N/sum(N), 3)
                  ][]
 
-index_persons_dt[, .(.N), by=RiskHRH][,
+index_persons_dt[, .(.N), by=RiskHeterosexual][,
                  "prop":=round(N/sum(N), 3)
                  ][]
 ```
@@ -645,7 +663,7 @@ index_persons_ge1contact_dt[, .(.N), by=RiskIDU][,
                  "prop":=round(N/sum(N), 3)
                  ][]
 
-index_persons_ge1contact_dt[, .(.N), by=RiskHRH][,
+index_persons_ge1contact_dt[, .(.N), by=RiskHeterosexual][,
                  "prop":=round(N/sum(N), 3)
                  ][]
 ```
@@ -661,7 +679,7 @@ partner_contacts_dt[, .(.N), by=RiskIDU][,
                  "prop":=round(N/sum(N), 3)
                  ][]
 
-partner_contacts_dt[, .(.N), by=RiskHRH][,
+partner_contacts_dt[, .(.N), by=RiskHeterosexual][,
                  "prop":=round(N/sum(N), 3)
                  ][]
 ```
@@ -857,7 +875,7 @@ Number of index persons (with named partners) who identify as HRH:
 
 ```{r}
 individuals_dt_of_hrh_who_named_partners <-
-  individuals_dt[StudyID %in% IPs_reporting_partners_in_unified_dt & RiskHRH == "True",,]
+  individuals_dt[StudyID %in% IPs_reporting_partners_in_unified_dt & RiskHeterosexual == "True",,]
 nrow(individuals_dt_of_hrh_who_named_partners)
 ```
 
