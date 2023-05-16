@@ -1,8 +1,6 @@
 ---
-title: "Table 4 regressions"
-output: 
-  html_notebook:
-    toc: FALSE
+title: "R Notebook"
+output: html_notebook
 ---
 
 # Setup
@@ -34,6 +32,7 @@ net_dt_mat <- cbind(as.character(net_dt[,1]), as.character(net_dt[,2]))
 net <- as.network(net_dt_mat, bipartite = F, directed = T)
 net
 length(net %v% "vertex.names")
+net %v% "vertex.names"
 named_pt_net <- net
 ```
 
@@ -269,9 +268,9 @@ run_analysis <- function(dataset) {
   xtabs4 <- xtabs(~ factor(named_partner_indicator, exclude = NULL) + factor(RiskMSM, exclude = NULL), data = dataset)
 
   # Model 5: RiskHRH
-  m5 <- glm(named_partner_indicator ~ RiskHRH, data = dataset, family = "binomial")
+  m5 <- glm(named_partner_indicator ~ RiskHeterosexual, data = dataset, family = "binomial")
   m5_summary <- summary(m5)
-  xtabs5 <- xtabs(~ factor(named_partner_indicator, exclude = NULL) + factor(RiskHRH, exclude = NULL), data = dataset)
+  xtabs5 <- xtabs(~ factor(named_partner_indicator, exclude = NULL) + factor(RiskHeterosexual, exclude = NULL), data = dataset)
 
   # Model 6: RiskIDU
   m6 <- glm(named_partner_indicator ~ RiskIDU, data = dataset, family = "binomial")
@@ -307,26 +306,6 @@ result_005 <- run_analysis(individuals_dt_w_index_persons_in_005)
 result_015 <- run_analysis(individuals_dt_w_index_persons_in_015)
 result_clusteredphyloany <- run_analysis(individuals_dt_w_index_persons_in_clusteredphyloany)
 ```
-Display the results for the write-up.
-
-Trace 005: 
-
-```{r, echo=TRUE, message=TRUE, results='markup'}
-result_005
-```
-
-Trace 005: 
-```{r, echo=TRUE, message=TRUE, results='markup'}
-result_015
-```
-
-Clustered Phylo Any:
-```{r, echo=TRUE, message=TRUE, results='markup'}
-result_clusteredphyloany
-```
-
-
-
 
 
 ## Table 4B: Logistic regression on named partners being genetically linked to the index case. 
@@ -446,9 +425,9 @@ run_analysis_clustering <- function(dataset, clustering_type) {
   xtabs4 <- xtabs(as.formula(paste("~ factor(", clustering_indicator, ", exclude = NULL) + factor(RiskMSM, exclude = NULL)")), data = dataset)
 
   # Model 5: RiskHRH
-  m5 <- glm(as.formula(paste(clustering_indicator, "~ RiskHRH")), data = dataset, family = "binomial")
+  m5 <- glm(as.formula(paste(clustering_indicator, "~ RiskHeterosexual")), data = dataset, family = "binomial")
   m5_summary <- summary(m5)
-  xtabs5 <- xtabs(as.formula(paste("~ factor(", clustering_indicator, ", exclude = NULL) + factor(RiskHRH, exclude = NULL)")), data = dataset)
+  xtabs5 <- xtabs(as.formula(paste("~ factor(", clustering_indicator, ", exclude = NULL) + factor(RiskHeterosexual, exclude = NULL)")), data = dataset)
 
   # Model 6: RiskIDU
   m6 <- glm(as.formula(paste(clustering_indicator, "~ RiskIDU")), data = dataset, family = "binomial")
@@ -491,41 +470,3 @@ results_015_converse <- run_analysis_clustering(individuals_in_named_pt_net_dt, 
 # Run the analysis for the phyloany clustering case
 results_phyloany_converse <- run_analysis_clustering(individuals_in_named_pt_net_dt, "phyloany")
 ```
-
-### Show the results
-
-Trace 005: 
-
-```{r, results='markup'}
-results_005_converse
-```
-
-Trace 015: 
-
-```{r, results='markup'}
-results_015_converse
-```
-
-
-Clustered Phylo Any:
-
-```{r, results='markup'}
-results_phyloany_converse
-```
-
-
-
-# Create a regression results environment and assign the objects to it:
-
-```{r}
-results_4A <- as.list(c(result_005, result_015, result_clusteredphyloany)) 
-results_4B <- as.list(c(results_005_converse, results_015_converse, results_phyloany_converse)) 
-
-results_env <- new.env()
-results_env$table4A <- results_4A
-results_env$table4B <- results_4B
-
-# Save the environment as an RDS file
-saveRDS(results_env, "results_objects.rds")
-```
-
