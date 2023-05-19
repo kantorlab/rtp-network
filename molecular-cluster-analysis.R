@@ -45,9 +45,9 @@ substrRight <- function(x, n){
 
 # How many unique clusters are the individuals in? ---------------------------
 
-unique(individuals_dt$ClusteredHIVTrace005) #161 unique clusters
-unique(individuals_dt$ClusteredHIVTrace015) #256 unique clusters
-unique(individuals_dt$ClusteredPhyloAny) #351 unique clusters
+length(unique(individuals_dt$ClusteredHIVTrace005))
+length(unique(individuals_dt$ClusteredHIVTrace015))
+length(unique(individuals_dt$ClusteredPhyloAny))
 
 sort(table(individuals_dt$ClusteredHIVTrace005, exclude = NULL)) #cluster sizes at 0.05% distance
 sort(table(individuals_dt$ClusteredHIVTrace015, exclude = NULL)) #cluster sizes at 0.15% distance
@@ -56,9 +56,9 @@ sort(table(individuals_dt$ClusteredPhyloAny, exclude = NULL)) #ClusteredPhyloAny
 
 # How many unique molecular clusters have only one individual? ---------------------------
 
-length(which(table(individuals_dt$ClusteredHIVTrace005) == 1)) #34 clusters only have 1 member
-length(which(table(individuals_dt$ClusteredHIVTrace015) == 1)) #35 clusters only have 1 member
-length(which(table(individuals_dt$ClusteredPhyloAny) == 1)) #35 clusters only have 1 member
+length(which(table(individuals_dt$ClusteredHIVTrace005) == 1)) #0
+length(which(table(individuals_dt$ClusteredHIVTrace015) == 1)) #0
+length(which(table(individuals_dt$ClusteredPhyloAny) == 1)) #0
 
 cluster_sizes_005 <- table(individuals_dt$ClusteredHIVTrace005)
 cluster_sizes_015 <- table(individuals_dt$ClusteredHIVTrace015)
