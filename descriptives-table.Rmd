@@ -124,6 +124,8 @@ length(unique(individuals_dt$StudyID))
 
 table(substr(individuals_dt$StudyID, 1, 1))
 ```
+<span style="background-color: #FFFF00"> And the SDB included sequences from `r length(unique(individuals_dt$StudyID))` persons. </span>
+
 **Note**: There are no persons with "CONTACT" Study ID in the unified individuals
 database. 
 
