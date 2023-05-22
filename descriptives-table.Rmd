@@ -51,6 +51,8 @@ ind_in_partner_db <- unique(c(net_dt$StudyIDFrom, net_dt$StudyIDTo))
 length(ind_in_partner_db)
 ```
 
+
+
 How many unique index persons are in the partner database?
 
 ```{r}
@@ -88,6 +90,11 @@ length(unique(net_dt_without_empty_StudyIDTo$StudyIDFrom))
 # Count the unique persons in StudyIDTo column in the filtered dataset
 length(unique(net_dt_without_empty_StudyIDTo$StudyIDTo))
 ```
+
+<span style="background-color: #FFFF00">
+> The CTDB included disease intervention specialist interview data from `r length(length(ind_in_partner_db))` unique persons (`r length(unique(net_dt$StudyIDFrom))` newly diagnosed; `r length(unique(net_dt$StudyIDTo))` named partners). 
+</span>
+
 Number of unique persons in StudyIDFrom column: `r nrow(unique_persons_dt)`.
 
 Number of unique StudyIDFrom's without an empty StudyIDTo: `r length(unique(net_dt_without_empty_StudyIDTo$StudyIDFrom))`. 
@@ -117,6 +124,8 @@ length(unique(individuals_dt$StudyID))
 
 table(substr(individuals_dt$StudyID, 1, 1))
 ```
+<span style="background-color: #FFFF00"> And the SDB included sequences from `r length(unique(individuals_dt$StudyID))` persons. </span>
+
 **Note**: There are no persons with "CONTACT" Study ID in the unified individuals
 database. 
 
@@ -136,7 +145,7 @@ length(unique(individuals_dt$ClusteredPhyloAny))
 ```
 
 
-
+<span style="background-color: #FFFF00">  There are `r length(unique(individuals_dt$ClusteredPhyloAny))` molecular clusters identified using the ClusteredPhyloAny technique. </span>
 
 ## Intersection of the Two Databases
 
@@ -169,8 +178,8 @@ length(individuals_in_net_dt_studyidto_witout_empty_StudyIDTo)
 ```
 
 
-- There are `r length(unique(individuals_dt[individuals_in_net_dt_studyidfrom,]$StudyID))` unique individuals in the Unified Individuals dataset who appear in the Partner 
-Contact database (including with empty StudyIDTos).
+- <span style="background-color: #FFFF00">  There are `r length(unique(individuals_dt[individuals_in_net_dt_studyidfrom,]$StudyID))` unique individuals in the Unified Individuals dataset who appear in the Partner 
+Contact database (including with empty StudyIDTos).  </span>
 
 - There are  `r length(unique(individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo))`
 unique individuals in the Unified Individuals dataset who appear in the Partner 
@@ -209,9 +218,19 @@ sum(table(individuals_dt[individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo]$Cl
       exclude = NULL))
 ```
 
+Ans: 
+
+
+* <span style="background-color: #FFFF00"> Number of newly diagnosed persons in the contact tracing database = 
+  `r length(individuals_in_net_dt_studyidfrom)` </span>
+  
+*  <span style="background-color: #FFFF00"> Of these, `r sum(table(individuals_dt[individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo]$ClusteredPhyloAny, exclude = NULL))` persons provided partner data. </span>
+
+* <span style="background-color: #FFFF00"> Of these, `r length(which(!is.na(individuals_dt[individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo]$ClusteredPhyloAny)))` are clustered phylogenetically.</span>
+
 
 Of the partners of the newly diagnosed persons in the contact tracing database, 
-how many are clustered? How many are clustered with someone who named them?
+how many nominated other persons? How many are clustered with someone who named them?
 
 ```{r}
 table(individuals_dt[individuals_in_net_dt_studyidto_witout_empty_StudyIDTo]$ClusteredPhyloAny, 
@@ -221,6 +240,12 @@ sum(table(individuals_dt[individuals_in_net_dt_studyidto_witout_empty_StudyIDTo]
 ```
 
 
+Ans:   
+
+*  <span style="background-color: #FFFF00"> Of the partners of the newly diagnosed persons in the contact tracing database, 
+`r sum(table(individuals_dt[individuals_in_net_dt_studyidto_witout_empty_StudyIDTo]$ClusteredPhyloAny, exclude = NULL))` nominated other persons. </span>
+
+*  <span style="background-color: #FFFF00"> Of these, `r length(which(!is.na(individuals_dt[individuals_in_net_dt_studyidto_witout_empty_StudyIDTo]$ClusteredPhyloAny)))` clustered phylogenetically with someone who named them. </span>
 
 
 What is the Jaccard Similarity Coefficient for the individuals database and partner contact tracing database?
@@ -236,7 +261,7 @@ jaccard_similarity <- intersection / union
 
 ```
 
-The Jaccard Similarity Index is `r jaccard_similarity`.
+ <span style="background-color: #FFFF00"> The Jaccard Similarity Index is `r jaccard_similarity`. </span>
 
 For how many persons (reported as
 index cases or partners in the PCRS dataset) do we have  
@@ -286,16 +311,23 @@ length(which(individuals_dt$StudyID %in% ind_in_partner_db == FALSE))
 ```
 
 
+<span style="background-color: #FFFF00"> 
+* N = `r length(which(individuals_dt$StudyID %in% ind_in_partner_db == FALSE))` persons are in the genomic database but not in the PCRS database. </span>
+
+
+
 #### How many persons are in the PCRS database but not in the genomic database?
 
 ```{r}
 length(which(ind_in_partner_db %in% individuals_dt$StudyID == FALSE))
 ```
 
+<span style="background-color: #FFFF00"> 
+N = `r length(which(ind_in_partner_db %in% individuals_dt$StudyID == FALSE))`
+persons are in the PCRS database but not in the genomic database. </span>
 
 #### What are the cluster sizes per the three sequencing techniques 
 of persons who appear in the partner database? 
-
 
 
 ```{r}
