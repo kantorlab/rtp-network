@@ -145,7 +145,7 @@ length(unique(individuals_dt$ClusteredPhyloAny))
 ```
 
 
-
+<span style="background-color: #FFFF00">  There are `r length(unique(individuals_dt$ClusteredPhyloAny))` molecular clusters identified using the ClusteredPhyloAny technique. </span>
 
 ## Intersection of the Two Databases
 
