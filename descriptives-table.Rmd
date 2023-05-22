@@ -92,7 +92,7 @@ length(unique(net_dt_without_empty_StudyIDTo$StudyIDTo))
 ```
 
 <span style="background-color: #FFFF00">
-> The CTDB included disease intervention specialist interview data from `r length(length(ind_in_partner_db))` unique persons (`r length(unique(net_dt$StudyIDFrom))` newly diagnosed; `r length(unique(net_dt$StudyIDTo))` named partners). 
+> The CTDB included disease intervention specialist interview data from `r length(ind_in_partner_db)` unique persons (`r length(unique(net_dt$StudyIDFrom))` newly diagnosed; `r length(unique(net_dt$StudyIDTo))` named partners). 
 </span>
 
 Number of unique persons in StudyIDFrom column: `r nrow(unique_persons_dt)`.
