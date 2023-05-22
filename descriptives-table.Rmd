@@ -209,9 +209,17 @@ sum(table(individuals_dt[individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo]$Cl
       exclude = NULL))
 ```
 
+Ans: 
+
+* Number of newly diagnosed persons in the contact tracing database = 
+  `r length(individuals_in_net_dt_studyidfrom)`
+  
+* Of these, `r sum(table(individuals_dt[individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo]$ClusteredPhyloAny, exclude = NULL))` persons provided partner data. 
+
+* Of these, `r length(which(!is.na(individuals_dt[individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo]$ClusteredPhyloAny)))` are clustered phylogenetically.
 
 Of the partners of the newly diagnosed persons in the contact tracing database, 
-how many are clustered? How many are clustered with someone who named them?
+how many nominated other persons? How many are clustered with someone who named them?
 
 ```{r}
 table(individuals_dt[individuals_in_net_dt_studyidto_witout_empty_StudyIDTo]$ClusteredPhyloAny, 
@@ -221,6 +229,12 @@ sum(table(individuals_dt[individuals_in_net_dt_studyidto_witout_empty_StudyIDTo]
 ```
 
 
+Ans:   
+
+* Of the partners of the newly diagnosed persons in the contact tracing database, 
+`r sum(table(individuals_dt[individuals_in_net_dt_studyidto_witout_empty_StudyIDTo]$ClusteredPhyloAny, exclude = NULL))` nominated other persons.
+
+* Of these, `r length(which(!is.na(individuals_dt[individuals_in_net_dt_studyidto_witout_empty_StudyIDTo]$ClusteredPhyloAny)))` clustered phylogenetically with someone who named them.
 
 
 What is the Jaccard Similarity Coefficient for the individuals database and partner contact tracing database?
