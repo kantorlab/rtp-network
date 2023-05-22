@@ -335,6 +335,13 @@ length(unique(individuals_dt$ClusteredHIVTrace005[study_id_from_and_to_in_indivi
 length(unique(individuals_dt$ClusteredHIVTrace015[study_id_from_and_to_in_individuals_dt])) 
 length(unique(individuals_dt$ClusteredPhyloAny[study_id_from_and_to_in_individuals_dt])) 
 ```
+  
+  
+* <span style="background-color: #FFFF00"> Of the 
+`r length(unique(individuals_dt$ClusteredPhyloAny))` 
+molecular clusters identified, 
+`r length(unique(individuals_dt$ClusteredPhyloAny[study_id_from_and_to_in_individuals_dt]))`
+consisted of persons also in the CTDB. </span>*
 
 ## [Table "1"](https://docs.google.com/document/d/12g9p5gsKfzjGl-hP524krx7GwZPHGY1UBvMf_7cMo8I/edit#bookmark=id.tc8pri6l7bee)  
 **Descriptive Characteristics of Index Persons and Partner Contacts**
