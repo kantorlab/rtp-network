@@ -178,8 +178,8 @@ length(individuals_in_net_dt_studyidto_witout_empty_StudyIDTo)
 ```
 
 
-- There are `r length(unique(individuals_dt[individuals_in_net_dt_studyidfrom,]$StudyID))` unique individuals in the Unified Individuals dataset who appear in the Partner 
-Contact database (including with empty StudyIDTos).
+- <span style="background-color: #FFFF00">  There are `r length(unique(individuals_dt[individuals_in_net_dt_studyidfrom,]$StudyID))` unique individuals in the Unified Individuals dataset who appear in the Partner 
+Contact database (including with empty StudyIDTos).  </span>
 
 - There are  `r length(unique(individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo))`
 unique individuals in the Unified Individuals dataset who appear in the Partner 
@@ -311,16 +311,23 @@ length(which(individuals_dt$StudyID %in% ind_in_partner_db == FALSE))
 ```
 
 
+<span style="background-color: #FFFF00"> 
+* N = `r length(which(individuals_dt$StudyID %in% ind_in_partner_db == FALSE))` persons are in the genomic database but not in the PCRS database. </span>
+
+
+
 #### How many persons are in the PCRS database but not in the genomic database?
 
 ```{r}
 length(which(ind_in_partner_db %in% individuals_dt$StudyID == FALSE))
 ```
 
+<span style="background-color: #FFFF00"> 
+N = `r length(which(ind_in_partner_db %in% individuals_dt$StudyID == FALSE))`
+persons are in the PCRS database but not in the genomic database. </span>
 
 #### What are the cluster sizes per the three sequencing techniques 
 of persons who appear in the partner database? 
-
 
 
 ```{r}
