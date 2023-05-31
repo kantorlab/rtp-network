@@ -18,7 +18,7 @@ ls()
 
 # Read data ---------------------------
 
-data_dir <- "/gpfs/data/rkantor/rtp/datasets/D50_20230412_unified/"
+data_dir <- "/gpfs/data/rkantor/rtp/datasets/D51_20230512_unified"
 list.files(path=data_dir)
 net_dt <- read.csv(paste0(data_dir, "/ContactTracingNetwork.csv"))
 individuals_dt <- read.csv(paste0(data_dir, "/Individuals.csv"))
