@@ -42,7 +42,7 @@ individuals_dt <- as.data.table(read.csv(paste0(data_dir, "/Individuals.csv")))
 dim(net_dt)
 ```
 
-The partner data are 4070 observations and 24 variables.
+The partner data are `r nrow(net_dt)` observations and `r `ncol(net_dt)` variables.
 
 How many unique persons (sources of targets) are in the partner database?
 
@@ -50,7 +50,6 @@ How many unique persons (sources of targets) are in the partner database?
 ind_in_partner_db <- unique(c(net_dt$StudyIDFrom, net_dt$StudyIDTo))
 length(ind_in_partner_db)
 ```
-
 
 
 How many unique index persons are in the partner database?
