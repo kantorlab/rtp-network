@@ -28,9 +28,9 @@ library(network)
 
 
 ```{r read_data, include=FALSE}
-data_dir <- "/gpfs/data/rkantor/rtp/datasets/D50_20230412_unified"
+data_dir <- "/gpfs/data/rkantor/rtp/datasets/D51_20230512_unified"
 list.files(path=data_dir)
-net_dt <- as.data.table(read.csv(paste0(data_dir, "/ContactTracingNetwork.csv")))
+net_dt <- as.data.table(read.csv(paste0(data_dir, "/ContactTracingNetwork.csv"))) 
 individuals_dt <- as.data.table(read.csv(paste0(data_dir, "/Individuals.csv")))
 
 
@@ -92,7 +92,8 @@ length(unique(net_dt_without_empty_StudyIDTo$StudyIDTo))
 ```
 
 <span style="background-color: #FFFF00">
-The CTDB included disease intervention specialist interview data from `r length(ind_in_partner_db)` unique persons (`r length(unique(net_dt$StudyIDFrom))` newly diagnosed; `r length(unique(net_dt$StudyIDTo))` named partners). 
+The CTDB included disease intervention specialist interview data from `r length(ind_in_partner_db)` unique persons (`r length(unique(net_dt$StudyIDFrom))` newly diagnosed; `r length(unique(net_dt_without_empty_StudyIDTo$StudyIDTo))` 
+named partners). 
 </span>
 
 Number of unique persons in StudyIDFrom column: `r nrow(unique_persons_dt)`.
@@ -194,8 +195,7 @@ partner contact dataset (including StudyIDTos with empty strings).
 unique partners of persons in the Unified Individuals dataset who appear in the 
 Partner Contact dataset  (excluding StudyIDTos with empty strings).
 
-#### How many persons for whom we have sequences appear as both 
-index persons and partners?
+#### How many persons for whom we have sequences appear as both index persons and partners?
 
 ```{r}
 intersection_set_from_and_to <- sort(
@@ -301,12 +301,10 @@ identical(length(unique(study_id_from_and_to_in_individuals_dt)),
 )
 ```
 
-567 = 509 + 156 – 98. 
 
 #### How many persons are in the genomic database but not in the PCRS database?
 
 ```{r}
-
 length(which(individuals_dt$StudyID %in% ind_in_partner_db == FALSE))
 ```
 
