@@ -5,14 +5,15 @@ output:
     df_print: paged
 editor_options:
   chunk_output_type: inline
+  markdown: 
+    wrap: 72
 ---
 
-# Objective 
+# Objective
 
-The purpose here is to create a prototype of Table 1 - summarizing demographic
-and behavioral characteristics of index persons and their contacts.
-
-
+The purpose here is to create a prototype of Table 1 - summarizing
+demographic and behavioral characteristics of index persons and their
+contacts.
 
 ```{r setup, include=FALSE}
 rm(list=ls())
@@ -25,12 +26,11 @@ library(stringi)
 library(network)
 ```
 
-
-
 ```{r read_data, include=FALSE}
 data_dir <- "/gpfs/data/rkantor/rtp/datasets/D51_20230512_unified"
 list.files(path=data_dir)
-net_dt <- as.data.table(read.csv(paste0(data_dir, "/ContactTracingNetwork.csv"))) 
+net_dt_old <- as.data.table(read.csv(paste0(data_dir, "/ContactTracingNetwork.csv"))) 
+net_dt <- as.data.table(read.csv("/gpfs/data/rkantor/rtp/shared_dir/ContactTracingNetwork20230726.csv"))
 individuals_dt <- as.data.table(read.csv(paste0(data_dir, "/Individuals.csv")))
 
 
@@ -42,16 +42,16 @@ individuals_dt <- as.data.table(read.csv(paste0(data_dir, "/Individuals.csv")))
 dim(net_dt)
 ```
 
-The partner data are  `r nrow(net_dt)` observations and `r ncol(net_dt)` variables.
+The partner data are `r nrow(net_dt)` observations and `r ncol(net_dt)`
+variables.
 
-How many unique persons (sources of targets) are in the partner database?
+How many unique persons (sources of targets) are in the partner
+database?
 
 ```{r}
 ind_in_partner_db <- unique(c(net_dt$StudyIDFrom, net_dt$StudyIDTo))
 length(ind_in_partner_db)
 ```
-
-
 
 How many unique index persons are in the partner database?
 
@@ -74,10 +74,13 @@ len_studyidto <- length(unique(net_dt$StudyIDTo))
 len_union <- length(union(unique(net_dt$StudyIDFrom), unique(net_dt$StudyIDTo)))
 len_intersection <- length(intersect(unique(net_dt$StudyIDFrom), unique(net_dt$StudyIDTo)))
 
+print(c(len_studyidfrom, len_studyidto, len_union, len_intersection))
+
 len_union == len_studyidfrom + len_studyidto - len_intersection
 
 # Partition the data
-unique_persons_dt <- unique(net_dt[,1, with=FALSE])
+unique_persons_dt <- unique(net_dt[,1, with=FALSE]) 
+  #all unique values from first column, with=F ensures column is selected by number
 nrow(unique_persons_dt)
 
 # Filter the data where StudyIDTo is not empty
@@ -91,28 +94,26 @@ length(unique(net_dt_without_empty_StudyIDTo$StudyIDFrom))
 length(unique(net_dt_without_empty_StudyIDTo$StudyIDTo))
 ```
 
-<span style="background-color: #FFFF00">
-The CTDB included disease intervention specialist interview data from `r length(ind_in_partner_db)` unique persons (`r length(unique(net_dt$StudyIDFrom))` newly diagnosed; `r length(unique(net_dt_without_empty_StudyIDTo$StudyIDTo))` 
-named partners). 
-</span>
+[ The CTDB included disease intervention specialist interview data from
+`r length(ind_in_partner_db)` unique persons
+(`r length(unique(net_dt$StudyIDFrom))` newly diagnosed;
+`r length(unique(net_dt_without_empty_StudyIDTo$StudyIDTo))` named
+partners). ]{style="background-color: #FFFF00"}
 
-Number of unique persons in StudyIDFrom column: `r nrow(unique_persons_dt)`.
+Number of unique persons in StudyIDFrom column:
+`r nrow(unique_persons_dt)`.
 
-Number of unique StudyIDFrom's without an empty StudyIDTo: `r length(unique(net_dt_without_empty_StudyIDTo$StudyIDFrom))`. 
+Number of unique StudyIDFrom's without an empty StudyIDTo:
+`r length(unique(net_dt_without_empty_StudyIDTo$StudyIDFrom))`.
 
 When were the data collected?
 
 ```{r}
-table(substr(net_dt$IdentifiedDate, 1, 4), exclude = NULL)
+table(substr(net_dt$DateIdentifed, 1, 4), exclude = NULL)
+# Note, in the old this was called Identified Date
 ```
 
-
-
-
-
-
-
-## Structure of the Statewide Unified Individuals' Genomic Database 
+## Structure of the Statewide Unified Individuals' Genomic Database
 
 How many unique persons in the individuals database?
 
@@ -125,34 +126,38 @@ length(unique(individuals_dt$StudyID))
 
 table(substr(individuals_dt$StudyID, 1, 1))
 ```
-<span style="background-color: #FFFF00"> And the SDB included sequences from `r length(unique(individuals_dt$StudyID))` persons. </span>
 
-**Note**: There are no persons with "CONTACT" Study ID in the unified individuals
-database. 
+[ And the SDB included sequences from
+`r length(unique(individuals_dt$StudyID))` persons.
+]{style="background-color: #FFFF00"}
 
-What is the source of the information of persons in the individuals database?
+**Note**: There are no persons with "CONTACT" Study ID in the unified
+individuals database.
+
+What is the source of the information of persons in the individuals
+database?
 
 ```{r}
 table(individuals_dt$Source, exclude = NULL)
 table(individuals_dt$Source, exclude = NULL)/sum(table(individuals_dt$Source, exclude = NULL))
 ```
 
+How many unique clusters are the individuals in?
 
-How many unique clusters are the individuals in? 
 ```{r}
 length(unique(individuals_dt$ClusteredHIVTrace005)) 
 length(unique(individuals_dt$ClusteredHIVTrace015)) 
 length(unique(individuals_dt$ClusteredPhyloAny)) 
 ```
 
-
-<span style="background-color: #FFFF00">  There are `r length(unique(individuals_dt$ClusteredPhyloAny))` molecular clusters identified using the ClusteredPhyloAny technique. </span>
+[ There are `r length(unique(individuals_dt$ClusteredPhyloAny))`
+molecular clusters identified using the ClusteredPhyloAny technique.
+]{style="background-color: #FFFF00"}
 
 ## Intersection of the Two Databases
 
-
-How many individuals from the genomics database appear in the partner database,
-as StudyIDFrom, and StudyIDTo?
+How many individuals from the genomics database appear in the partner
+database, as StudyIDFrom, and StudyIDTo?
 
 ```{r}
 individuals_in_net_dt_studyidfrom <- 
@@ -178,22 +183,28 @@ individuals_in_net_dt_studyidto_witout_empty_StudyIDTo <-
 length(individuals_in_net_dt_studyidto_witout_empty_StudyIDTo)
 ```
 
+-   [ There are
+    `r length(unique(individuals_dt[individuals_in_net_dt_studyidfrom,]$StudyID))`
+    unique individuals in the Unified Individuals dataset who appear in
+    the Partner Contact database (including with empty StudyIDTos).
+    ]{style="background-color: #FFFF00"}
 
-- <span style="background-color: #FFFF00">  There are `r length(unique(individuals_dt[individuals_in_net_dt_studyidfrom,]$StudyID))` unique individuals in the Unified Individuals dataset who appear in the Partner 
-Contact database (including with empty StudyIDTos).  </span>
+-   There are
+    `r length(unique(individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo))`
+    unique individuals in the Unified Individuals dataset who appear in
+    the Partner Contact database (without any empty StudyIDTos, i.e.
+    they reported on at least one partner).
 
-- There are  `r length(unique(individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo))`
-unique individuals in the Unified Individuals dataset who appear in the Partner 
-Contact database (without any empty StudyIDTos, i.e. they reported on at least 
-one partner).
+-   There are `r length(unique(individuals_in_net_dt_studyidto))`
+    reported unique partners of persons in the Unified Individuals
+    dataset who appear in the partner contact dataset (including
+    StudyIDTos with empty strings).
 
-- There are `r length(unique(individuals_in_net_dt_studyidto))` reported 
-unique partners of persons in the Unified Individuals dataset who appear in the 
-partner contact dataset (including StudyIDTos with empty strings).
-
-- There are `r length(unique(individuals_in_net_dt_studyidto_witout_empty_StudyIDTo))` reported 
-unique partners of persons in the Unified Individuals dataset who appear in the 
-Partner Contact dataset  (excluding StudyIDTos with empty strings).
+-   There are
+    `r length(unique(individuals_in_net_dt_studyidto_witout_empty_StudyIDTo))`
+    reported unique partners of persons in the Unified Individuals
+    dataset who appear in the Partner Contact dataset (excluding
+    StudyIDTos with empty strings).
 
 #### How many persons for whom we have sequences appear as both index persons and partners?
 
@@ -207,9 +218,9 @@ intersection_set_from_and_to <- sort(
 length(intersection_set_from_and_to)
 ```
 
-Of the newly diagnosed persons in the contact tracing database, 
-for how many do we have sequences and how many are in clusters? 
-How many are clustered with someone who named them?
+Of the newly diagnosed persons in the contact tracing database, for how
+many do we have sequences and how many are in clusters? How many are
+clustered with someone who named them?
 
 ```{r}
 table(individuals_dt[individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo]$ClusteredPhyloAny, 
@@ -218,19 +229,23 @@ sum(table(individuals_dt[individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo]$Cl
       exclude = NULL))
 ```
 
-Ans: 
+Ans:
 
+-   [ Number of newly diagnosed persons in the contact tracing database
+    = `r length(individuals_in_net_dt_studyidfrom)`
+    ]{style="background-color: #FFFF00"}
 
-* <span style="background-color: #FFFF00"> Number of newly diagnosed persons in the contact tracing database = 
-  `r length(individuals_in_net_dt_studyidfrom)` </span>
-  
-*  <span style="background-color: #FFFF00"> Of these, `r sum(table(individuals_dt[individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo]$ClusteredPhyloAny, exclude = NULL))` persons provided partner data. </span>
+-   [ Of these,
+    `r sum(table(individuals_dt[individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo]$ClusteredPhyloAny, exclude = NULL))`
+    persons provided partner data. ]{style="background-color: #FFFF00"}
 
-* <span style="background-color: #FFFF00"> Of these, `r length(which(!is.na(individuals_dt[individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo]$ClusteredPhyloAny)))` are clustered phylogenetically.</span>
+-   [ Of these,
+    `r length(which(!is.na(individuals_dt[individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo]$ClusteredPhyloAny)))`
+    are clustered phylogenetically.]{style="background-color: #FFFF00"}
 
-
-Of the partners of the newly diagnosed persons in the contact tracing database, 
-how many nominated other persons? How many are clustered with someone who named them?
+Of the partners of the newly diagnosed persons in the contact tracing
+database, how many nominated other persons? How many are clustered with
+someone who named them?
 
 ```{r}
 table(individuals_dt[individuals_in_net_dt_studyidto_witout_empty_StudyIDTo]$ClusteredPhyloAny, 
@@ -239,16 +254,20 @@ sum(table(individuals_dt[individuals_in_net_dt_studyidto_witout_empty_StudyIDTo]
       exclude = NULL))
 ```
 
+Ans:
 
-Ans:   
+-   [ Of the partners of the newly diagnosed persons in the contact
+    tracing database,
+    `r sum(table(individuals_dt[individuals_in_net_dt_studyidto_witout_empty_StudyIDTo]$ClusteredPhyloAny, exclude = NULL))`
+    nominated other persons. ]{style="background-color: #FFFF00"}
 
-*  <span style="background-color: #FFFF00"> Of the partners of the newly diagnosed persons in the contact tracing database, 
-`r sum(table(individuals_dt[individuals_in_net_dt_studyidto_witout_empty_StudyIDTo]$ClusteredPhyloAny, exclude = NULL))` nominated other persons. </span>
+-   [ Of these,
+    `r length(which(!is.na(individuals_dt[individuals_in_net_dt_studyidto_witout_empty_StudyIDTo]$ClusteredPhyloAny)))`
+    clustered phylogenetically with someone who named them.
+    ]{style="background-color: #FFFF00"}
 
-*  <span style="background-color: #FFFF00"> Of these, `r length(which(!is.na(individuals_dt[individuals_in_net_dt_studyidto_witout_empty_StudyIDTo]$ClusteredPhyloAny)))` clustered phylogenetically with someone who named them. </span>
-
-
-What is the Jaccard Similarity Coefficient for the individuals database and partner contact tracing database?
+What is the Jaccard Similarity Coefficient for the individuals database
+and partner contact tracing database?
 
 ```{r}
 study_ids_ctdb <- unique(c(net_dt$StudyIDFrom, net_dt$StudyIDTo))
@@ -258,14 +277,15 @@ intersection <- length(intersect(study_ids_ctdb, study_ids_gdb))
 union <- length(unique(c(study_ids_ctdb, study_ids_gdb)))
 
 jaccard_similarity <- intersection / union
-
+print(jaccard_similarity)
 ```
 
- <span style="background-color: #FFFF00"> The Jaccard Similarity Index is `r jaccard_similarity`. </span>
+[ The Jaccard Similarity Index is `r jaccard_similarity`.
+]{style="background-color: #FFFF00"}
 
-For how many persons (reported as
-index cases or partners in the PCRS dataset) do we have  
-sequences? 
+For how many persons (reported as index cases or partners in the PCRS
+dataset) do we have\
+sequences?
 
 ```{r}
 study_id_from_and_to_in_individuals_dt <- 
@@ -278,20 +298,22 @@ which(duplicated(study_id_from_and_to_in_individuals_dt) == TRUE)
 length(study_id_from_and_to_in_individuals_dt)
 ```
 
-- There are `r length(unique(study_id_from_and_to_in_individuals_dt))` unique
-persons (reported as
-index cases or partners in the PCRS dataset) for whom we have  
-sequences.
+-   There are `r length(unique(study_id_from_and_to_in_individuals_dt))`
+    unique persons (reported as index cases or partners in the PCRS
+    dataset) for whom we have\
+    sequences.
 
-Note that these `r length(unique(study_id_from_and_to_in_individuals_dt))`  are comprised of 
-`r length(individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo)` 
-who appear as index cases who are interviewed for PCRS, 
-`r length(individuals_in_net_dt_studyidto_witout_empty_StudyIDTo)` 
-appeared as reported partners and are in the genomics database, and 
-`r length(intersection_set_from_and_to)`
- appeared as both index persons and partners. 
+Note that these
+`r length(unique(study_id_from_and_to_in_individuals_dt))` are comprised
+of `r length(individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo)` who
+appear as index cases who are interviewed for PCRS,
+`r length(individuals_in_net_dt_studyidto_witout_empty_StudyIDTo)`
+appeared as reported partners and are in the genomics database, and
+`r length(intersection_set_from_and_to)` appeared as both index persons
+and partners.
 
-Note that 
+Note that
+
 ```{r}
 identical(length(unique(study_id_from_and_to_in_individuals_dt)),
            (length(individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo) +
@@ -301,18 +323,16 @@ identical(length(unique(study_id_from_and_to_in_individuals_dt)),
 )
 ```
 
-
 #### How many persons are in the genomic database but not in the PCRS database?
 
 ```{r}
 length(which(individuals_dt$StudyID %in% ind_in_partner_db == FALSE))
 ```
 
-
-<span style="background-color: #FFFF00"> 
-* N = `r length(which(individuals_dt$StudyID %in% ind_in_partner_db == FALSE))` persons are in the genomic database but not in the PCRS database. </span>
-
-
+[ \* N =
+`r length(which(individuals_dt$StudyID %in% ind_in_partner_db == FALSE))`
+persons are in the genomic database but not in the PCRS database.
+]{style="background-color: #FFFF00"}
 
 #### How many persons are in the PCRS database but not in the genomic database?
 
@@ -320,30 +340,30 @@ length(which(individuals_dt$StudyID %in% ind_in_partner_db == FALSE))
 length(which(ind_in_partner_db %in% individuals_dt$StudyID == FALSE))
 ```
 
-<span style="background-color: #FFFF00"> 
-N = `r length(which(ind_in_partner_db %in% individuals_dt$StudyID == FALSE))`
-persons are in the PCRS database but not in the genomic database. </span>
+[ N =
+`r length(which(ind_in_partner_db %in% individuals_dt$StudyID == FALSE))`
+persons are in the PCRS database but not in the genomic database.
+]{style="background-color: #FFFF00"}
 
-#### What are the cluster sizes per the three sequencing techniques 
-of persons who appear in the partner database? 
+#### What are the cluster sizes per the three sequencing techniques
 
+of persons who appear in the partner database?
 
 ```{r}
 length(unique(individuals_dt$ClusteredHIVTrace005[study_id_from_and_to_in_individuals_dt])) 
 length(unique(individuals_dt$ClusteredHIVTrace015[study_id_from_and_to_in_individuals_dt])) 
 length(unique(individuals_dt$ClusteredPhyloAny[study_id_from_and_to_in_individuals_dt])) 
 ```
-  
-  
-* <span style="background-color: #FFFF00"> Of the 
-`r length(unique(individuals_dt$ClusteredPhyloAny))` 
-molecular clusters identified, 
-`r length(unique(individuals_dt$ClusteredPhyloAny[study_id_from_and_to_in_individuals_dt]))`
-consisted of persons also in the CTDB. </span>*
 
-## [Table "1"](https://docs.google.com/document/d/12g9p5gsKfzjGl-hP524krx7GwZPHGY1UBvMf_7cMo8I/edit#bookmark=id.tc8pri6l7bee)  
+-   [ Of the `r length(unique(individuals_dt$ClusteredPhyloAny))`
+    molecular clusters identified,
+    `r length(unique(individuals_dt$ClusteredPhyloAny[study_id_from_and_to_in_individuals_dt]))`
+    consisted of persons also in the CTDB.
+    ]{style="background-color: #FFFF00"}\*
+
+## [Table "1"](https://docs.google.com/document/d/12g9p5gsKfzjGl-hP524krx7GwZPHGY1UBvMf_7cMo8I/edit#bookmark=id.tc8pri6l7bee)
+
 **Descriptive Characteristics of Index Persons and Partner Contacts**
-
 
 #### By source
 
@@ -430,6 +450,7 @@ individuals_dt[individuals_in_net_dt_studyidfrom, .(.N),
                  ][
                  ]
 
+
 individuals_dt[individuals_in_net_dt_studyidfrom, .(.N), 
                by=.(DemoHispanic)
                ][,
@@ -465,10 +486,9 @@ individuals_dt[individuals_in_net_dt_studyidto, .(.N),
 
 ```
 
-
 #### Age at HIV Diagnosis
 
-**Index Persons** 
+**Index Persons**
 
 ```{r}
 individuals_dt[individuals_in_net_dt_studyidfrom, 
@@ -498,7 +518,8 @@ hivdxage_cat_dt
 sum(hivdxage_cat_dt$N)
 
 ## Who are the people here who do not have a reported age for diagnosis?
-na_hivdxage_cat_dt <- individuals_dt[intersect(individuals_in_net_dt_studyidfrom, which(is.na(individuals_dt$hivdxage_cat))),]
+na_hivdxage_cat_dt <- individuals_dt[intersect(individuals_in_net_dt_studyidfrom,
+                                               which(is.na(individuals_dt$hivdxage_cat))),]
 dim(na_hivdxage_cat_dt)
 knitr::kable(na_hivdxage_cat_dt)
 knitr::kable(individuals_dt[individuals_in_net_dt_studyidfrom, .SD, .SDcols=c("StudyID", 
@@ -509,7 +530,7 @@ knitr::kable(individuals_dt[individuals_in_net_dt_studyidfrom, .SD, .SDcols=c("S
 
 ```
 
-**Index Persons (reporting at least one partner)** 
+**Index Persons (reporting at least one partner)**
 
 ```{r}
 individuals_dt[individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo, 
@@ -598,6 +619,7 @@ knitr::kable(individuals_dt[individuals_in_net_dt_studyidto, .SD, .SDcols=c("Stu
 #### HIV Diagnosis Year
 
 **Index Persons**
+
 ```{r}
 index_persons_dt <- individuals_dt[individuals_in_net_dt_studyidfrom,]
 index_persons_dt[, hivdiagnosis_year := as.numeric(substr(HIVDxDate, 1, 4))]
@@ -626,10 +648,10 @@ index_persons_dt[which(is.na(hivdiagnosis_year)), .SD, .SDcols=c("StudyID",
                                                                  "hivdiagnosis_year_group")]
 ```
 
-There are 40 index persons who do not have a reported year of HIV Diagnosis. 
-All of these are persons whose source is RIDOH. 
+There are 40 index persons who do not have a reported year of HIV
+Diagnosis. All of these are persons whose source is RIDOH.
 
-** Index Persons (reporting at least one contact) **
+\*\* Index Persons (reporting at least one contact) \*\*
 
 ```{r}
 index_persons_ge1contact_dt <- 
@@ -653,6 +675,7 @@ index_persons_ge1contact_dt[, .(.N),
 ```
 
 **Partner Contacts**
+
 ```{r}
 partner_contacts_dt <- individuals_dt[individuals_in_net_dt_studyidto,]
 partner_contacts_dt[, hivdiagnosis_year := as.numeric(substr(HIVDxDate, 1, 4))]
@@ -671,10 +694,10 @@ partner_contacts_dt[, .(.N), by=hivdiagnosis_year_group][,
                  ][order(hivdiagnosis_year_group)]
 ```
 
-
 #### Behavioral Characteristics: MSM, IDU, HRH
 
 **Index Persons**
+
 ```{r}
 index_persons_dt[, .(.N), by=RiskMSM][,
                  "prop":=round(N/sum(N), 3)
@@ -689,8 +712,8 @@ index_persons_dt[, .(.N), by=RiskHeterosexual][,
                  ][]
 ```
 
-
 **Index Persons (reporting at least one partner)**
+
 ```{r}
 index_persons_ge1contact_dt[, .(.N), by=RiskMSM][,
                  "prop":=round(N/sum(N), 3)
@@ -705,8 +728,8 @@ index_persons_ge1contact_dt[, .(.N), by=RiskHeterosexual][,
                  ][]
 ```
 
-
 **Partner Contacts**
+
 ```{r}
 partner_contacts_dt[, .(.N), by=RiskMSM][,
                  "prop":=round(N/sum(N), 3)
@@ -721,28 +744,29 @@ partner_contacts_dt[, .(.N), by=RiskHeterosexual][,
                  ][]
 ```
 
-### [Table 2]()  
-**Mean number of named, diagnosed and sequenced partners by index case characteristics**
+### [Table 2]()
+
+**Mean number of named, diagnosed and sequenced partners by index case
+characteristics**
 
 ```{r}
 #knitr::kable(net_dt)
 ```
 
-To focus on index persons with a named person, 
-filter out rows with missing `StudyIDTo`:
+To focus on index persons with a named person, filter out rows with
+missing `StudyIDTo`:
 
 ```{r}
 no_missing_rows_in_net_dt <- net_dt[StudyIDTo != "", , ]
 class(no_missing_rows_in_net_dt)
 ```
 
+-   Start by computing the mean number of *named partners* for all index
+    persons?
+-   Then break down this list by index person behavioral and demographic
+    characteristics?
 
-
-- Start by computing the mean number of *named partners* for all index persons?
-- Then break down this list by index person behavioral and demographic characteristics?
-
-Number of contacts reported by each index person: 
-
+Number of contacts reported by each index person:
 
 #### Analysis of named partners for all index persons
 
@@ -763,6 +787,7 @@ unique_contacts_counts <- no_missing_rows_in_net_dt[, .(UniqueContacts = uniqueN
 
 sum(unique_contacts_counts$UniqueContacts)
 ```
+
 Count the number of times each contact has been reported:
 
 ```{r}
@@ -779,14 +804,16 @@ individuals_in_net_dt_studyidto_nomiss <- which(individuals_dt$StudyID %in% no_m
 length(individuals_in_net_dt_studyidto_nomiss)
 ```
 
-How many unique partners are reported by indexed persons with named partners?
+How many unique partners are reported by indexed persons with named
+partners?
 
 ```{r}
 length(no_missing_rows_in_net_dt$StudyIDTo)
 length(unique(no_missing_rows_in_net_dt$StudyIDTo))
 ```
 
-What is the distribution of unique partners reported by indexed persons with named partners?
+What is the distribution of unique partners reported by indexed persons
+with named partners?
 
 ```{r}
 pts_reported_by_IPs_with_named_pts <- no_missing_rows_in_net_dt[,.N,by=StudyIDFrom]
@@ -797,10 +824,11 @@ idxs <- which(pts_reported_by_IPs_with_named_pts$StudyIDFrom %in% individuals_dt
 IPs_reporting_partners_in_unified_dt <- pts_reported_by_IPs_with_named_pts$StudyIDFrom[idxs]
 ```
 
-Of these `length(unique(no_missing_rows_in_net_dt$StudyIDTo))`, how many appear
-in the unified individuals data set and how many are diagnosed?
+Of these `length(unique(no_missing_rows_in_net_dt$StudyIDTo))`, how many
+appear in the unified individuals data set and how many are diagnosed?
 
-**N.B.**: Date of HIV Diagnosis is used to indicate whether a person is diagnosed.
+**N.B.**: Date of HIV Diagnosis is used to indicate whether a person is
+diagnosed.
 
 ```{r}
 unique_named_pt_contacts_reported_by_IPs <- unique(no_missing_rows_in_net_dt$StudyIDTo)
@@ -824,6 +852,7 @@ table(named_contacts_rows_from_unified_dt$Sequence, exclude = NULL)
 ```
 
 #### Analysis of named partners for index persons stratified by behavior,
+
 race, ethnicity.
 
 **MSM**:
@@ -836,7 +865,9 @@ individuals_dt_of_msm_who_named_partners <-
 nrow(individuals_dt_of_msm_who_named_partners)
 ```
 
-***How many partners are reported by the `r nrow(individuals_dt_of_msm_who_named_partners)` MSM persons who named partners?***
+***How many partners are reported by the
+`r nrow(individuals_dt_of_msm_who_named_partners)` MSM persons who named
+partners?***
 
 ```{r}
 net_dt_of_msm_who_named_partners <- net_dt[StudyIDFrom %in% individuals_dt_of_msm_who_named_partners$StudyID,,] 
@@ -850,7 +881,8 @@ pt_counts_msm_who_named_partners[,summary(N)]
 
 ***Ans: `r pt_counts_msm_who_named_partners[,sum(N)]`***.
 
-***How many of these partners are in the individuals dataset, diagnosed, and sequenced?***
+***How many of these partners are in the individuals dataset, diagnosed,
+and sequenced?***
 
 ```{r}
 idx <- which(net_dt_of_msm_who_named_partners$StudyIDTo %in% individuals_dt$StudyID)
@@ -862,7 +894,6 @@ table(msm_partners_in_individuals_full_dt$HIVDxDate, exclude = NULL)
 table(msm_partners_in_individuals_full_dt$Sequence, exclude = NULL)
 ```
 
-
 **IDU**:
 
 Number of index persons (with named partners) who identify as IDU:
@@ -873,8 +904,9 @@ individuals_dt_of_hrh_who_named_partners <-
 nrow(individuals_dt_of_hrh_who_named_partners)
 ```
 
-
-***How many partners are reported by the `r nrow(individuals_dt_of_hrh_who_named_partners)` idu persons who named partners?***
+***How many partners are reported by the
+`r nrow(individuals_dt_of_hrh_who_named_partners)` idu persons who named
+partners?***
 
 ```{r}
 net_dt_of_hrh_who_named_partners <- net_dt[StudyIDFrom %in% individuals_dt_of_hrh_who_named_partners$StudyID,,] 
@@ -888,7 +920,8 @@ pt_counts_hrh_who_named_partners[,summary(N)]
 
 ***Ans: `r pt_counts_hrh_who_named_partners[,sum(N)]`***.
 
-***How many of these partners are in the individuals dataset, diagnosed, and sequenced?***
+***How many of these partners are in the individuals dataset, diagnosed,
+and sequenced?***
 
 ```{r}
 idx <- which(net_dt_of_hrh_who_named_partners$StudyIDTo %in% individuals_dt$StudyID)
@@ -903,9 +936,6 @@ table(idu_partners_in_individuals_full_dt$HIVDxDate, exclude = NULL)
 table(idu_partners_in_individuals_full_dt$Sequence, exclude = NULL)
 ```
 
-
-
-
 **HRH**:
 
 Number of index persons (with named partners) who identify as HRH:
@@ -916,8 +946,9 @@ individuals_dt_of_hrh_who_named_partners <-
 nrow(individuals_dt_of_hrh_who_named_partners)
 ```
 
-
-***How many partners are reported by the `r nrow(individuals_dt_of_hrh_who_named_partners)` idu persons who named partners?***
+***How many partners are reported by the
+`r nrow(individuals_dt_of_hrh_who_named_partners)` idu persons who named
+partners?***
 
 ```{r}
 net_dt_of_hrh_who_named_partners <- net_dt[StudyIDFrom %in% individuals_dt_of_hrh_who_named_partners$StudyID,,] 
@@ -931,7 +962,8 @@ pt_counts_hrh_who_named_partners[,summary(N)]
 
 ***Ans: `r pt_counts_hrh_who_named_partners[,sum(N)]`***.
 
-***How many of these partners are in the individuals dataset, diagnosed, and sequenced?***
+***How many of these partners are in the individuals dataset, diagnosed,
+and sequenced?***
 
 ```{r}
 idx <- which(net_dt_of_hrh_who_named_partners$StudyIDTo %in% individuals_dt$StudyID)
@@ -957,8 +989,9 @@ individuals_dt_of_black_who_named_partners <-
 nrow(individuals_dt_of_black_who_named_partners)
 ```
 
-
-***How many partners are reported by the `r nrow(individuals_dt_of_black_who_named_partners)` Black persons who named partners?***
+***How many partners are reported by the
+`r nrow(individuals_dt_of_black_who_named_partners)` Black persons who
+named partners?***
 
 ```{r}
 net_dt_of_black_who_named_partners <- net_dt[StudyIDFrom %in% individuals_dt_of_black_who_named_partners$StudyID,,] 
@@ -972,7 +1005,8 @@ pt_counts_black_who_named_partners[,summary(N)]
 
 ***Ans: `r pt_counts_black_who_named_partners[,sum(N)]`***.
 
-***How many of these partners are in the individuals dataset, diagnosed, and sequenced?***
+***How many of these partners are in the individuals dataset, diagnosed,
+and sequenced?***
 
 ```{r}
 idx <- which(net_dt_of_black_who_named_partners$StudyIDTo %in% individuals_dt$StudyID)
@@ -998,8 +1032,9 @@ individuals_dt_of_white_who_named_partners <-
 nrow(individuals_dt_of_white_who_named_partners)
 ```
 
-
-***How many partners are reported by the `r nrow(individuals_dt_of_white_who_named_partners)` White persons who named partners?***
+***How many partners are reported by the
+`r nrow(individuals_dt_of_white_who_named_partners)` White persons who
+named partners?***
 
 ```{r}
 net_dt_of_white_who_named_partners <- net_dt[StudyIDFrom %in% individuals_dt_of_white_who_named_partners$StudyID,,] 
@@ -1013,7 +1048,8 @@ pt_counts_white_who_named_partners[,summary(N)]
 
 ***Ans: `r pt_counts_white_who_named_partners[,sum(N)]`***.
 
-***How many of these partners are in the individuals dataset, diagnosed, and sequenced?***
+***How many of these partners are in the individuals dataset, diagnosed,
+and sequenced?***
 
 ```{r}
 idx <- which(net_dt_of_white_who_named_partners$StudyIDTo %in% individuals_dt$StudyID)
@@ -1039,8 +1075,9 @@ individuals_dt_of_asian_who_named_partners <-
 nrow(individuals_dt_of_asian_who_named_partners)
 ```
 
-
-***How many partners are reported by the `r nrow(individuals_dt_of_asian_who_named_partners)` Asian persons who named partners?***
+***How many partners are reported by the
+`r nrow(individuals_dt_of_asian_who_named_partners)` Asian persons who
+named partners?***
 
 ```{r}
 net_dt_of_asian_who_named_partners <- net_dt[StudyIDFrom %in% individuals_dt_of_asian_who_named_partners$StudyID,,] 
@@ -1054,7 +1091,8 @@ pt_counts_asian_who_named_partners[,summary(N)]
 
 ***Ans: `r pt_counts_asian_who_named_partners[,sum(N)]`***.
 
-***How many of these partners are in the individuals dataset, diagnosed, and sequenced?***
+***How many of these partners are in the individuals dataset, diagnosed,
+and sequenced?***
 
 ```{r}
 idx <- which(net_dt_of_asian_who_named_partners$StudyIDTo %in% individuals_dt$StudyID)
@@ -1080,8 +1118,9 @@ individuals_dt_of_other_who_named_partners <-
 nrow(individuals_dt_of_other_who_named_partners)
 ```
 
-
-***How many partners are reported by the `r nrow(individuals_dt_of_other_who_named_partners)` other persons who named partners?***
+***How many partners are reported by the
+`r nrow(individuals_dt_of_other_who_named_partners)` other persons who
+named partners?***
 
 ```{r}
 net_dt_of_other_who_named_partners <- net_dt[StudyIDFrom %in% individuals_dt_of_other_who_named_partners$StudyID,,] 
@@ -1095,7 +1134,8 @@ pt_counts_other_who_named_partners[,summary(N)]
 
 ***Ans: `r pt_counts_other_who_named_partners[,sum(N)]`***.
 
-***How many of these partners are in the individuals dataset, diagnosed, and sequenced?***
+***How many of these partners are in the individuals dataset, diagnosed,
+and sequenced?***
 
 ```{r}
 idx <- which(net_dt_of_other_who_named_partners$StudyIDTo %in% individuals_dt$StudyID)
@@ -1121,8 +1161,9 @@ individuals_dt_of_nonhispanic_who_named_partners <-
 nrow(individuals_dt_of_nonhispanic_who_named_partners)
 ```
 
-
-***How many partners are reported by the `r nrow(individuals_dt_of_other_who_named_partners)` other persons who named partners?***
+***How many partners are reported by the
+`r nrow(individuals_dt_of_other_who_named_partners)` other persons who
+named partners?***
 
 ```{r}
 net_dt_of_nonhispanic_who_named_partners <- net_dt[StudyIDFrom %in% individuals_dt_of_nonhispanic_who_named_partners$StudyID,,] 
@@ -1136,7 +1177,8 @@ pt_counts_nonhispanic_who_named_partners[,summary(N)]
 
 **Ethnicity = Non-Hispanic**
 
-Number of index persons (with named partners) who identify as Non-Hispanic:
+Number of index persons (with named partners) who identify as
+Non-Hispanic:
 
 ```{r}
 individuals_dt_of_nonnonhispanic_who_named_partners <-
@@ -1144,8 +1186,9 @@ individuals_dt_of_nonnonhispanic_who_named_partners <-
 nrow(individuals_dt_of_nonnonhispanic_who_named_partners)
 ```
 
-
-***How many partners are reported by the `r nrow(individuals_dt_of_other_who_named_partners)` other persons who named partners?***
+***How many partners are reported by the
+`r nrow(individuals_dt_of_other_who_named_partners)` other persons who
+named partners?***
 
 ```{r}
 net_dt_of_nonhispanic_who_named_partners <- net_dt[StudyIDFrom %in% individuals_dt_of_nonhispanic_who_named_partners$StudyID,,] 
@@ -1159,7 +1202,8 @@ pt_counts_nonhispanic_who_named_partners[,summary(N)]
 
 ***Ans: `r pt_counts_nonhispanic_who_named_partners[,sum(N)]`***.
 
-***How many of these partners are in the individuals dataset, diagnosed, and sequenced?***
+***How many of these partners are in the individuals dataset, diagnosed,
+and sequenced?***
 
 ```{r}
 idx <- which(net_dt_of_nonhispanic_who_named_partners$StudyIDTo %in% individuals_dt$StudyID)
