@@ -20,7 +20,8 @@ ls()
 
 data_dir <- "/gpfs/data/rkantor/rtp/datasets/D51_20230512_unified"
 list.files(path=data_dir)
-net_dt <- read.csv(paste0(data_dir, "/ContactTracingNetwork.csv"))
+net_dt_old <- read.csv(paste0(data_dir, "/ContactTracingNetwork.csv"))
+net_dt <- read.csv("/gpfs/data/rkantor/rtp/shared_dir/ContactTracingNetwork20230726.csv")
 individuals_dt <- read.csv(paste0(data_dir, "/Individuals.csv"))
 
 dim(net_dt)
