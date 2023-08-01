@@ -1236,17 +1236,17 @@ pt_counts_nonhispanic_who_named_partners[,summary(N)]
 and sequenced?***
 
 ```{r}
-idx <- which(net_dt_of_hispanic_who_named_partners$StudyIDTo %in% individuals_dt$StudyID)
+idx <- which(net_dt_of_nonhispanic_who_named_partners$StudyIDTo %in% individuals_dt$StudyID)
 length(idx)
-hispanic_reported_partners_in_individuals_dt <- net_dt_of_hispanic_who_named_partners$StudyIDTo[idx] 
-hispanic_reported_partners_in_individuals_dt
-unique(hispanic_reported_partners_in_individuals_dt)
-length(unique(hispanic_reported_partners_in_individuals_dt))
+nonhispanic_reported_partners_in_individuals_dt <- net_dt_of_nonhispanic_who_named_partners$StudyIDTo[idx] 
+nonhispanic_reported_partners_in_individuals_dt
+unique(nonhispanic_reported_partners_in_individuals_dt)
+length(unique(nonhispanic_reported_partners_in_individuals_dt))
 
-hispanic_partners_in_individuals_full_dt <- individuals_dt[StudyID %in% hispanic_reported_partners_in_individuals_dt,,]
+nonhispanic_partners_in_individuals_full_dt <- individuals_dt[StudyID %in% nonhispanic_reported_partners_in_individuals_dt,,]
 
-table(hispanic_partners_in_individuals_full_dt$HIVDxDate)
-sum(table(hispanic_partners_in_individuals_full_dt$HIVDxDate))
-table(hispanic_partners_in_individuals_full_dt$HIVDxDate, exclude = NULL)
-table(hispanic_partners_in_individuals_full_dt$Sequence, exclude = NULL)
+table(nonhispanic_partners_in_individuals_full_dt$HIVDxDate)
+sum(table(nonhispanic_partners_in_individuals_full_dt$HIVDxDate))
+table(nonhispanic_partners_in_individuals_full_dt$HIVDxDate, exclude = NULL)
+table(nonhispanic_partners_in_individuals_full_dt$Sequence, exclude = NULL)
 ```
