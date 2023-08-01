@@ -59,7 +59,7 @@ sort(table(individuals_dt$ClusteredPhyloAny, exclude = NULL)) #ClusteredPhyloAny
 
 length(which(table(individuals_dt$ClusteredHIVTrace005) == 1)) #0
 length(which(table(individuals_dt$ClusteredHIVTrace015) == 1)) #0
-length(which(table(individuals_dt$ClusteredPhyloAny) == 1)) #0
+length(which(table(individuals_dt$ClusteredPhyloAny) == 1)) #1
 
 cluster_sizes_005 <- table(individuals_dt$ClusteredHIVTrace005)
 cluster_sizes_015 <- table(individuals_dt$ClusteredHIVTrace015)
