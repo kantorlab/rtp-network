@@ -32,7 +32,7 @@ net_dt_mat <- cbind(as.character(net_dt[,1]), as.character(net_dt[,2]))
 net <- as.network(net_dt_mat, bipartite = F, directed = T)
 net
 length(net %v% "vertex.names")
-net %v% "vertex.names"
+head(net %v% "vertex.names")
 named_pt_net <- net
 ```
 
@@ -248,31 +248,54 @@ individuals_dt_w_index_persons_in_clusteredphyloany$named_partner_indicator <-
 ```{r}
 run_analysis <- function(dataset) {
   # Model 1: DemoGender
+  
+  # recode DemoGender to combine XMF and not reported into one category
+  dataset$DemoGender <- as.character(dataset$DemoGender)
+  dataset$DemoGender[dataset$DemoGender %in% c("XMF", "")] <- "XMF_not_reported"
+  dataset$DemoGender <- as.factor(dataset$DemoGender)
+  
+  # relevel DemoGender to make Female the reference category
+  dataset$DemoGender <- relevel(dataset$DemoGender, ref = "F")
+  
+  #fit model
   m1 <- glm(named_partner_indicator ~ DemoGender, data = dataset, family = "binomial")
   m1_summary <- summary(m1)
   xtabs1 <- xtabs(~ factor(named_partner_indicator, exclude = NULL) + factor(DemoGender, exclude = NULL), data = dataset)
   
   # Model 2: DemoRace
+  # relevel DemoGender to make Black the reference category
+  dataset$DemoRace <- as.factor(dataset$DemoRace)
+  dataset$DemoRace <- relevel(dataset$DemoRace, ref = "Black")
+  
   m2 <- glm(named_partner_indicator ~ DemoRace, data = dataset, family = "binomial")
   m2_summary <- summary(m2)
   xtabs2 <- xtabs(~ factor(named_partner_indicator, exclude = NULL) + factor(DemoRace, exclude = NULL), data = dataset)
   
   # Model 3: RecodedSequenceSubtype
-  m3 <- glm(named_partner_indicator ~ RecodedSequenceSubtype, data = dataset, family = "binomial")
+  m3 <- glm(named_partner_indicator ~ as.factor(RecodedSequenceSubtype), data = dataset, family = "binomial")
   m3_summary <- summary(m3)
   xtabs3 <- xtabs(~ factor(named_partner_indicator, exclude = NULL) + factor(RecodedSequenceSubtype, exclude = NULL), data = dataset)
 
   # Model 4: RiskMSM
+  dataset$RiskMSM <- as.factor(dataset$RiskMSM)
+  dataset$RiskMSM <- relevel(dataset$RiskMSM, ref="False")
+  
   m4 <- glm(named_partner_indicator ~ RiskMSM, data = dataset, family = "binomial")
   m4_summary <- summary(m4)
   xtabs4 <- xtabs(~ factor(named_partner_indicator, exclude = NULL) + factor(RiskMSM, exclude = NULL), data = dataset)
 
-  # Model 5: RiskHRH
+  # Model 5: RiskHeterosexual
+  dataset$RiskHeterosexual <- as.factor(dataset$RiskHeterosexual)
+  dataset$RiskHeterosexual <- relevel(dataset$RiskHeterosexual, ref="False")
+  
   m5 <- glm(named_partner_indicator ~ RiskHeterosexual, data = dataset, family = "binomial")
   m5_summary <- summary(m5)
   xtabs5 <- xtabs(~ factor(named_partner_indicator, exclude = NULL) + factor(RiskHeterosexual, exclude = NULL), data = dataset)
 
   # Model 6: RiskIDU
+  dataset$RiskIDU <- as.factor(dataset$RiskIDU)
+  dataset$RiskIDU <- relevel(dataset$RiskIDU, ref="False")
+  
   m6 <- glm(named_partner_indicator ~ RiskIDU, data = dataset, family = "binomial")
   m6_summary <- summary(m6)
   xtabs6 <- xtabs(~ factor(named_partner_indicator, exclude = NULL) + factor(RiskIDU, exclude = NULL), data = dataset)
