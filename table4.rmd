@@ -541,3 +541,52 @@ results_015_converse <- run_analysis_clustering(individuals_in_named_pt_net_dt, 
 # Run the analysis for the phyloany clustering case
 results_phyloany_converse <- run_analysis_clustering(individuals_in_named_pt_net_dt, "phyloany")
 ```
+
+```{r}
+table(individuals_in_named_pt_net_dt$indicator_015_cluster, exclude = NULL)
+#table(individuals_dt_w_index_persons_in_015$named_partner_indicator, exclude = NULL)
+
+## DemoGender
+table(individuals_in_named_pt_net_dt$DemoGender, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$DemoGender, exclude = NULL) +
+  factor(individuals_in_named_pt_net_dt$indicator_015_cluster, exclude = NULL)
+   )
+   
+## DemoRace
+table(individuals_in_named_pt_net_dt$DemoRace, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$DemoRace, exclude = NULL) +
+  factor(individuals_in_named_pt_net_dt$indicator_015_cluster, exclude = NULL)
+   )
+
+## Sequence
+table(individuals_in_named_pt_net_dt$RecodedSequenceSubtype, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$RecodedSequenceSubtype, exclude = NULL) +
+factor(individuals_in_named_pt_net_dt$indicator_015_cluster, exclude = NULL)
+ )
+
+## MSM
+table(individuals_in_named_pt_net_dt$RiskMSM, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$RiskMSM, exclude = NULL) +
+factor(individuals_in_named_pt_net_dt$indicator_015_cluster, exclude = NULL)
+ )
+
+## Heterosexual
+table(individuals_in_named_pt_net_dt$RiskHeterosexual, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$RiskHeterosexual, exclude = NULL) +
+factor(individuals_in_named_pt_net_dt$indicator_015_cluster, exclude = NULL)
+ )
+
+## IDU
+table(individuals_in_named_pt_net_dt$RiskIDU, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$RiskIDU, exclude = NULL) +
+factor(individuals_in_named_pt_net_dt$indicator_015_cluster, exclude = NULL)
+ )
+
+## age at HIV diagnosis
+summary(individuals_in_named_pt_net_dt$HIVDxAge)
+individuals_in_named_pt_net_dt %>%
+  group_by(indicator_015_cluster) %>%
+  summarise(mean_HIVDxAge = mean(HIVDxAge, na.rm = TRUE))
+```
+
+
