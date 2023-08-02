@@ -430,12 +430,12 @@ individuals_dt[individuals_in_net_dt_studyidto, .(.N),
                  ][
                  ]
 
-individuals_dt[individuals_in_net_dt_studyidto, .(.N),
-               by=.(DemoBirthSex)
-               ][,
-                 "prop":=round(N/sum(N), 3)
-                 ][
-                 ]
+# individuals_dt[individuals_in_net_dt_studyidto, .(.N),
+#                by=.(DemoBirthSex)
+#                ][,
+#                  "prop":=round(N/sum(N), 3)
+#                  ][
+#                  ]
 ```
 
 #### Race and Ethnicity
@@ -935,8 +935,8 @@ nrow(pt_counts_idu_who_named_partners)
 pt_counts_idu_who_named_partners[,sum(N)]
 pt_counts_idu_who_named_partners[,summary(N)]
 
-sum(table(idu_partners_in_individuals_full_dt$HIVDxDate, exclude = NULL)) #diagnosed
-table(idu_partners_in_individuals_full_dt$Sequence, exclude=NULL) #sequenced?
+#sum(table(idu_partners_in_individuals_full_dt$HIVDxDate, exclude = NULL)) #diagnosed
+#table(idu_partners_in_individuals_full_dt$Sequence, exclude=NULL) #sequenced?
 ```
 
 **HRH**:
@@ -978,11 +978,11 @@ length(idu_reported_partners_in_individuals_dt)
 unique(idu_reported_partners_in_individuals_dt)
 length(unique(idu_reported_partners_in_individuals_dt))
 
-hrh_partners_in_individuals_full_dt <- individuals_dt[StudyID %in% hrh_reported_partners_in_individuals_dt,,]
-dim(hrh_partners_in_individuals_full_dt)
-table(hrh_partners_in_individuals_full_dt$HIVDxDate, exclude = NULL)
-sum(table(hrh_partners_in_individuals_full_dt$HIVDxDate)) #diagnosed
-table(hrh_partners_in_individuals_full_dt$Sequence, exclude = NULL) #Sequenced
+# hrh_partners_in_individuals_full_dt <- individuals_dt[StudyID %in% hrh_reported_partners_in_individuals_dt,,]
+# dim(hrh_partners_in_individuals_full_dt)
+# table(hrh_partners_in_individuals_full_dt$HIVDxDate, exclude = NULL)
+# sum(table(hrh_partners_in_individuals_full_dt$HIVDxDate)) #diagnosed
+# table(hrh_partners_in_individuals_full_dt$Sequence, exclude = NULL) #Sequenced
 ```
 
 
