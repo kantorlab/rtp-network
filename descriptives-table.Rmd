@@ -914,11 +914,6 @@ nrow(individuals_dt_of_idu_who_named_partners)
 ```
 
 
-***How many partners are reported by the
-`r nrow(individuals_dt_of_idu_who_named_partners)` IDU persons who named
-partners?***
-
-***Ans: `r pt_counts_idu_who_named_partners[,sum(N)]`***.
 
 
 ***How many of these partners are in the individuals dataset, diagnosed,
@@ -938,6 +933,14 @@ pt_counts_idu_who_named_partners[,summary(N)]
 #sum(table(idu_partners_in_individuals_full_dt$HIVDxDate, exclude = NULL)) #diagnosed
 #table(idu_partners_in_individuals_full_dt$Sequence, exclude=NULL) #sequenced?
 ```
+
+
+***How many partners are reported by the
+`r nrow(individuals_dt_of_idu_who_named_partners)` IDU persons who named
+partners?***
+
+Ans: `r pt_counts_idu_who_named_partners[,sum(N)]`.
+
 
 **HRH**:
 
