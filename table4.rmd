@@ -481,26 +481,46 @@ run_analysis_clustering <- function(dataset, clustering_type) {
   xtabs1 <- xtabs(as.formula(paste("~ factor(", clustering_indicator, ", exclude = NULL) + factor(DemoGender, exclude = NULL)")), data = dataset)
 
   # Model 2: DemoRace
+  # relevel DemoGender to make Black the reference category
+  dataset$DemoRace <- as.factor(dataset$DemoRace)
+  dataset$DemoRace <- relevel(dataset$DemoRace, ref = "Black")
+  
   m2 <- glm(as.formula(paste(clustering_indicator, "~ DemoRace")), data = dataset, family = "binomial")
   m2_summary <- summary(m2)
   xtabs2 <- xtabs(as.formula(paste("~ factor(", clustering_indicator, ", exclude = NULL) + factor(DemoRace, exclude = NULL)")), data = dataset)
 
   # Model 3: RecodedSequenceSubtype
+  # relevel RecodedSequenceSubtype to make B the reference category
+  dataset$RecodedSequenceSubtype <- as.factor(dataset$RecodedSequenceSubtype)
+  dataset$RecodedSequenceSubtype <- relevel(dataset$RecodedSequenceSubtype, ref = "B")
+  
   m3 <- glm(as.formula(paste(clustering_indicator, "~ RecodedSequenceSubtype")), data = dataset, family = "binomial")
   m3_summary <- summary(m3)
   xtabs3 <- xtabs(as.formula(paste("~ factor(", clustering_indicator, ", exclude = NULL) + factor(RecodedSequenceSubtype, exclude = NULL)")), data = dataset)
 
   # Model 4: RiskMSM
+  # relevel to make non-MSM the reference category
+  dataset$RiskMSM <- as.factor(dataset$RiskMSM)
+  dataset$RiskMSM <- relevel(dataset$RiskMSM, ref = "False")
+  
   m4 <- glm(as.formula(paste(clustering_indicator, "~ RiskMSM")), data = dataset, family = "binomial")
   m4_summary <- summary(m4)
   xtabs4 <- xtabs(as.formula(paste("~ factor(", clustering_indicator, ", exclude = NULL) + factor(RiskMSM, exclude = NULL)")), data = dataset)
 
   # Model 5: RiskHRH
+  # relevel to make non-HRH the reference category
+  dataset$RiskHeterosexual <- as.factor(dataset$RiskHeterosexual)
+  dataset$RiskHeterosexual <- relevel(dataset$RiskHeterosexual, ref = "False")
+                               
   m5 <- glm(as.formula(paste(clustering_indicator, "~ RiskHeterosexual")), data = dataset, family = "binomial")
   m5_summary <- summary(m5)
   xtabs5 <- xtabs(as.formula(paste("~ factor(", clustering_indicator, ", exclude = NULL) + factor(RiskHeterosexual, exclude = NULL)")), data = dataset)
 
   # Model 6: RiskIDU
+  # relevel to make non-HRH the reference category
+  dataset$RiskIDU <- as.factor(dataset$RiskIDU)
+  dataset$RiskIDU <- relevel(dataset$RiskIDU, ref = "False")
+  
   m6 <- glm(as.formula(paste(clustering_indicator, "~ RiskIDU")), data = dataset, family = "binomial")
   m6_summary <- summary(m6)
   xtabs6 <- xtabs(as.formula(paste("~ factor(", clustering_indicator, ", exclude = NULL) + factor(RiskIDU, exclude = NULL)")), data = dataset)
