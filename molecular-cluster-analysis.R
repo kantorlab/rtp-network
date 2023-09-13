@@ -268,6 +268,161 @@ named_pt_dt[identify_p2_rows,]
 #Repeat named partnership/cluster size distribution with "ClusteredPhyloAny" sequence ---------------------------
 
 
+# How many persons are naming partners ---------------------------
+
+unique_naming_persons <- net_dt %>%
+  select(StudyIDFrom) %>%
+  distinct()
+
+count_unique_naming_persons <- individuals_dt %>%
+  filter(StudyID %in% unique_naming_persons$StudyIDFrom)
+
+nrow(count_unique_naming_persons)
+
+
+# How many persons are naming partners per cluster ---------------------------
+
+# function
+calc_num_persons_naming_partners <- 
+  function(distance="005") {
+    
+    persons_naming_num_list <- NULL
+    
+    if (distance == "005") {
+      clusters_List = cluster_sizes_005
+    }
+    else if (distance == "015") {
+      clusters_List = cluster_sizes_015
+    }
+    else if (distance == "clusteredphyloany") {
+      clusters_List = cluster_sizes_clusteredphyloany
+    }
+    
+    for (i in names(clusters_List)) {
+      
+      if (distance != "clusteredphyloany") {
+        label_col <- paste0("ClusteredHIVTrace", distance)
+      }
+      else if (distance == "clusteredphyloany") {
+        label_col <- "ClusteredPhyloAny"
+      }
+      
+      cluster_distance <- which(individuals_dt[[label_col]] == i) 
+      
+      studyids_cluster_distance <- individuals_dt$StudyID[cluster_distance]
+      
+      # Check individuals who named partners
+      persons_naming <- unique(net_dt$StudyIDFrom[net_dt$StudyIDFrom %in% studyids_cluster_distance])
+      
+      persons_naming_num_list <- c(persons_naming_num_list, length(persons_naming))
+      
+    }
+    
+    return(persons_naming_num_list)
+  }
+
+a1 <- calc_num_persons_naming_partners(distance="005")
+b1 <- calc_num_persons_naming_partners(distance="015")
+c1 <- calc_num_persons_naming_partners(distance="clusteredphyloany")
+
+length(a1)
+table(a1[-1], exclude = NULL)
+
+length(b1)
+table(b1[-1], exclude = NULL)
+
+length(c1)
+table(c1[-1], exclude = NULL)
+
+naming_partner_persons_005 <- cbind(a1[-1])
+naming_partner_persons_015 <- cbind(b1[-1])
+naming_partner_persons_clusteredphyloany <- cbind(c1[-1])
+
+summary(naming_partner_persons_005)      
+summary(naming_partner_persons_005[which(as.numeric(cluster_sizes_005) > 1)]) # the conditional adds only 1 NA, no difference otherwise
+
+summary(naming_partner_persons_015) 
+summary(naming_partner_persons_015[which(as.numeric(cluster_sizes_015) > 1)]) # as above
+
+summary(naming_partner_persons_clusteredphyloany) 
+summary(naming_partner_persons_clusteredphyloany[which(as.numeric(cluster_sizes_clusteredphyloany) > 1)]) # as above
+
+
+# How many persons are naming partners in the same cluster ---------------------------
+
+calc_persons_naming_within_cluster <- function(distance="005") {
+  
+  within_cluster_naming_list <- NULL
+  
+  if (distance == "005") {
+    clusters_List = cluster_sizes_005
+  }
+  else if (distance == "015") {
+    clusters_List = cluster_sizes_015
+  }
+  else if (distance == "clusteredphyloany") {
+    clusters_List = cluster_sizes_clusteredphyloany
+  }
+  
+  for (i in names(clusters_List)) {
+    
+    if (distance != "clusteredphyloany") {
+      label_col <- paste0("ClusteredHIVTrace", distance)
+    }
+    else if (distance == "clusteredphyloany") {
+      label_col <- "ClusteredPhyloAny"
+    }
+    
+    cluster_distance <- which(individuals_dt[[label_col]] == i) 
+    studyids_cluster_distance <- individuals_dt$StudyID[cluster_distance]
+    
+    # Initial count for the current cluster
+    cluster_count <- 0
+    
+    # For each individual in the cluster, check their named partners 
+    for (study_id in studyids_cluster_distance) {
+      
+      # Get the partners they named
+      named_partners <- net_dt$StudyIDTo[net_dt$StudyIDFrom == study_id]
+      
+      # Count how many of these partners are also in the cluster
+      cluster_count <- cluster_count + sum(named_partners %in% studyids_cluster_distance)
+      
+    }
+    
+    within_cluster_naming_list <- c(within_cluster_naming_list, cluster_count)
+    
+  }
+  
+  return(within_cluster_naming_list)
+}
+
+
+a2 <- calc_persons_naming_within_cluster(distance="005")
+b2 <- calc_persons_naming_within_cluster(distance="015")
+c2 <- calc_persons_naming_within_cluster(distance="clusteredphyloany")
+
+summary(a2)
+summary(b2)
+summary(c2)
+
+## The `calc_persons_naming_within_cluster` gives the same answer 
+## as the `calc_num_in_named_partners()` function above because:
+
+# `calc_num_in_named_partners`:
+#   
+# - For each cluster, identifies the individuals that are a part of it.
+# - For these individuals, determines the partners they have named.
+# - Checks whether these named partners are also within the same cluster.
+# - Aggregates the results based on the count of unique named relationships within the cluster.
+
+# calc_persons_naming_within_cluster:
+#   
+# - For each cluster, identifies the individuals that are a part of it.
+# - For these individuals, identifies the partners they have named.
+# - Checks whether these named partners are also within the same cluster.
+# - Aggregates the results based on the number of instances where cluster individuals named partners from the same cluster.
+
 #Save Object ---------------------------
 
 #save.image(file="EDA.RData")
@@ -282,3 +437,4 @@ eda_env$named_pt_idx_clusteredphyloany <- c
 
 # Save the environment as an RDS file
 saveRDS(eda_env, "eda_objects.rds")
+
