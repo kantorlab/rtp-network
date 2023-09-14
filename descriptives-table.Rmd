@@ -32,8 +32,6 @@ list.files(path=data_dir)
 net_dt_old <- as.data.table(read.csv(paste0(data_dir, "/ContactTracingNetwork.csv"))) 
 net_dt <- as.data.table(read.csv("/gpfs/data/rkantor/rtp/shared_dir/ContactTracingNetwork20230726.csv"))
 individuals_dt <- as.data.table(read.csv(paste0(data_dir, "/Individuals.csv")))
-
-
 ```
 
 ## Structure of the Partner Contact Database
@@ -832,11 +830,26 @@ diagnosed.
 
 ```{r}
 unique_named_pt_contacts_reported_by_IPs <- unique(no_missing_rows_in_net_dt$StudyIDTo)
+length(unique_named_pt_contacts_reported_by_IPs) #unique partners named
+head(unique_named_pt_contacts_reported_by_IPs)
+glimpse(no_missing_rows_in_net_dt)
 
+# Count the unique partners tested for HIV
+table(net_dt$HIVTested, exclude=NULL) # use the HIV tested variable
+
+named_partners_tested <- no_missing_rows_in_net_dt %>%
+  filter(HIVTested == 1) %>%
+  pull(StudyIDFrom) %>%
+  unique() 
+
+named_partners_tested
+length(named_partners_tested) 
+
+## diagnosed
 length(which(unique_named_pt_contacts_reported_by_IPs %in% individuals_dt$StudyID))
 
 named_contacts_in_unified_dataset <- unique_named_pt_contacts_reported_by_IPs[which(unique_named_pt_contacts_reported_by_IPs %in% individuals_dt$StudyID)]
-length(named_contacts_in_unified_dataset)
+length(named_contacts_in_unified_dataset) # number of reported partners in genomic database
 
 
 named_contacts_rows_from_unified_dt <- individuals_dt[StudyID %in% named_contacts_in_unified_dataset,,]
@@ -847,15 +860,14 @@ length(which(named_contacts_rows_from_unified_dt$HIVDxDate == ""))
 table(individuals_dt[StudyID %in% named_contacts_in_unified_dataset,,]$HIVDxDate, exclude = NULL)
 ```
 
-How many are sequenced?
+
+How many named partners are sequenced?
 
 ```{r}
 table(named_contacts_rows_from_unified_dt$Sequence, exclude = NULL)
 ```
 
-#### Analysis of named partners for index persons stratified by behavior,
-
-race, ethnicity.
+#### Analysis of named partners for index persons stratified by behavior, race, ethnicity.
 
 **MSM**:
 
@@ -903,6 +915,24 @@ sum(table(msm_partners_in_individuals_full_dt$HIVDxDate, exclude = NULL)) #diagn
 table(msm_partners_in_individuals_full_dt$Sequence, exclude=NULL) #sequenced?
 ```
 
+How many of the partners named by MSM are tested for HIV?
+
+```{r}
+# filter the main dataset for rows where StudyIDFrom matches MSM individuals who named partners 
+msm_named_partners_tested <- 
+  no_missing_rows_in_net_dt %>%
+  filter(StudyIDFrom %in% individuals_dt_of_msm_who_named_partners$StudyID & 
+           (HIVTested == 1)) %>%
+  pull(StudyIDTo) %>%
+  unique()
+  
+
+length(msm_named_partners_tested)
+
+```
+
+
+
 **IDU**:
 
 Number of index persons (with named partners) who identify as IDU:
@@ -941,6 +971,40 @@ partners?***
 
 Ans: `r pt_counts_idu_who_named_partners[,sum(N)]`.
 
+***How many of these partners are in the individuals dataset, diagnosed,
+and sequenced?***
+
+```{r}
+idx <- which(net_dt_of_idu_who_named_partners$StudyIDTo %in% individuals_dt$StudyID)
+idu_reported_partners_in_individuals_dt <- net_dt_of_idu_who_named_partners$StudyIDTo[idx] 
+length(idu_reported_partners_in_individuals_dt)
+length(unique(idu_reported_partners_in_individuals_dt))
+
+idu_partners_in_individuals_full_dt <- individuals_dt[StudyID %in% idu_reported_partners_in_individuals_dt,,]
+dim(idu_partners_in_individuals_full_dt)
+table(idu_partners_in_individuals_full_dt$HIVDxDate, exclude = NULL)
+table(idu_partners_in_individuals_full_dt$Sequence, exclude = NULL)
+
+sum(table(idu_partners_in_individuals_full_dt$HIVDxDate, exclude = NULL)) #diagnosed
+table(idu_partners_in_individuals_full_dt$Sequence, exclude=NULL) #sequenced?
+```
+
+
+How many of the partners named by IDU are tested for HIV?
+
+```{r}
+# filter the main dataset for rows where StudyIDFrom matches MSM individuals who named partners 
+idu_named_partners_tested <- 
+  no_missing_rows_in_net_dt %>%
+  filter(StudyIDFrom %in% individuals_dt_of_idu_who_named_partners$StudyID & 
+           (HIVTested == 1)) %>%
+  pull(StudyIDTo) %>%
+  unique()
+  
+
+length(idu_named_partners_tested)
+
+```
 
 **HRH**:
 
@@ -976,18 +1040,35 @@ and sequenced?***
 ```{r}
 idx <- which(net_dt_of_hrh_who_named_partners$StudyIDTo %in% individuals_dt$StudyID)
 length(idx)
-idu_reported_partners_in_individuals_dt <- net_dt_of_hrh_who_named_partners$StudyIDTo[idx] 
-length(idu_reported_partners_in_individuals_dt)
-unique(idu_reported_partners_in_individuals_dt)
-length(unique(idu_reported_partners_in_individuals_dt))
+hrh_reported_partners_in_individuals_dt <- net_dt_of_hrh_who_named_partners$StudyIDTo[idx] 
+length(hrh_reported_partners_in_individuals_dt)
+unique(hrh_reported_partners_in_individuals_dt)
+length(unique(hrh_reported_partners_in_individuals_dt))
 
-# hrh_partners_in_individuals_full_dt <- individuals_dt[StudyID %in% hrh_reported_partners_in_individuals_dt,,]
-# dim(hrh_partners_in_individuals_full_dt)
-# table(hrh_partners_in_individuals_full_dt$HIVDxDate, exclude = NULL)
-# sum(table(hrh_partners_in_individuals_full_dt$HIVDxDate)) #diagnosed
-# table(hrh_partners_in_individuals_full_dt$Sequence, exclude = NULL) #Sequenced
+hrh_partners_in_individuals_full_dt <- individuals_dt[StudyID %in% hrh_reported_partners_in_individuals_dt,,]
+dim(hrh_partners_in_individuals_full_dt)
+table(hrh_partners_in_individuals_full_dt$HIVDxDate, exclude = NULL)
+table(hrh_partners_in_individuals_full_dt$Sequence, exclude = NULL)
+
+sum(table(hrh_partners_in_individuals_full_dt$HIVDxDate, exclude = NULL)) #diagnosed
+table(hrh_partners_in_individuals_full_dt$Sequence, exclude=NULL) #sequenced?
 ```
 
+How many of the partners named by HRH are tested for HIV?
+
+```{r}
+# filter the main dataset for rows where StudyIDFrom matches MSM individuals who named partners 
+hrh_named_partners_tested <- 
+  no_missing_rows_in_net_dt %>%
+  filter(StudyIDFrom %in% individuals_dt_of_hrh_who_named_partners$StudyID & 
+           (HIVTested == 1)) %>%
+  pull(StudyIDTo) %>%
+  unique()
+  
+
+length(hrh_named_partners_tested)
+
+```
 
 **BLACK**:
 
@@ -1034,6 +1115,22 @@ sum(table(black_partners_in_individuals_full_dt$HIVDxDate, exclude = NULL))
 table(black_partners_in_individuals_full_dt$Sequence, exclude = NULL)
 ```
 
+How many of the partners named by Black persons are tested for HIV?
+
+```{r}
+# filter the main dataset for rows where StudyIDFrom matches MSM individuals who named partners 
+black_named_partners_tested <- 
+  no_missing_rows_in_net_dt %>%
+  filter(StudyIDFrom %in% individuals_dt_of_black_who_named_partners$StudyID & 
+           (HIVTested == 1)) %>%
+  pull(StudyIDTo) %>%
+  unique()
+  
+
+length(black_named_partners_tested)
+
+```
+
 **White**
 
 Number of index persons (with named partners) who identify as White:
@@ -1076,8 +1173,26 @@ white_partners_in_individuals_full_dt <- individuals_dt[StudyID %in% white_repor
 table(white_partners_in_individuals_full_dt$HIVDxDate, exclude = NULL)
 table(white_partners_in_individuals_full_dt$HIVDxDate, exclude = NULL)
 length(which(white_partners_in_individuals_full_dt$HIVDxDate == ""))
+table(white_partners_in_individuals_full_dt$Sequence, exclude = NULL)
 sum(table(white_partners_in_individuals_full_dt$Sequence))
 ```
+
+How many of the partners named by White persons are tested for HIV?
+
+```{r}
+# filter the main dataset for rows where StudyIDFrom matches White individuals who named partners 
+white_named_partners_tested <- 
+  no_missing_rows_in_net_dt %>%
+  filter(StudyIDFrom %in% individuals_dt_of_white_who_named_partners$StudyID & 
+           (HIVTested == 1)) %>%
+  pull(StudyIDTo) %>%
+  unique()
+  
+
+length(white_named_partners_tested)
+
+```
+
 
 **Asian**
 
@@ -1122,6 +1237,23 @@ table(asian_partners_in_individuals_full_dt$HIVDxDate, exclude = NULL)
 table(asian_partners_in_individuals_full_dt$Sequence, exclude = NULL)
 ```
 
+How many of the partners named by Asian persons are tested for HIV?
+
+```{r}
+# filter the main dataset for rows where StudyIDFrom matches Asian individuals who named partners 
+asian_named_partners_tested <- 
+  no_missing_rows_in_net_dt %>%
+  filter(StudyIDFrom %in% individuals_dt_of_asian_who_named_partners$StudyID & 
+           (HIVTested == 1)) %>%
+  pull(StudyIDTo) %>%
+  unique()
+  
+
+length(asian_named_partners_tested)
+```
+
+
+
 **Other**
 
 Number of index persons (with named partners) who identify as other:
@@ -1165,6 +1297,23 @@ table(other_partners_in_individuals_full_dt$HIVDxDate, exclude = NULL)
 table(other_partners_in_individuals_full_dt$Sequence, exclude = NULL)
 ```
 
+
+How many of the partners named by Other persons are tested for HIV?
+
+```{r}
+# filter the main dataset for rows where StudyIDFrom matches Asian individuals who named partners 
+other_named_partners_tested <- 
+  no_missing_rows_in_net_dt %>%
+  filter(StudyIDFrom %in% individuals_dt_of_other_who_named_partners$StudyID & 
+           (HIVTested == 1)) %>%
+  pull(StudyIDTo) %>%
+  unique()
+  
+
+length(other_named_partners_tested)
+```
+
+
 **Ethnicity = Hispanic**
 
 Number of index persons (with named partners) who identify as Hispanic:
@@ -1207,6 +1356,23 @@ sum(table(hispanic_partners_in_individuals_full_dt$HIVDxDate))
 table(hispanic_partners_in_individuals_full_dt$HIVDxDate, exclude = NULL)
 table(hispanic_partners_in_individuals_full_dt$Sequence, exclude = NULL)
 ```
+
+How many of the partners named by Hispanic persons are tested for HIV?
+
+```{r}
+# filter the main dataset for rows where StudyIDFrom matches Asian individuals who named partners 
+hispanic_named_partners_tested <- 
+  no_missing_rows_in_net_dt %>%
+  filter(StudyIDFrom %in% individuals_dt_of_hispanic_who_named_partners$StudyID & 
+           (HIVTested == 1)) %>%
+  pull(StudyIDTo) %>%
+  unique()
+  
+
+length(hispanic_named_partners_tested)
+```
+
+
 
 **Ethnicity = Non-Hispanic**
 
@@ -1253,3 +1419,19 @@ sum(table(nonhispanic_partners_in_individuals_full_dt$HIVDxDate))
 table(nonhispanic_partners_in_individuals_full_dt$HIVDxDate, exclude = NULL)
 table(nonhispanic_partners_in_individuals_full_dt$Sequence, exclude = NULL)
 ```
+How many of the partners named by Non-Hispanic persons are tested for HIV?
+
+```{r}
+# filter the main dataset for rows where StudyIDFrom matches Asian individuals who named partners 
+nonhispanic_named_partners_tested <- 
+  no_missing_rows_in_net_dt %>%
+  filter(StudyIDFrom %in% individuals_dt_of_nonhispanic_who_named_partners$StudyID & 
+           (HIVTested == 1)) %>%
+  pull(StudyIDTo) %>%
+  unique()
+  
+
+length(nonhispanic_named_partners_tested)
+```
+
+
