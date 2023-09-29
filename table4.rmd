@@ -25,6 +25,7 @@ net_dt <- eda_env$net_dt
 named_pt_idx_005 <- eda_env$named_pt_idx_005 
 named_pt_idx_015 <- eda_env$named_pt_idx_015
 ```
+
 # Create a named partner network object
 
 ```{r}
@@ -220,7 +221,7 @@ dim(individuals_dt_w_index_persons_in_clusteredphyloany)
 #named_pt_net%v% "vertex.names"
 trace005_persons_in_named_pt_net_idx <- which((index_persons_in_005) %in% (named_pt_net %v% "vertex.names"))
 trace015_persons_in_named_pt_net_idx <- which((index_persons_in_015) %in% (named_pt_net %v% "vertex.names"))
-clusteredphyloany_persons_in_named_pt_net_idx <- which((index_persons_in_015) %in% (named_pt_net %v% "vertex.names"))
+clusteredphyloany_persons_in_named_pt_net_idx <- which((index_persons_in_clusteredphyloany) %in% (named_pt_net %v% "vertex.names"))
 
 individuals_dt_w_index_persons_in_005$named_partner_indicator <- 0
 individuals_dt_w_index_persons_in_005$named_partner_indicator[trace005_persons_in_named_pt_net_idx] <- 1
@@ -238,6 +239,8 @@ individuals_dt_w_index_persons_in_clusteredphyloany$named_partner_indicator[
 individuals_dt_w_index_persons_in_clusteredphyloany$named_partner_indicator <-
   as.factor(individuals_dt_w_index_persons_in_clusteredphyloany$named_partner_indicator)
 
+dim(individuals_dt_w_index_persons_in_clusteredphyloany)
+table(individuals_dt_w_index_persons_in_clusteredphyloany$named_partner_indicator, exclude = NULL)
 ```
 
 
@@ -660,6 +663,58 @@ results_015_converse <- run_analysis_clustering(individuals_in_named_pt_net_dt, 
 results_phyloany_converse <- run_analysis_clustering(individuals_in_named_pt_net_dt, "phyloany")
 ```
 
+
+### 005 cluster
+```{r}
+table(individuals_in_named_pt_net_dt$indicator_005_cluster, exclude = NULL)
+#table(individuals_dt_w_index_persons_in_015$named_partner_indicator, exclude = NULL)
+
+## DemoGender
+table(individuals_in_named_pt_net_dt$DemoGender, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$DemoGender, exclude = NULL) +
+  factor(individuals_in_named_pt_net_dt$indicator_005_cluster, exclude = NULL)
+   )
+   
+## DemoRace
+table(individuals_in_named_pt_net_dt$DemoRace, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$DemoRace, exclude = NULL) +
+  factor(individuals_in_named_pt_net_dt$indicator_005_cluster, exclude = NULL)
+   )
+
+## Sequence
+table(individuals_in_named_pt_net_dt$RecodedSequenceSubtype, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$RecodedSequenceSubtype, exclude = NULL) +
+factor(individuals_in_named_pt_net_dt$indicator_005_cluster, exclude = NULL)
+ )
+
+## MSM
+table(individuals_in_named_pt_net_dt$RiskMSM, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$RiskMSM, exclude = NULL) +
+factor(individuals_in_named_pt_net_dt$indicator_005_cluster, exclude = NULL)
+ )
+
+## Heterosexual
+table(individuals_in_named_pt_net_dt$RiskHeterosexual, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$RiskHeterosexual, exclude = NULL) +
+factor(individuals_in_named_pt_net_dt$indicator_005_cluster, exclude = NULL)
+ )
+
+## IDU
+table(individuals_in_named_pt_net_dt$RiskIDU, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$RiskIDU, exclude = NULL) +
+factor(individuals_in_named_pt_net_dt$indicator_005_cluster, exclude = NULL)
+ )
+
+## age at HIV diagnosis
+summary(individuals_in_named_pt_net_dt$HIVDxAge)
+individuals_in_named_pt_net_dt %>%
+  group_by(indicator_005_cluster) %>%
+  summarise(mean_HIVDxAge = mean(HIVDxAge, na.rm = TRUE))
+```
+
+
+
+### 015 cluster
 ```{r}
 table(individuals_in_named_pt_net_dt$indicator_015_cluster, exclude = NULL)
 #table(individuals_dt_w_index_persons_in_015$named_partner_indicator, exclude = NULL)
@@ -707,4 +762,52 @@ individuals_in_named_pt_net_dt %>%
   summarise(mean_HIVDxAge = mean(HIVDxAge, na.rm = TRUE))
 ```
 
+
+### phyloanycluster
+```{r}
+table(individuals_in_named_pt_net_dt$indicator_phyloany_cluster, exclude = NULL)
+#table(individuals_dt_w_index_persons_in_015$named_partner_indicator, exclude = NULL)
+
+## DemoGender
+table(individuals_in_named_pt_net_dt$DemoGender, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$DemoGender, exclude = NULL) +
+  factor(individuals_in_named_pt_net_dt$indicator_phyloany_cluster, exclude = NULL)
+   )
+   
+## DemoRace
+table(individuals_in_named_pt_net_dt$DemoRace, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$DemoRace, exclude = NULL) +
+  factor(individuals_in_named_pt_net_dt$indicator_phyloany_cluster, exclude = NULL)
+   )
+
+## Sequence
+table(individuals_in_named_pt_net_dt$RecodedSequenceSubtype, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$RecodedSequenceSubtype, exclude = NULL) +
+factor(individuals_in_named_pt_net_dt$indicator_phyloany_cluster, exclude = NULL)
+ )
+
+## MSM
+table(individuals_in_named_pt_net_dt$RiskMSM, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$RiskMSM, exclude = NULL) +
+factor(individuals_in_named_pt_net_dt$indicator_phyloany_cluster, exclude = NULL)
+ )
+
+## Heterosexual
+table(individuals_in_named_pt_net_dt$RiskHeterosexual, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$RiskHeterosexual, exclude = NULL) +
+factor(individuals_in_named_pt_net_dt$indicator_phyloany_cluster, exclude = NULL)
+ )
+
+## IDU
+table(individuals_in_named_pt_net_dt$RiskIDU, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$RiskIDU, exclude = NULL) +
+factor(individuals_in_named_pt_net_dt$indicator_phyloany_cluster, exclude = NULL)
+ )
+
+## age at HIV diagnosis
+summary(individuals_in_named_pt_net_dt$HIVDxAge)
+individuals_in_named_pt_net_dt %>%
+  group_by(indicator_phyloany_cluster) %>%
+  summarise(mean_HIVDxAge = mean(HIVDxAge, na.rm = TRUE))
+```
 
