@@ -2,25 +2,6 @@ rm(list=ls())
 
 library(ggplot2)
 
-# # Sample data
-# df <- data.frame(
-#   category = c("Gender: Male", "Race: Black", "Behavior: PWID"),
-#   log_odds = c(-0.2188, -0.29668, 0.40669),
-#   std_error = c(0.1401, 0.22138, 0.19599),
-#   p_value = c(0.1184, 0.18, 0.038)
-# )
-# 
-# # Calculate confidence intervals
-# df$lower_ci <- df$log_odds - 1.96 * df$std_error
-# df$upper_ci <- df$log_odds + 1.96 * df$std_error
-# 
-# ggplot(df, aes(x=log_odds, y=category)) + 
-#   geom_vline(aes(xintercept=0), linetype="dashed", color="grey") +
-#   geom_point(size=3, aes(color=(p_value < 0.05))) +  # Point for log odds; color coded for significance
-#   geom_errorbarh(aes(xmin=lower_ci, xmax=upper_ci), height=0.2) +  # Horizontal bars for CIs
-#   scale_color_manual(values=c("TRUE"="red", "FALSE"="black")) +  # Color for significance
-#   labs(title="Forest Plot", x="Log Odds", y="Category", color="Significant") +
-#   theme_minimal()
 
 # Sample data 
 df <- data.frame(
@@ -40,6 +21,25 @@ df$significant <- ifelse(df$lower_ci * df$upper_ci <= 0, "No", "Yes")
 
 # ... [Same data preparation code with the 'significant' column addition]
 
+# ggplot(df, aes(x=log_odds, y=category)) + 
+#   geom_vline(aes(xintercept=0), linetype="dashed", color="grey") +
+#   
+#   # Point for log odds colored by significance
+#   geom_point(aes(color=significant), size=3) +  
+#   
+#   # Error bars colored by significance
+#   geom_errorbarh(aes(xmin=lower_ci, xmax=upper_ci, color=significant), 
+#                  height=0.2) +
+#   scale_color_manual(values=c("No"="black", "Yes"="red"), 
+#                      name="Significance",
+#                      breaks=c("Yes", "No"),
+#                      labels=c("Significant", "Not Significant")) +
+#   
+#   labs(title="", x="Log Odds", y="Category") +
+#   theme_minimal() +
+#   theme(legend.position="bottom")
+
+
 ggplot(df, aes(x=log_odds, y=category)) + 
   geom_vline(aes(xintercept=0), linetype="dashed", color="grey") +
   
@@ -54,9 +54,8 @@ ggplot(df, aes(x=log_odds, y=category)) +
                      breaks=c("Yes", "No"),
                      labels=c("Significant", "Not Significant")) +
   
-  labs(title="Forest Plot", x="Log Odds", y="Category") +
+  labs(title="", x="Log Odds", y="") +
   theme_minimal() +
-  theme(legend.position="bottom")
-
-
+  theme(legend.position="bottom",
+        axis.text.y=element_text(size=14, face="bold", color="blue")) # modified theme settings
 

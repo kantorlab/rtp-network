@@ -15,6 +15,26 @@ df$upper_ci <- df$log_odds + 1.96 * df$std_error
 # Determine if CI crosses 0 (non-significant) or not (significant)
 df$significant <- ifelse(df$lower_ci * df$upper_ci <= 0, "No", "Yes")
 
+# ggplot(df, aes(x=log_odds, y=category)) + 
+#   geom_vline(aes(xintercept=0), linetype="dashed", color="grey") +
+#   
+#   # Point for log odds colored by significance
+#   geom_point(aes(color=significant), size=3) +  
+#   
+#   # Error bars colored by significance
+#   geom_errorbarh(aes(xmin=lower_ci, xmax=upper_ci, color=significant), height=0.2) +
+#   
+#   scale_color_manual(values=c("No"="black", "Yes"="red"), 
+#                      name="Significance",
+#                      breaks=c("Yes", "No"),
+#                      labels=c("Significant", "Not Significant")) +
+#   
+#   labs(title="", x="Log Odds", y="Category") +
+#   theme_minimal() +
+#   theme(legend.position="bottom")
+
+### make y-axis categories stand out more
+
 ggplot(df, aes(x=log_odds, y=category)) + 
   geom_vline(aes(xintercept=0), linetype="dashed", color="grey") +
   
@@ -29,7 +49,8 @@ ggplot(df, aes(x=log_odds, y=category)) +
                      breaks=c("Yes", "No"),
                      labels=c("Significant", "Not Significant")) +
   
-  labs(title="", x="Log Odds", y="Category") +
+  labs(title="", x="Log Odds", y="") +
   theme_minimal() +
-  theme(legend.position="bottom")
+  theme(legend.position="bottom",
+        axis.text.y=element_text(size=14, face="bold", color="blue")) # modified theme settings
 
