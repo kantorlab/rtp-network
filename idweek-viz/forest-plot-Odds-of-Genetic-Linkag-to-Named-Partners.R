@@ -57,5 +57,7 @@ ggplot(df, aes(x=log_odds, y=category)) +
   labs(title="", x="Log Odds", y="") +
   theme_minimal() +
   theme(legend.position="bottom",
-        axis.text.y=element_text(size=14, face="bold", color="blue")) # modified theme settings
-
+        axis.text.y=element_text(size=18, face="bold", color="blue"),   # for y-axis categories
+        axis.title.x=element_text(size=16, face="bold", color="black"), # for x-axis label "Log Odds"
+        legend.title=element_text(size=16, face="bold", color="black"), # for legend title "Significance"
+        legend.text=element_text(size=16, face="bold", color="black"))  # for legend items "Significant"/"Not Significant"
