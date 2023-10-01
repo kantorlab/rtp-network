@@ -261,8 +261,12 @@ Ans:
 
 -   [ Of these,
     `r length(which(!is.na(individuals_dt[individuals_in_net_dt_studyidto_witout_empty_StudyIDTo]$ClusteredPhyloAny)))`
-    clustered phylogenetically with someone who named them.
-    ]{style="background-color: #FFFF00"}
+    clustered phylogenetically with someone who named them (per clusteredphyloany).
+    ]{style="background-color: #FFFF00"}. 
+    
+- For the equivalent measures for Trace 005 and 015, see the number of missing entries in 
+`r table(individuals_dt[individuals_in_net_dt_studyidto_witout_empty_StudyIDTo]$ClusteredHIVTrace005, exclude = NULL)` and
+`r table(individuals_dt[individuals_in_net_dt_studyidto_witout_empty_StudyIDTo]$ClusteredHIVTrace015, exclude = NULL)`
 
 What is the Jaccard Similarity Coefficient for the individuals database
 and partner contact tracing database?
