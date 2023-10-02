@@ -109,7 +109,7 @@ combined_df <- rbind(df_long, df_race_long, df_ethnicity_long)
 # Plot
 p <- ggplot(combined_df, aes(x = Grouping, y = Value, fill = Category)) +
   geom_bar(stat = "identity", position = "dodge") +
-  labs(y = "Mean Number of Partners") +
+  labs(y = "Mean Number of Partners per Index Case") +
   scale_fill_brewer(palette="Set1", 
                     breaks=c("Named_Mean", "Tested_Mean", "Diagnosed_Mean", "Sequenced_Mean"),
                     labels=c("Named", "Tested", "Diagnosed", "Sequenced"),
