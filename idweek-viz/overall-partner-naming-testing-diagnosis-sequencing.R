@@ -21,7 +21,7 @@ overall_data$Category <- factor(overall_data$Category,
 p_overall <- ggplot(overall_data, aes(x = Category, y = Value, fill = Category)) +
   geom_bar(stat = "identity", position = "dodge") +
   # Add this line to annotate bars with their value
-  geom_text(aes(label=sprintf("%.2f", Value)), vjust=-0.5, size=4) + # vjust controls the vertical position of the label (negative values move the label upwards)
+  geom_text(aes(label=sprintf("%.2f", Value)), vjust=-0.5, size=4, fontface="bold") + # vjust controls the vertical position of the label (negative values move the label upwards)
   labs(title = "",
        y = "Mean Number of Partners per Index Case",
        x = "") +
@@ -37,7 +37,7 @@ p_overall <- ggplot(overall_data, aes(x = Category, y = Value, fill = Category))
     axis.title.y = element_text(size = 16),
     axis.text.x = element_blank(),   # This will remove the x-axis labels
     axis.text.y = element_text(size = 14),
-    legend.text = element_text(size = 14),
+    legend.text = element_text(size = 16),
     legend.title = element_text(size = 16)
   )
 
