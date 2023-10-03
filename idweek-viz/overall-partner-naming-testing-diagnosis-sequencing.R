@@ -17,11 +17,15 @@ overall_data$Category <- factor(overall_data$Category,
 
 # Plot for overall data
 
+# Create the labels
+labels_n = c("n=1349", "n=338", "n=154", "n=152")
+
 # Plot for overall data
 p_overall <- ggplot(overall_data, aes(x = Category, y = Value, fill = Category)) +
   geom_bar(stat = "identity", position = "dodge") +
   # Add this line to annotate bars with their value
-  geom_text(aes(label=sprintf("%.2f", Value)), vjust=-0.5, size=4, fontface="bold") + # vjust controls the vertical position of the label (negative values move the label upwards)
+  #geom_text(aes(label=sprintf("%.2f", Value)), vjust=-0.5, size=4, fontface="bold") + # vjust controls the vertical position of the label (negative values move the label upwards)
+  geom_text(aes(label=labels_n), vjust=-0.5, size=4, fontface="bold") +
   labs(title = "",
        y = "Mean Number of Partners per Index Case",
        x = "") +
