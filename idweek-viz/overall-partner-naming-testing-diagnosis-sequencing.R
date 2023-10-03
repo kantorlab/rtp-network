@@ -18,7 +18,7 @@ overall_data$Category <- factor(overall_data$Category,
 # Plot for overall data
 
 # Create the labels
-labels_n = c("n=1349", "n=338", "n=154", "n=152")
+labels_n = c("n=1342", "n=338", "n=154", "n=152")
 
 # Plot for overall data
 p_overall <- ggplot(overall_data, aes(x = Category, y = Value, fill = Category)) +
