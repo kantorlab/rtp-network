@@ -38,7 +38,7 @@ p_overall <- ggplot(overall_data, aes(x = Category, y = Value, fill = Category))
   theme(
     plot.title = element_text(size = 18, face = "bold"),
     axis.title.x = element_blank(),
-    axis.title.y = element_text(size = 16),
+    axis.title.y = element_text(size = 18, face = "bold", color = "black"),
     axis.text.x = element_blank(),   # This will remove the x-axis labels
     axis.text.y = element_text(size = 14),
     legend.text = element_text(size = 16),
