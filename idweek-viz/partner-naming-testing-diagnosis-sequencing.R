@@ -13,10 +13,11 @@ df <- data.frame(
   Sequenced_Mean = c(79/275, 12/26, 31/160)  # Mean number of sequenced partners in SDB
 )
 
+df$N <- c("MSM (n=275)", "PWID (n=26)", "HRH (n=160)")
 
 
 df_long <- df %>%
-  gather(Category, Value, -Grouping)
+  gather(Category, Value, -Grouping, -N)
 
 
 df_long$Category <- factor(df_long$Category, 
@@ -28,6 +29,7 @@ df_long$Category <- factor(df_long$Category,
 # Plot
 ggplot(df_long, aes(x = factor(Grouping, levels=c("MSM", "PWID", "HRH")), 
                     y = Value, fill = Category)) +
+  geom_text(aes(label = N, y = 0), vjust = 1.5, hjust = 0.5, size = 4, color = "black", inherit.aes = FALSE)+
   geom_bar(stat = "identity", position = "dodge") +
   labs(title = "Mean Number of Partners by Index Cases Providing Partner Data",
        y = "Mean Number of Partners",
@@ -48,17 +50,24 @@ df_race <- data.frame(
   Sequenced_Mean = c(86/313, 34/133, 3/16, 7/28)
 )
 
+
+df_race$N <- c("White (n=313)", "Black (n=133)", "Asian (n=16)", "Other (n=28)")
+
 df_race_long <- df_race %>%
-  gather(Category, Value, -Grouping)
+  gather(Category, Value, -Grouping, -N)
 
 df_race_long$Category <- factor(df_race_long$Category, 
                                 levels = c("Named_Mean", "Tested_Mean", "Diagnosed_Mean", "Sequenced_Mean"))
+
+df_race$N <- c("White (n=313)", "Black (n=133)", "Asian (n=16)", "Other (n=28)")
 
 
 
 ggplot(df_race_long, aes(x = Grouping, 
                          y = Value, fill = Category)) +
   geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = N, y = 0), vjust = 1.5, hjust = 0.5, size = 4, color = "black", inherit.aes = FALSE)+
+
   labs(title = "Mean Number of Partners by Race",
        y = "Mean Number of Partners",
        x = "Race") +
@@ -80,8 +89,10 @@ df_ethnicity <- data.frame(
   Sequenced_Mean = c(40/140, 89/357)
 )
 
+df_ethnicity$N <- c("Hispanic (n=140)", "Not Hispanic (n=357)")
+
 df_ethnicity_long <- df_ethnicity %>%
-  gather(Category, Value, -Grouping)
+  gather(Category, Value, -Grouping, -N)
 
 df_ethnicity_long$Category <- factor(df_ethnicity_long$Category, 
                                      levels = c("Named_Mean", "Tested_Mean", "Diagnosed_Mean", "Sequenced_Mean"))
@@ -90,6 +101,7 @@ df_ethnicity_long$Category <- factor(df_ethnicity_long$Category,
 ggplot(df_ethnicity_long, aes(x = Grouping, 
                               y = Value, fill = Category)) +
   geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = N, y = 0), vjust = 1.5, hjust = 0.5, size = 4, color = "black", inherit.aes = FALSE)+
   labs(title = "Mean Number of Partners by Ethnicity",
        y = "Mean Number of Partners",
        x = "Ethnicity") +
@@ -109,6 +121,7 @@ combined_df <- rbind(df_long, df_race_long, df_ethnicity_long)
 # Plot
 p <- ggplot(combined_df, aes(x = Grouping, y = Value, fill = Category)) +
   geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = N, y = 0), vjust = 1.5, hjust = 0.5, size = 4, color = "black", inherit.aes = FALSE)+
   labs(y = "Mean Number of Partners per Index Case") +
   scale_fill_brewer(palette="Set1", 
                     breaks=c("Named_Mean", "Tested_Mean", "Diagnosed_Mean", "Sequenced_Mean"),
@@ -133,42 +146,15 @@ p <-
   p + theme(
   plot.title = element_text(size = 18, face = "bold"),
   axis.title.x = element_text(size = 16, vjust=-0.5),  # vjust for vertical adjustment
-  axis.title.y = element_text(size = 16, vjust=0.5),  # vjust for vertical adjustment
-  axis.text.x = element_text(size = 14, angle = 45, hjust = 1),  # Angle for better label readability
-  axis.text.y = element_text(size = 14),
+  axis.title.y = element_text(size = 14, face = "bold", color = "black", vjust=0.5),  # vjust for vertical adjustment
+  axis.text.x = element_text(size = 14, face = "bold", color = "black"),
+  axis.text.y = element_text(size = 14, face = "bold", color = "black"),
   legend.text = element_text(size = 14),
   legend.title = element_text(size = 16),
   
   # Customizing the facet titles
   strip.text = element_text(size = 20, face = "bold", color = "black"),  # Make facet titles larger, bolder, and black
-  strip.background = element_rect(fill = "lightgray", color = "black", size = 1)  # Change the background color and border of facet titles
+  strip.background = element_rect(fill = "lightgray", color = "black", linewidth = 1)  # Change the background color and border of facet titles
 )
-
-# p <- p + 
-#   theme(
-#     plot.margin = margin(5, 40, 5, 5, "pt")  # Add more space on the right side
-#   ) +
-#   annotate(
-#     geom = "text", x = Inf, y = Inf, 
-#     label = "MSM: Men who have Sex with Men",
-#     hjust = 1.5, vjust = 1, size = 4, 
-#     family = "sans", color = "black"
-#   ) +
-#   annotate(
-#     geom = "text", x = Inf, y = Inf - 0.1, 
-#     label = "HRH: High-Risk Heterosexuals",
-#     hjust = 1.5, vjust = 1, size = 4, 
-#     family = "sans", color = "black"
-#   ) +
-#   annotate(
-#     geom = "text", x = Inf, y = Inf - 0.2, 
-#     label = "PWID: Persons who Inject Drugs",
-#     hjust = 1.5, vjust = 1, size = 4, 
-#     family = "sans", color = "black"
-#   ) +
-#   theme(
-#     strip.text = element_text(size = 20, face = "bold", color = "black"),  
-#     strip.background = element_rect(fill = "lightgray", color = "black", linewidth = 1)  
-#   )
 
 print(p)
