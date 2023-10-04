@@ -217,7 +217,6 @@ length(which(is.na(individuals_dt$ClusteredPhyloAny)))
 individuals_dt_w_index_persons_in_clusteredphyloany <- individuals_dt[index_person_idx_in_clusteredphyloany,]
 dim(individuals_dt_w_index_persons_in_clusteredphyloany)
 ```
-
 [Thus, there are `r nrow(individuals_dt_w_index_persons_in_clusteredphyloany)`
     who are clustered phylogenetically by the `phyloany` method.
     Of these, `r length(which(individuals_dt_w_index_persons_in_clusteredphyloany$named_partner_indicator == 1))`]{style="background-color: #FFFF00"}
@@ -818,9 +817,12 @@ factor(individuals_in_named_pt_net_dt$indicator_phyloany_cluster, exclude = NULL
 
 ## age at HIV diagnosis
 summary(individuals_in_named_pt_net_dt$HIVDxAge)
-individuals_in_named_pt_net_dt %>%
+res <-
+  individuals_in_named_pt_net_dt %>%
   group_by(indicator_phyloany_cluster) %>%
-  summarise(mean_HIVDxAge = mean(HIVDxAge, na.rm = TRUE))
+  summarise(mean_HIVDxAge = mean(HIVDxAge, na.rm = TRUE),
+            n=n())
+print(res)
 ```
 
 [Thus, there are `r length(individuals_in_named_pt_net_dt$indicator_phyloany_cluster)`
@@ -829,3 +831,4 @@ individuals_in_named_pt_net_dt %>%
     `r length(which(individuals_in_named_pt_net_dt$indicator_phyloany_cluster == 0))`
     did not]{style="background-color: #FFFF00"}
     
+
