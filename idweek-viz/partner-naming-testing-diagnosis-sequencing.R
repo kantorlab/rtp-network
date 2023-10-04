@@ -51,7 +51,8 @@ p <- ggplot(combined_df, aes(x = Grouping, y = Value, fill = Category)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_text(aes(label = N, y = 0), vjust = 1.5, hjust = 0.5, size = 6, color = "black") +
   labs(y = "Mean Number of Partners per Index Case") +
-  scale_fill_brewer(palette="Set1", breaks=c("Named_Mean", "Tested_Mean", "Diagnosed_Mean", "Sequenced_Mean"), labels=c("Named", "Tested", "Diagnosed", "Sequenced"), name="Category") +
+  #scale_fill_brewer(palette="Set1", breaks=c("Named_Mean", "Tested_Mean", "Diagnosed_Mean", "Sequenced_Mean"), labels=c("Named", "Tested", "Diagnosed", "Sequenced"), name="Category") +
+  scale_fill_brewer(palette="Set1", breaks=c("Named_Mean", "Tested_Mean", "Diagnosed_Mean", "Sequenced_Mean"), labels=c("Named", "Tested", "Diagnosed", "Sequenced"), name=NULL)+
   theme_minimal() +
   theme(
     plot.title = element_text(size = 18, face = "bold"),
@@ -59,8 +60,8 @@ p <- ggplot(combined_df, aes(x = Grouping, y = Value, fill = Category)) +
     axis.title.y = element_text(size = 18, face = "bold", color = "black"),
     #axis.text.x = element_text(size = 14, angle = 45, hjust = 1),
     axis.text.y = element_text(size = 16, face = "bold", color = "black"),
-    legend.text = element_text(size = 14),
-    legend.title = element_text(size = 16),
+    legend.text = element_text(size = 16, face = "bold"),
+    #legend.title = element_text(size = 16),
     strip.text = element_text(size = 20, face = "bold", color = "black"),
     strip.background = element_rect(fill = "lightgray", color = "black", linewidth = 1)
   ) +
