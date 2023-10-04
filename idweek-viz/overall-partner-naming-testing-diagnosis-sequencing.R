@@ -30,7 +30,7 @@ labels_n = c("n=1342", "n=338", "n=154", "n=152")
 # Updated plot code
 p_overall <- ggplot(overall_data, aes(x = Category, y = Value, fill = Category)) +
   geom_bar(stat = "identity", position = "dodge") +
-  geom_text(aes(label=labels_n), vjust=-0.5, size=4, fontface="bold") +
+  geom_text(aes(label=labels_n), vjust=-0.5, size=6, fontface="bold") +
   labs(title = "",
        y = "Mean Number of Partners per Index Case",
        x = "") +
@@ -41,7 +41,7 @@ p_overall <- ggplot(overall_data, aes(x = Category, y = Value, fill = Category))
     plot.title = element_text(size = 18, face = "bold"),
     axis.title.x = element_blank(),
     axis.title.y = element_text(size = 18, face = "bold", color = "black"),
-    axis.text.y = element_text(size = 14),
+    axis.text.y = element_text(size = 16, face = "bold", color = "black"),
     axis.text.x = element_text(size = 18, face = "bold", color = "black"),
     legend.position = "none"   # This will remove the legend
   )
