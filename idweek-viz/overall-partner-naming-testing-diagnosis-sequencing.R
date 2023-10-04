@@ -11,38 +11,39 @@ overall_data <- data.frame(
   Value = c(2.7, 338/497, 154/497, 152/497)
 )
 
-# Setting the order of the factor levels for Category
+# Adjusting the factor levels and labels for the Category column
 overall_data$Category <- factor(overall_data$Category, 
-                                levels = c("Named_Mean", "Tested_Mean", "Diagnosed_Mean", "Sequenced_Mean"))
+                                levels = c("Named_Mean", "Tested_Mean", "Diagnosed_Mean", "Sequenced_Mean"),
+                                labels = c("Named", "Tested", "Diagnosed", "Sequenced"))
 
-# Plot for overall data
+# Color settings
+set1_colors <- brewer.pal(8, "Set1")
+my_colors <- c("Named" = set1_colors[1],  # Red from Set1
+               "Tested" = set1_colors[2],  # Blue from Set1
+               "Diagnosed" = set1_colors[3],  # Green from Set1
+               "Sequenced" = set1_colors[4])  # Purple from Set1
+
 
 # Create the labels
 labels_n = c("n=1342", "n=338", "n=154", "n=152")
 
-# Plot for overall data
+# Updated plot code
 p_overall <- ggplot(overall_data, aes(x = Category, y = Value, fill = Category)) +
   geom_bar(stat = "identity", position = "dodge") +
-  # Add this line to annotate bars with their value
-  #geom_text(aes(label=sprintf("%.2f", Value)), vjust=-0.5, size=4, fontface="bold") + # vjust controls the vertical position of the label (negative values move the label upwards)
   geom_text(aes(label=labels_n), vjust=-0.5, size=4, fontface="bold") +
   labs(title = "",
        y = "Mean Number of Partners per Index Case",
        x = "") +
-  scale_fill_brewer(palette="Set1", 
-                    breaks=c("Named_Mean", "Tested_Mean", "Diagnosed_Mean", "Sequenced_Mean"),
-                    labels=c("Named", "Tested", "Diagnosed", "Sequenced"),
-                    name="Category") +
-  scale_y_continuous(limits = c(0, 3)) + # Replace 0 and 1 with the range of the race/ethnicity/behavior plot
+  scale_fill_manual(values=my_colors) +  # Setting colors manually
+  scale_y_continuous(limits = c(0, 3)) +
   theme_minimal() +
   theme(
     plot.title = element_text(size = 18, face = "bold"),
     axis.title.x = element_blank(),
     axis.title.y = element_text(size = 18, face = "bold", color = "black"),
-    axis.text.x = element_blank(),   # This will remove the x-axis labels
     axis.text.y = element_text(size = 14),
-    legend.text = element_text(size = 16),
-    legend.title = element_text(size = 16)
+    axis.text.x = element_text(size = 18, face = "bold", color = "black"),
+    legend.position = "none"   # This will remove the legend
   )
 
 print(p_overall)
