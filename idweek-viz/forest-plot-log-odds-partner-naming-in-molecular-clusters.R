@@ -1,8 +1,20 @@
 library(ggplot2)
 
+rm(list=ls())
+
 # Sample data
 df <- data.frame(
-  category = c("Gender: Male", "Gender: Non-Binary/Not Reported", "Race: Asian", "Race: Other", "Race: White", "Race: Not Reported", "Sequence: not B", "Behavior: MSM", "Behavior: HRH", "Risk: PWID", "Age at HIV Diagnosis"),
+  category = c("Gender: Male (n=477)", 
+               "Gender: Non-Binary/Not Reported (n=7)", 
+               "Race: Asian (n=10)", 
+               "Race: Other (n=30)", 
+               "Race: White (n=386)", 
+               "Race: Not Reported (n=7)", 
+               "Sequence: not B (n=51)", 
+               "Behavior: MSM (n=333)", 
+               "Behavior: HRH (n=165)", 
+               "Risk: PWID  (n=33)", 
+               "Age at HIV Diagnosis (n=583)"),
   log_odds = c(0.5195, 0.3712, -0.7893, 0.3093, 0.4604, 0.5280, -0.91371, 0.39270, -0.53185, 0.99007, -0.007950),
   std_error = c(0.1693, 0.6443, 0.4223, 0.3342, 0.1552, 0.7014, 0.20528, 0.13964, 0.14633, 0.42209, 0.005376),
   p_value = c(0.00214, 0.56453, 0.06162, 0.35464, 0.00301, 0.45160, 8.54e-06, 0.00492, 0.000278, 0.019, 0.139)
@@ -25,7 +37,7 @@ ggplot(df, aes(x=log_odds, y=category)) +
   geom_errorbarh(aes(xmin=lower_ci, xmax=upper_ci, color=significant), height=0.2) +
   
   scale_color_manual(values=c("No"="black", "Yes"="red"), 
-                     name="Significance",
+                     name="",
                      breaks=c("Yes", "No"),
                      labels=c("Significant", "Not Significant")) +
   
