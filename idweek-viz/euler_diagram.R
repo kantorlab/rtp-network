@@ -1,19 +1,18 @@
+rm(list=ls())
 library(eulerr)
 
-combo <- c("Partner DB"=2418,
-           "Genomic DB"=2553,
-           "Partner DB&Genomic DB"=904,
-           "Index cases"=497,
-           "Partner DB&Index cases"=497,
-           "Genomic DB&Index cases"=497,
-           "Partner DB&Genomic DB&Index cases"=497,
-           "Named partners"=154,
-           "Partner DB&Named partners"=154,
-           "Genomic DB&Named partners"=154,
-           "Index cases&Named partners"=154,
-           "Partner DB&Genomic DB&Named partners"=154,
-           "Partner DB&Index cases&Named partners"=154,
-           "Genomic DB&Index cases&Named partners"=154,
-           "Partner DB&Genomic DB&Index cases&Named partners"=154)
+# Define the sets and their intersections
+counts <- c(
+  "Partner DB" = 1514, 
+  "Genomic DB" = 1649, 
+  "Genomic DB&Partner DB" = 904)
 
-plot(euler(combo, input="union"), quantities = TRUE)
+# Draw the Euler diagram with enhanced quantities
+euler_plot <-
+  plot(euler(counts),
+     quantities = TRUE,
+     fills = c("red", "blue"),
+     ptext.cex = 3.0,        # Increase font size
+     ptext.col = "black",   # Change font color to black
+     ptext.fontface = "bold" # Make text bold
+)
