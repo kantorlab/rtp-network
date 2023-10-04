@@ -239,7 +239,16 @@ Ans:
 
 -   [ Of these,
     `r length(which(!is.na(individuals_dt[individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo]$ClusteredPhyloAny)))`
-    are clustered phylogenetically.]{style="background-color: #FFFF00"}
+    are clustered phylogenetically.]{style="background-color: #FFFF00"} (per `clusteredphyloany`)
+
+-   [ Of these,
+    `r table(individuals_dt[individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo]$ClusteredHIVTrace005, exclude=NULL)`
+    are clustered phylogenetically.]{style="background-color: #FFFF00"} (per `Trace 005`) - subtract blank entries
+    
+-   [ Of these,
+    `r table(individuals_dt[individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo]$ClusteredHIVTrace015, exclude=NULL)`
+    are clustered phylogenetically.]{style="background-color: #FFFF00"} (per `Trace 005`) - subtract blank entries
+
 
 Of the partners of the newly diagnosed persons in the contact tracing
 database, how many nominated other persons? How many are clustered with
