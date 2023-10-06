@@ -28,3 +28,23 @@ length(intersected_persons_without_named_partner)
 
 # How many total partners are named by the 497 index cases in the genomic DB who named partners?
 length(unique(partner_db_non_missing_studyidto$StudyIDTo))
+
+# Compute Jaccard coefficient
+
+## identify unique individuals
+genomic_individuals <- unique(genomic_db$StudyID)
+partner_individuals_from <- unique(partner_db$StudyIDFrom)
+partner_individuals_to <- unique(partner_db$StudyIDTo)
+
+# combine the 'StudyIDFrom' and 'StudyIDTo' for partner_db
+partner_individuals <- unique(c(partner_individuals_from, partner_individuals_to))
+
+# compute intersection and union lengths
+intersection_length <- length(intersect(genomic_individuals, partner_individuals))
+union_length <- length(union(genomic_individuals, partner_individuals))
+
+# Calculate Jaccard Coefficient
+jaccard_coefficient <- intersection_length / union_length
+jaccard_coefficient
+
+
