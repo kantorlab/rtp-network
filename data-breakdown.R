@@ -17,15 +17,16 @@ length(unique(partner_db$StudyIDFrom))
 length(unique(partner_db$StudyIDTo))
 
 # Identify all unique StudyIDs in the partner DB  
-net_el <- (cbind(partner_db$StudyIDFrom, partner_db$StudyIDTo))
-dim(net_el)
+partner_db_el <- (cbind(partner_db$StudyIDFrom, partner_db$StudyIDTo))
+dim(partner_db_el)
 length(which((partner_db$StudyIDFrom) == ""))
 length(which((partner_db$StudyIDTo) == ""))
 non_missing_studyidto <- which(partner_db$StudyIDTo != "")
 length(non_missing_studyidto)
-non_missing_studyidto_net_el <- net_el[non_missing_studyidto,]
-dim(non_missing_studyidto_net_el)
+non_missing_studyidto_partner_db_el <- partner_db_el[non_missing_studyidto,]
+dim(non_missing_studyidto_partner_db_el)
 partner_db_non_missing_studyidto <- partner_db[non_missing_studyidto,]
+dim(partner_db_non_missing_studyidto)
 
 # Are all studyids in genomic DB interviewed as studyidfrom
 genomic_studyid_notin_studyidfrom <- 
@@ -35,6 +36,29 @@ length(genomic_studyid_notin_studyidfrom)
 # How many unique study ids in the genomic database are interviewed as studyidfrom
 genomic_studyid_in_studyidfrom <- genomic_db$StudyID[which(genomic_db$StudyID %in% partner_db_non_missing_studyidto$StudyIDFrom)]
 length(genomic_studyid_in_studyidfrom)
+
+genomic_studyid_notin_studyidfrom <- genomic_db$StudyID[which(!genomic_db$StudyID %in% partner_db_non_missing_studyidto$StudyIDFrom)]
+length(genomic_studyid_notin_studyidfrom)
+
+# compute intersections betwee genomic db and partnerdb
+length(intersect(genomic_db$StudyID, partner_db$StudyIDFrom))
+length(intersect(genomic_db$StudyID, partner_db$StudyIDTo))
+length(intersect(partner_db$StudyIDFrom, partner_db$StudyIDTo))
+length(Reduce(intersect, list(genomic_db$StudyID, partner_db$StudyIDFrom, partner_db$StudyIDTo)))
+
+# Filter partner_db to only rows where StudyIDTo is not missing
+partner_db_non_missing_studyidto <- partner_db[which(partner_db$StudyIDTo != ""), ]
+overlap_count <- length(intersect(genomic_db$StudyID, partner_db_non_missing_studyidto$StudyIDFrom))
+overlap_count
+
+# Start with those that intersect with genomic_db$StudyID and partner_db$StudyIDFrom
+intersected_persons <- intersect(genomic_db$StudyID, partner_db$StudyIDFrom)
+
+# Then filter these individuals based on missing or empty StudyIDTo in partner_db
+persons_without_valid_partner <- intersected_persons[!intersected_persons %in% partner_db_non_missing_studyidto$StudyIDFrom]
+
+length(persons_without_valid_partner)  # This should give 407
+
 
 # Identify all unique StudyIDTos 
 length(unique(partner_db$StudyIDTo))
