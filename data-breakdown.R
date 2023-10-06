@@ -16,15 +16,15 @@ length(intersect(genomic_db$StudyID, partner_db$StudyIDTo))
 length(intersect(partner_db$StudyIDFrom, partner_db$StudyIDTo))
 length(Reduce(intersect, list(genomic_db$StudyID, partner_db$StudyIDFrom, partner_db$StudyIDTo)))
 
-# Filter partner_db to only rows where StudyIDTo is not missing
+# How many of the interviewed index cases who are also in the genomic DB provided identifiable partner data?
 partner_db_non_missing_studyidto <- partner_db[which(partner_db$StudyIDTo != ""), ]
-overlap_count <- length(intersect(genomic_db$StudyID, partner_db_non_missing_studyidto$StudyIDFrom))
-overlap_count
+index_cases_who_named_partners <- intersect(genomic_db$StudyID, partner_db_non_missing_studyidto$StudyIDFrom)
+length(index_cases_who_named_partners)
 
-# Start with those that intersect with genomic_db$StudyID and partner_db$StudyIDFrom
-intersected_persons <- intersect(genomic_db$StudyID, partner_db$StudyIDFrom)
+# How many of the interviewed index cases who are also in the genomic DB did not provide identifiable partner data?
+intersected_persons_partner_genomic_db <- intersect(genomic_db$StudyID, partner_db$StudyIDFrom)
+intersected_persons_without_named_partner <- intersected_persons_partner_genomic_db[!intersected_persons_partner_genomic_db %in% partner_db_non_missing_studyidto$StudyIDFrom]
+length(intersected_persons_without_named_partner)  
 
-# Then filter these individuals based on missing or empty StudyIDTo in partner_db
-persons_without_valid_partner <- intersected_persons[!intersected_persons %in% partner_db_non_missing_studyidto$StudyIDFrom]
-length(persons_without_valid_partner)  # This should give 407
-
+# How many total partners are named by the 497 index cases in the genomic DB who named partners?
+length(unique(partner_db_non_missing_studyidto$StudyIDTo))
