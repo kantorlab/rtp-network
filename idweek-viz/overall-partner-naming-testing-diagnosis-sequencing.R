@@ -7,25 +7,34 @@ library(RColorBrewer)
 
 # Structuring the data with the average values
 overall_data <- data.frame(
-  Category = c("Named_Mean", "Tested_Mean", "Diagnosed_Mean", "Sequenced_Mean"),
-  Value = c(2.7, 338/497, 154/497, 152/497)
+  Category = c("Named_Mean", "Contacted_Mean", "Tested_Mean", "Diagnosed_Mean", "Sequenced_Mean"),
+  Value = c(1343/497, 880/497, 338/497, 154/497, 152/497)
 )
 
 # Adjusting the factor levels and labels for the Category column
 overall_data$Category <- factor(overall_data$Category, 
-                                levels = c("Named_Mean", "Tested_Mean", "Diagnosed_Mean", "Sequenced_Mean"),
-                                labels = c("Named", "Tested", "Diagnosed", "Sequenced"))
+                                levels = c("Named_Mean", 
+                                           "Contacted_Mean",
+                                           "Tested_Mean",
+                                           "Diagnosed_Mean",
+                                           "Sequenced_Mean"),
+                                labels = c("Named", 
+                                           "Contacted",
+                                           "Tested", 
+                                           "Diagnosed", 
+                                           "Sequenced"))
 
 # Color settings
 set1_colors <- brewer.pal(8, "Set1")
-my_colors <- c("Named" = set1_colors[1],  # Red from Set1
-               "Tested" = set1_colors[2],  # Blue from Set1
-               "Diagnosed" = set1_colors[3],  # Green from Set1
-               "Sequenced" = set1_colors[4])  # Purple from Set1
+my_colors <- c("Named" = set1_colors[1], 
+               "Contacted" = set1_colors[2],
+               "Tested" = set1_colors[3],     
+               "Diagnosed" = set1_colors[4],  
+               "Sequenced" = set1_colors[5]) 
 
 
 # Create the labels
-labels_n = c("n=1342", "n=338", "n=154", "n=152")
+labels_n = c("n=1343", "n=880", "n=338", "n=154", "n=152")
 
 # Updated plot code
 p_overall <- ggplot(overall_data, aes(x = Category, y = Value, fill = Category)) +
