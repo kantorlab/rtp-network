@@ -47,4 +47,15 @@ union_length <- length(union(genomic_individuals, partner_individuals))
 jaccard_coefficient <- intersection_length / union_length
 jaccard_coefficient
 
+# How many named partners are also sequenced 
+named_partners_in_genomic_db <- intersect(genomic_db$StudyID, partner_db$StudyIDTo)
+id_named_partners_in_genomic_db <- which(genomic_db$StudyID %in% named_partners_in_genomic_db)
 
+length(which(is.na(genomic_db$ClusteredPhyloAny)))
+length(which(is.na(genomic_db$ClusteredPhyloAny)))
+
+table(genomic_db$Sequence, exclude=NULL)
+table(genomic_db$SequenceSubtype, exclude=NULL)
+
+table(genomic_db[id_named_partners_in_genomic_db]$Sequence, exclude=NULL)
+z 5
