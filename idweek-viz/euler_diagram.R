@@ -16,3 +16,5 @@ euler_plot <-
      ptext.col = "black",   # Change font color to black
      ptext.fontface = "bold" # Make text bold
 )
+
+print(euler_plot)

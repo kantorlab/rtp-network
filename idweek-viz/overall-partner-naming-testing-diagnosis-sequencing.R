@@ -8,7 +8,7 @@ library(RColorBrewer)
 # Structuring the data with the average values
 overall_data <- data.frame(
   Category = c("Named_Mean", "Contacted_Mean", "Tested_Mean", "Diagnosed_Mean", "Sequenced_Mean"),
-  Value = c(1343/497, 880/497, 338/497, 154/497, 152/497)
+  Value = c(1342/497, 880/497, 338/497, 152/497, 152/497)
 )
 
 # Adjusting the factor levels and labels for the Category column
@@ -34,7 +34,7 @@ my_colors <- c("Named" = set1_colors[1],
 
 
 # Create the labels
-labels_n = c("n=1343", "n=880", "n=338", "n=154", "n=152")
+labels_n = c("n=1342", "n=880", "n=338", "n=152", "n=152")
 
 # Updated plot code
 p_overall <- ggplot(overall_data, aes(x = Category, y = Value, fill = Category)) +

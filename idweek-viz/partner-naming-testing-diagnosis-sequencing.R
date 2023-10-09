@@ -62,10 +62,12 @@ p <- ggplot(combined_df, aes(x = Grouping, y = Value, fill = Category)) +
     axis.text.y = element_text(size = 16, face = "bold", color = "black"),
     legend.text = element_text(size = 16, face = "bold"),
     #legend.title = element_text(size = 16),
-    strip.text = element_text(size = 20, face = "bold", color = "black"),
+    strip.text = element_text(size = 24, face = "bold", color = "black"),
     strip.background = element_rect(fill = "lightgray", color = "black", linewidth = 1)
   ) +
   facet_wrap(~Type, scales = "free_x", ncol = 3) +
   ylim(0, max(combined_df$Value) + 0.1*max(combined_df$Value))
 
+pdf("cascade-breakdown.pdf", width=28, height=12)
 print(p)
+dev.off()
