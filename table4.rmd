@@ -1,8 +1,6 @@
 ---
-title: "Table 4 regressions"
-output: 
-  html_notebook:
-    toc: FALSE
+title: "R Notebook"
+output: html_notebook
 ---
 
 # Setup
@@ -34,6 +32,7 @@ net_dt_mat <- cbind(as.character(net_dt[,1]), as.character(net_dt[,2]))
 net <- as.network(net_dt_mat, bipartite = F, directed = T)
 net
 length(net %v% "vertex.names")
+head(net %v% "vertex.names")
 named_pt_net <- net
 ```
 
@@ -239,9 +238,155 @@ individuals_dt_w_index_persons_in_clusteredphyloany$named_partner_indicator[
 individuals_dt_w_index_persons_in_clusteredphyloany$named_partner_indicator <-
   as.factor(individuals_dt_w_index_persons_in_clusteredphyloany$named_partner_indicator)
 
-#table(individuals_dt_w_index_persons_in_015$named_partner_indicator, exclude = NULL)
 ```
 
+
+- Split the above counts by attributes
+
+Trace 005:
+```{r}
+table(individuals_dt_w_index_persons_in_005$named_partner_indicator, exclude = NULL)
+
+## DemoGender
+table(individuals_dt_w_index_persons_in_005$DemoGender, exclude = NULL)
+xtabs(~factor(individuals_dt_w_index_persons_in_005$DemoGender, exclude = NULL) +
+  factor(individuals_dt_w_index_persons_in_005$named_partner_indicator, exclude = NULL)
+   )
+   
+## DemoRace
+table(individuals_dt_w_index_persons_in_005$DemoRace, exclude = NULL)
+xtabs(~factor(individuals_dt_w_index_persons_in_005$DemoRace, exclude = NULL) +
+factor(individuals_dt_w_index_persons_in_005$named_partner_indicator, exclude = NULL)
+ )
+
+## Sequence
+table(individuals_dt_w_index_persons_in_005$RecodedSequenceSubtype, exclude = NULL)
+xtabs(~factor(individuals_dt_w_index_persons_in_005$RecodedSequenceSubtype, exclude = NULL) +
+factor(individuals_dt_w_index_persons_in_005$named_partner_indicator, exclude = NULL)
+ )
+
+## MSM
+table(individuals_dt_w_index_persons_in_005$RiskMSM, exclude = NULL)
+xtabs(~factor(individuals_dt_w_index_persons_in_005$RiskMSM, exclude = NULL) +
+factor(individuals_dt_w_index_persons_in_005$named_partner_indicator, exclude = NULL)
+ )
+
+## Heterosexual
+table(individuals_dt_w_index_persons_in_005$RiskHeterosexual, exclude = NULL)
+xtabs(~factor(individuals_dt_w_index_persons_in_005$RiskHeterosexual, exclude = NULL) +
+factor(individuals_dt_w_index_persons_in_005$named_partner_indicator, exclude = NULL)
+ )
+
+## IDU
+table(individuals_dt_w_index_persons_in_005$RiskIDU, exclude = NULL)
+xtabs(~factor(individuals_dt_w_index_persons_in_005$RiskIDU, exclude = NULL) +
+factor(individuals_dt_w_index_persons_in_005$named_partner_indicator, exclude = NULL)
+ )
+
+## age at HIV diagnosis
+summary(individuals_dt_w_index_persons_in_005$HIVDxAge)
+individuals_dt_w_index_persons_in_005 %>%
+  group_by(named_partner_indicator) %>%
+  summarise(mean_HIVDxAge = mean(HIVDxAge, na.rm = TRUE))
+```
+
+
+
+Trace 015:
+```{r}
+
+table(individuals_dt_w_index_persons_in_015$named_partner_indicator, exclude = NULL)
+
+## DemoGender
+table(individuals_dt_w_index_persons_in_015$DemoGender, exclude = NULL)
+xtabs(~factor(individuals_dt_w_index_persons_in_015$DemoGender, exclude = NULL) +
+  factor(individuals_dt_w_index_persons_in_015$named_partner_indicator, exclude = NULL)
+   )
+   
+## DemoRace
+table(individuals_dt_w_index_persons_in_015$DemoRace, exclude = NULL)
+xtabs(~factor(individuals_dt_w_index_persons_in_015$DemoRace, exclude = NULL) +
+factor(individuals_dt_w_index_persons_in_015$named_partner_indicator, exclude = NULL)
+ )
+
+## Sequence
+table(individuals_dt_w_index_persons_in_015$RecodedSequenceSubtype, exclude = NULL)
+xtabs(~factor(individuals_dt_w_index_persons_in_015$RecodedSequenceSubtype, exclude = NULL) +
+factor(individuals_dt_w_index_persons_in_015$named_partner_indicator, exclude = NULL)
+ )
+
+## MSM
+table(individuals_dt_w_index_persons_in_015$RiskMSM, exclude = NULL)
+xtabs(~factor(individuals_dt_w_index_persons_in_015$RiskMSM, exclude = NULL) +
+factor(individuals_dt_w_index_persons_in_015$named_partner_indicator, exclude = NULL)
+ )
+
+## Heterosexual
+table(individuals_dt_w_index_persons_in_015$RiskHeterosexual, exclude = NULL)
+xtabs(~factor(individuals_dt_w_index_persons_in_015$RiskHeterosexual, exclude = NULL) +
+factor(individuals_dt_w_index_persons_in_015$named_partner_indicator, exclude = NULL)
+ )
+
+## IDU
+table(individuals_dt_w_index_persons_in_015$RiskIDU, exclude = NULL)
+xtabs(~factor(individuals_dt_w_index_persons_in_015$RiskIDU, exclude = NULL) +
+factor(individuals_dt_w_index_persons_in_015$named_partner_indicator, exclude = NULL)
+ )
+
+## age at HIV diagnosis
+summary(individuals_dt_w_index_persons_in_015$HIVDxAge)
+individuals_dt_w_index_persons_in_015 %>%
+  group_by(named_partner_indicator) %>%
+  summarise(mean_HIVDxAge = mean(HIVDxAge, na.rm = TRUE))
+```
+
+Clustered Phlyo Any:
+```{r}
+
+table(individuals_dt_w_index_persons_in_clusteredphyloany$named_partner_indicator, exclude = NULL)
+
+## DemoGender
+table(individuals_dt_w_index_persons_in_clusteredphyloany$DemoGender, exclude = NULL)
+xtabs(~factor(individuals_dt_w_index_persons_in_clusteredphyloany$DemoGender, exclude = NULL) +
+  factor(individuals_dt_w_index_persons_in_clusteredphyloany$named_partner_indicator, exclude = NULL)
+   )
+   
+## DemoRace
+table(individuals_dt_w_index_persons_in_clusteredphyloany$DemoRace, exclude = NULL)
+xtabs(~factor(individuals_dt_w_index_persons_in_clusteredphyloany$DemoRace, exclude = NULL) +
+factor(individuals_dt_w_index_persons_in_clusteredphyloany$named_partner_indicator, exclude = NULL)
+ )
+
+## Sequence
+table(individuals_dt_w_index_persons_in_clusteredphyloany$RecodedSequenceSubtype, exclude = NULL)
+xtabs(~factor(individuals_dt_w_index_persons_in_clusteredphyloany$RecodedSequenceSubtype, exclude = NULL) +
+factor(individuals_dt_w_index_persons_in_clusteredphyloany$named_partner_indicator, exclude = NULL)
+ )
+
+## MSM
+table(individuals_dt_w_index_persons_in_clusteredphyloany$RiskMSM, exclude = NULL)
+xtabs(~factor(individuals_dt_w_index_persons_in_clusteredphyloany$RiskMSM, exclude = NULL) +
+factor(individuals_dt_w_index_persons_in_clusteredphyloany$named_partner_indicator, exclude = NULL)
+ )
+
+## Heterosexual
+table(individuals_dt_w_index_persons_in_clusteredphyloany$RiskHeterosexual, exclude = NULL)
+xtabs(~factor(individuals_dt_w_index_persons_in_clusteredphyloany$RiskHeterosexual, exclude = NULL) +
+factor(individuals_dt_w_index_persons_in_clusteredphyloany$named_partner_indicator, exclude = NULL)
+ )
+
+## IDU
+table(individuals_dt_w_index_persons_in_clusteredphyloany$RiskIDU, exclude = NULL)
+xtabs(~factor(individuals_dt_w_index_persons_in_clusteredphyloany$RiskIDU, exclude = NULL) +
+factor(individuals_dt_w_index_persons_in_clusteredphyloany$named_partner_indicator, exclude = NULL)
+ )
+
+## age at HIV diagnosis
+summary(individuals_dt_w_index_persons_in_clusteredphyloany$HIVDxAge)
+individuals_dt_w_index_persons_in_clusteredphyloany %>%
+  group_by(named_partner_indicator) %>%
+  summarise(mean_HIVDxAge = mean(HIVDxAge, na.rm = TRUE))
+```
 
 
 ### Write a function to run the regression model:
@@ -249,31 +394,54 @@ individuals_dt_w_index_persons_in_clusteredphyloany$named_partner_indicator <-
 ```{r}
 run_analysis <- function(dataset) {
   # Model 1: DemoGender
+  
+  # recode DemoGender to combine XMF and not reported into one category
+  dataset$DemoGender <- as.character(dataset$DemoGender)
+  dataset$DemoGender[dataset$DemoGender %in% c("XMF", "")] <- "XMF_not_reported"
+  dataset$DemoGender <- as.factor(dataset$DemoGender)
+  
+  # relevel DemoGender to make Female the reference category
+  dataset$DemoGender <- relevel(dataset$DemoGender, ref = "F")
+  
+  #fit model
   m1 <- glm(named_partner_indicator ~ DemoGender, data = dataset, family = "binomial")
   m1_summary <- summary(m1)
   xtabs1 <- xtabs(~ factor(named_partner_indicator, exclude = NULL) + factor(DemoGender, exclude = NULL), data = dataset)
   
   # Model 2: DemoRace
+  # relevel DemoGender to make Black the reference category
+  dataset$DemoRace <- as.factor(dataset$DemoRace)
+  dataset$DemoRace <- relevel(dataset$DemoRace, ref = "Black")
+  
   m2 <- glm(named_partner_indicator ~ DemoRace, data = dataset, family = "binomial")
   m2_summary <- summary(m2)
   xtabs2 <- xtabs(~ factor(named_partner_indicator, exclude = NULL) + factor(DemoRace, exclude = NULL), data = dataset)
   
   # Model 3: RecodedSequenceSubtype
-  m3 <- glm(named_partner_indicator ~ RecodedSequenceSubtype, data = dataset, family = "binomial")
+  m3 <- glm(named_partner_indicator ~ as.factor(RecodedSequenceSubtype), data = dataset, family = "binomial")
   m3_summary <- summary(m3)
   xtabs3 <- xtabs(~ factor(named_partner_indicator, exclude = NULL) + factor(RecodedSequenceSubtype, exclude = NULL), data = dataset)
 
   # Model 4: RiskMSM
+  dataset$RiskMSM <- as.factor(dataset$RiskMSM)
+  dataset$RiskMSM <- relevel(dataset$RiskMSM, ref="False")
+  
   m4 <- glm(named_partner_indicator ~ RiskMSM, data = dataset, family = "binomial")
   m4_summary <- summary(m4)
   xtabs4 <- xtabs(~ factor(named_partner_indicator, exclude = NULL) + factor(RiskMSM, exclude = NULL), data = dataset)
 
-  # Model 5: RiskHRH
-  m5 <- glm(named_partner_indicator ~ RiskHRH, data = dataset, family = "binomial")
+  # Model 5: RiskHeterosexual
+  dataset$RiskHeterosexual <- as.factor(dataset$RiskHeterosexual)
+  dataset$RiskHeterosexual <- relevel(dataset$RiskHeterosexual, ref="False")
+  
+  m5 <- glm(named_partner_indicator ~ RiskHeterosexual, data = dataset, family = "binomial")
   m5_summary <- summary(m5)
-  xtabs5 <- xtabs(~ factor(named_partner_indicator, exclude = NULL) + factor(RiskHRH, exclude = NULL), data = dataset)
+  xtabs5 <- xtabs(~ factor(named_partner_indicator, exclude = NULL) + factor(RiskHeterosexual, exclude = NULL), data = dataset)
 
   # Model 6: RiskIDU
+  dataset$RiskIDU <- as.factor(dataset$RiskIDU)
+  dataset$RiskIDU <- relevel(dataset$RiskIDU, ref="False")
+  
   m6 <- glm(named_partner_indicator ~ RiskIDU, data = dataset, family = "binomial")
   m6_summary <- summary(m6)
   xtabs6 <- xtabs(~ factor(named_partner_indicator, exclude = NULL) + factor(RiskIDU, exclude = NULL), data = dataset)
@@ -307,26 +475,6 @@ result_005 <- run_analysis(individuals_dt_w_index_persons_in_005)
 result_015 <- run_analysis(individuals_dt_w_index_persons_in_015)
 result_clusteredphyloany <- run_analysis(individuals_dt_w_index_persons_in_clusteredphyloany)
 ```
-Display the results for the write-up.
-
-Trace 005: 
-
-```{r, echo=TRUE, message=TRUE, results='markup'}
-result_005
-```
-
-Trace 005: 
-```{r, echo=TRUE, message=TRUE, results='markup'}
-result_015
-```
-
-Clustered Phylo Any:
-```{r, echo=TRUE, message=TRUE, results='markup'}
-result_clusteredphyloany
-```
-
-
-
 
 
 ## Table 4B: Logistic regression on named partners being genetically linked to the index case. 
@@ -431,26 +579,46 @@ run_analysis_clustering <- function(dataset, clustering_type) {
   xtabs1 <- xtabs(as.formula(paste("~ factor(", clustering_indicator, ", exclude = NULL) + factor(DemoGender, exclude = NULL)")), data = dataset)
 
   # Model 2: DemoRace
+  # relevel DemoGender to make Black the reference category
+  dataset$DemoRace <- as.factor(dataset$DemoRace)
+  dataset$DemoRace <- relevel(dataset$DemoRace, ref = "Black")
+  
   m2 <- glm(as.formula(paste(clustering_indicator, "~ DemoRace")), data = dataset, family = "binomial")
   m2_summary <- summary(m2)
   xtabs2 <- xtabs(as.formula(paste("~ factor(", clustering_indicator, ", exclude = NULL) + factor(DemoRace, exclude = NULL)")), data = dataset)
 
   # Model 3: RecodedSequenceSubtype
+  # relevel RecodedSequenceSubtype to make B the reference category
+  dataset$RecodedSequenceSubtype <- as.factor(dataset$RecodedSequenceSubtype)
+  dataset$RecodedSequenceSubtype <- relevel(dataset$RecodedSequenceSubtype, ref = "B")
+  
   m3 <- glm(as.formula(paste(clustering_indicator, "~ RecodedSequenceSubtype")), data = dataset, family = "binomial")
   m3_summary <- summary(m3)
   xtabs3 <- xtabs(as.formula(paste("~ factor(", clustering_indicator, ", exclude = NULL) + factor(RecodedSequenceSubtype, exclude = NULL)")), data = dataset)
 
   # Model 4: RiskMSM
+  # relevel to make non-MSM the reference category
+  dataset$RiskMSM <- as.factor(dataset$RiskMSM)
+  dataset$RiskMSM <- relevel(dataset$RiskMSM, ref = "False")
+  
   m4 <- glm(as.formula(paste(clustering_indicator, "~ RiskMSM")), data = dataset, family = "binomial")
   m4_summary <- summary(m4)
   xtabs4 <- xtabs(as.formula(paste("~ factor(", clustering_indicator, ", exclude = NULL) + factor(RiskMSM, exclude = NULL)")), data = dataset)
 
   # Model 5: RiskHRH
-  m5 <- glm(as.formula(paste(clustering_indicator, "~ RiskHRH")), data = dataset, family = "binomial")
+  # relevel to make non-HRH the reference category
+  dataset$RiskHeterosexual <- as.factor(dataset$RiskHeterosexual)
+  dataset$RiskHeterosexual <- relevel(dataset$RiskHeterosexual, ref = "False")
+                               
+  m5 <- glm(as.formula(paste(clustering_indicator, "~ RiskHeterosexual")), data = dataset, family = "binomial")
   m5_summary <- summary(m5)
-  xtabs5 <- xtabs(as.formula(paste("~ factor(", clustering_indicator, ", exclude = NULL) + factor(RiskHRH, exclude = NULL)")), data = dataset)
+  xtabs5 <- xtabs(as.formula(paste("~ factor(", clustering_indicator, ", exclude = NULL) + factor(RiskHeterosexual, exclude = NULL)")), data = dataset)
 
   # Model 6: RiskIDU
+  # relevel to make non-HRH the reference category
+  dataset$RiskIDU <- as.factor(dataset$RiskIDU)
+  dataset$RiskIDU <- relevel(dataset$RiskIDU, ref = "False")
+  
   m6 <- glm(as.formula(paste(clustering_indicator, "~ RiskIDU")), data = dataset, family = "binomial")
   m6_summary <- summary(m6)
   xtabs6 <- xtabs(as.formula(paste("~ factor(", clustering_indicator, ", exclude = NULL) + factor(RiskIDU, exclude = NULL)")), data = dataset)
@@ -492,40 +660,51 @@ results_015_converse <- run_analysis_clustering(individuals_in_named_pt_net_dt, 
 results_phyloany_converse <- run_analysis_clustering(individuals_in_named_pt_net_dt, "phyloany")
 ```
 
-### Show the results
-
-Trace 005: 
-
-```{r, results='markup'}
-results_005_converse
-```
-
-Trace 015: 
-
-```{r, results='markup'}
-results_015_converse
-```
-
-
-Clustered Phylo Any:
-
-```{r, results='markup'}
-results_phyloany_converse
-```
-
-
-
-# Create a regression results environment and assign the objects to it:
-
 ```{r}
-results_4A <- as.list(c(result_005, result_015, result_clusteredphyloany)) 
-results_4B <- as.list(c(results_005_converse, results_015_converse, results_phyloany_converse)) 
+table(individuals_in_named_pt_net_dt$indicator_015_cluster, exclude = NULL)
+#table(individuals_dt_w_index_persons_in_015$named_partner_indicator, exclude = NULL)
 
-results_env <- new.env()
-results_env$table4A <- results_4A
-results_env$table4B <- results_4B
+## DemoGender
+table(individuals_in_named_pt_net_dt$DemoGender, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$DemoGender, exclude = NULL) +
+  factor(individuals_in_named_pt_net_dt$indicator_015_cluster, exclude = NULL)
+   )
+   
+## DemoRace
+table(individuals_in_named_pt_net_dt$DemoRace, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$DemoRace, exclude = NULL) +
+  factor(individuals_in_named_pt_net_dt$indicator_015_cluster, exclude = NULL)
+   )
 
-# Save the environment as an RDS file
-saveRDS(results_env, "results_objects.rds")
+## Sequence
+table(individuals_in_named_pt_net_dt$RecodedSequenceSubtype, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$RecodedSequenceSubtype, exclude = NULL) +
+factor(individuals_in_named_pt_net_dt$indicator_015_cluster, exclude = NULL)
+ )
+
+## MSM
+table(individuals_in_named_pt_net_dt$RiskMSM, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$RiskMSM, exclude = NULL) +
+factor(individuals_in_named_pt_net_dt$indicator_015_cluster, exclude = NULL)
+ )
+
+## Heterosexual
+table(individuals_in_named_pt_net_dt$RiskHeterosexual, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$RiskHeterosexual, exclude = NULL) +
+factor(individuals_in_named_pt_net_dt$indicator_015_cluster, exclude = NULL)
+ )
+
+## IDU
+table(individuals_in_named_pt_net_dt$RiskIDU, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$RiskIDU, exclude = NULL) +
+factor(individuals_in_named_pt_net_dt$indicator_015_cluster, exclude = NULL)
+ )
+
+## age at HIV diagnosis
+summary(individuals_in_named_pt_net_dt$HIVDxAge)
+individuals_in_named_pt_net_dt %>%
+  group_by(indicator_015_cluster) %>%
+  summarise(mean_HIVDxAge = mean(HIVDxAge, na.rm = TRUE))
 ```
+
 
