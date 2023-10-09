@@ -58,4 +58,13 @@ table(genomic_db$Sequence, exclude=NULL)
 table(genomic_db$SequenceSubtype, exclude=NULL)
 
 table(genomic_db[id_named_partners_in_genomic_db]$Sequence, exclude=NULL)
-z 5
+
+# How many named partners in the Partner DB are contacted?
+unique_named_partners <- unique(partner_db$StudyIDTo)
+id_unique_named_partners <- which(partner_db$StudyIDTo %in% unique_named_partners)
+
+colnames(partner_db)
+table(partner_db$ClientReached, exclude=NULL)
+table(partner_db$NoReachWhy, exclude=NULL)
+
+table(partner_db[id_unique_named_partners,]$ClientReached, exclude=NULL)
