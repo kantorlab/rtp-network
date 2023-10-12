@@ -34,7 +34,7 @@ my_colors <- c("Named" = set1_colors[1],
 
 
 # Create the labels
-labels_n = c("n=1342", "n=880", "n=338", "n=152", "n=152")
+labels_n = c("1342", "880 (66%)", "338 (38%)", "152 (45%)", "152 (100%)")
 
 # Updated plot code
 p_overall <- ggplot(overall_data, aes(x = Category, y = Value, fill = Category)) +
