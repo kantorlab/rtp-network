@@ -11,6 +11,9 @@ partner_db_old <- as.data.table(read.csv(paste0(data_dir, "/ContactTracingNetwor
 partner_db <- as.data.table(read.csv("/gpfs/data/rkantor/rtp/shared_dir/ContactTracingNetwork20230726.csv"))
 genomic_db <- as.data.table(read.csv(paste0(data_dir, "/Individuals.csv")))
 
+
+# Descriptives -------------
+
 # How many persons in the Genomic DB are sequenced?
 table(genomic_db$Sequence, exclude=NULL)
 genomic_db_sequenced_id <- which(genomic_db$Sequence == "True")
@@ -99,5 +102,80 @@ nrow(seq_index_cases_nmd_pts_dt) -  length(which(is.na(seq_index_cases_nmd_pts_d
 sequenced_who_are_named_pts <- (intersect(genomic_db_sequenced, partner_db$StudyIDTo))
 sequenced_who_are_named_pts_id <- which(genomic_db_sequenced_dt$StudyID %in% sequenced_who_are_named_pts)
 sequenced_who_are_named_pts_dt <- genomic_db_sequenced_dt[sequenced_who_are_named_pts_id,] 
-nrow(sequenced_who_are_named_pts_dt) -  length(which(is.na(sequenced_who_are_named_pts_dt$ClusteredPhyloAny)))
-.Last.value/nrow(sequenced_who_are_named_pts_dt)
+ans <- nrow(sequenced_who_are_named_pts_dt) -  length(which(is.na(sequenced_who_are_named_pts_dt$ClusteredPhyloAny)))
+ans/nrow(sequenced_who_are_named_pts_dt)
+
+# Comparison Table -------------
+
+## Sequenced Index cases in Genomic DB
+length(unique(genomic_db_sequenced_dt$StudyID))
+
+table(genomic_db_sequenced_dt$DemoGender) #gender
+table(genomic_db_sequenced_dt$DemoGender)/sum(table(genomic_db_sequenced_dt$DemoGender))
+
+table(genomic_db_sequenced_dt$DemoRace) #race
+table(genomic_db_sequenced_dt$DemoRace)/sum(table(genomic_db_sequenced_dt$DemoRace))
+
+table(genomic_db_sequenced_dt$DemoHispanic) #ethnicity
+table(genomic_db_sequenced_dt$DemoHispanic)/sum(table(genomic_db_sequenced_dt$DemoHispanic))
+
+summary(genomic_db_sequenced_dt$HIVDxAge) #age at hiv diagnosis
+
+breaks = c(0, 2000, 2006, 2011, 2021) #year of HIV diagnosis
+labels = c("<2000", "2001-2005", "2006-2010", "2011-2020")
+
+genomic_db_sequenced_dt[, hivdiagnosis_year_group := 
+                          cut(as.numeric(substr(HIVDxDate, 1, 4)), 
+                              breaks = breaks, 
+                              labels = labels)]
+
+table(genomic_db_sequenced_dt$hivdiagnosis_year_group)
+table(genomic_db_sequenced_dt$hivdiagnosis_year_group)/sum(
+  table(genomic_db_sequenced_dt$hivdiagnosis_year_group)
+)
+
+table(genomic_db_sequenced_dt$RiskMSM, exclude = NULL) #msm
+table(genomic_db_sequenced_dt$RiskMSM, exclude = NULL)/sum(
+  table(genomic_db_sequenced_dt$RiskMSM, exclude = NULL) #msm
+  )
+
+table(genomic_db_sequenced_dt$RiskIDU, exclude = NULL) #IDU
+table(genomic_db_sequenced_dt$RiskIDU, exclude = NULL)/sum(
+  table(genomic_db_sequenced_dt$RiskIDU, exclude = NULL) #IDU
+)
+
+table(genomic_db_sequenced_dt$RiskHeterosexual, exclude = NULL) #Heterosexual
+table(genomic_db_sequenced_dt$RiskHeterosexual, exclude = NULL)/sum(
+  table(genomic_db_sequenced_dt$RiskHeterosexual, exclude = NULL) #Heterosexual
+)
+
+## Sequenced Index cases who were interviewed in Partner DB
+sequenced_and_interviewed <- intersect(genomic_db_sequenced, partner_db$StudyIDFrom)
+sequenced_and_interviewed_idx <- which(genomic_db_sequenced_dt$StudyID %in% sequenced_and_interviewed)
+sequenced_and_interviewed_db <- genomic_db_sequenced_dt[sequenced_and_interviewed_idx,]
+dim(sequenced_and_interviewed_db)
+
+table(sequenced_and_interviewed_db$DemoGender) #gender
+table(sequenced_and_interviewed_db$DemoGender)/sum(table(sequenced_and_interviewed_db$DemoGender))
+
+table(sequenced_and_interviewed_db$DemoRace) #race
+table(sequenced_and_interviewed_db$DemoRace)/sum(table(sequenced_and_interviewed_db$DemoRace))
+
+
+## Sequenced Index cases who were interviewed in Partner DB and named at least one partner
+
+sequenced_and_named_pt_idx <- which(genomic_db_sequenced_dt$StudyID %in% index_cases_who_named_partners)
+sequenced_and_named_pt_dt <- genomic_db_sequenced_dt[sequenced_and_named_pt_idx,]
+dim(sequenced_and_named_pt_dt)
+
+table(sequenced_and_named_pt_dt$DemoGender) #gender
+table(sequenced_and_named_pt_dt$DemoGender)/sum(table(sequenced_and_named_pt_dt$DemoGender))
+
+
+## Named partners in the genomic DB
+named_partners_in_genomic_dt <- genomic_db_sequenced_dt[id_named_partners_in_genomic_db,]
+dim(named_partners_in_genomic_dt)
+
+table(named_partners_in_genomic_dt$DemoGender) #gender
+table(named_partners_in_genomic_dt$DemoGender)/sum(table(named_partners_in_genomic_dt$DemoGender))
+
