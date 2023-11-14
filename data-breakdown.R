@@ -1,9 +1,14 @@
 rm(list=ls())
 
+# Libraries -------------
+
 library(data.table)
 library(dplyr)
 library(stringi)
 library(network)
+
+
+# Datasets -------------
 
 data_dir <- "/gpfs/data/rkantor/rtp/datasets/D51_20230512_unified"
 list.files(path=data_dir)
@@ -11,6 +16,10 @@ partner_db_old <- as.data.table(read.csv(paste0(data_dir, "/ContactTracingNetwor
 partner_db <- as.data.table(read.csv("/gpfs/data/rkantor/rtp/shared_dir/ContactTracingNetwork20230726.csv"))
 genomic_db <- as.data.table(read.csv(paste0(data_dir, "/Individuals.csv")))
 
+
+
+# Utilites -------------
+source("utils/compare-descriptives-function.R")
 
 # Descriptives -------------
 
@@ -95,59 +104,22 @@ seq_pers_cluster_phylo/nrow(genomic_db_sequenced_dt)
 # How many index cases (who appear in partner DB) and are sequenced are found to cluster phylogenetically?
 seq_index_cases_nmd_pts <- which(genomic_db_sequenced_dt$StudyID %in% index_cases_who_named_partners)
 seq_index_cases_nmd_pts_dt <- genomic_db_sequenced_dt[seq_index_cases_nmd_pts,]
-nrow(seq_index_cases_nmd_pts_dt) -  length(which(is.na(seq_index_cases_nmd_pts_dt$ClusteredPhyloAny)))
-.Last.value/nrow(seq_index_cases_nmd_pts_dt)
+ans1 <- nrow(seq_index_cases_nmd_pts_dt) -  length(which(is.na(seq_index_cases_nmd_pts_dt$ClusteredPhyloAny)))
+ans1/nrow(seq_index_cases_nmd_pts_dt)
 
 # How many named partners (who appear in partner DB) and are sequenced are found to cluster phylogenetically?
 sequenced_who_are_named_pts <- (intersect(genomic_db_sequenced, partner_db$StudyIDTo))
 sequenced_who_are_named_pts_id <- which(genomic_db_sequenced_dt$StudyID %in% sequenced_who_are_named_pts)
 sequenced_who_are_named_pts_dt <- genomic_db_sequenced_dt[sequenced_who_are_named_pts_id,] 
-ans <- nrow(sequenced_who_are_named_pts_dt) -  length(which(is.na(sequenced_who_are_named_pts_dt$ClusteredPhyloAny)))
-ans/nrow(sequenced_who_are_named_pts_dt)
+ans2 <- nrow(sequenced_who_are_named_pts_dt) -  length(which(is.na(sequenced_who_are_named_pts_dt$ClusteredPhyloAny)))
+ans2/nrow(sequenced_who_are_named_pts_dt)
 
 # Comparison Table -------------
 
 ## Sequenced Index cases in Genomic DB
 length(unique(genomic_db_sequenced_dt$StudyID))
 
-table(genomic_db_sequenced_dt$DemoGender) #gender
-table(genomic_db_sequenced_dt$DemoGender)/sum(table(genomic_db_sequenced_dt$DemoGender))
-
-table(genomic_db_sequenced_dt$DemoRace) #race
-table(genomic_db_sequenced_dt$DemoRace)/sum(table(genomic_db_sequenced_dt$DemoRace))
-
-table(genomic_db_sequenced_dt$DemoHispanic) #ethnicity
-table(genomic_db_sequenced_dt$DemoHispanic)/sum(table(genomic_db_sequenced_dt$DemoHispanic))
-
-summary(genomic_db_sequenced_dt$HIVDxAge) #age at hiv diagnosis
-
-breaks = c(0, 2000, 2006, 2011, 2021) #year of HIV diagnosis
-labels = c("<2000", "2001-2005", "2006-2010", "2011-2020")
-
-genomic_db_sequenced_dt[, hivdiagnosis_year_group := 
-                          cut(as.numeric(substr(HIVDxDate, 1, 4)), 
-                              breaks = breaks, 
-                              labels = labels)]
-
-table(genomic_db_sequenced_dt$hivdiagnosis_year_group)
-table(genomic_db_sequenced_dt$hivdiagnosis_year_group)/sum(
-  table(genomic_db_sequenced_dt$hivdiagnosis_year_group)
-)
-
-table(genomic_db_sequenced_dt$RiskMSM, exclude = NULL) #msm
-table(genomic_db_sequenced_dt$RiskMSM, exclude = NULL)/sum(
-  table(genomic_db_sequenced_dt$RiskMSM, exclude = NULL) #msm
-  )
-
-table(genomic_db_sequenced_dt$RiskIDU, exclude = NULL) #IDU
-table(genomic_db_sequenced_dt$RiskIDU, exclude = NULL)/sum(
-  table(genomic_db_sequenced_dt$RiskIDU, exclude = NULL) #IDU
-)
-
-table(genomic_db_sequenced_dt$RiskHeterosexual, exclude = NULL) #Heterosexual
-table(genomic_db_sequenced_dt$RiskHeterosexual, exclude = NULL)/sum(
-  table(genomic_db_sequenced_dt$RiskHeterosexual, exclude = NULL) #Heterosexual
-)
+compare_descriptives(dt=genomic_db_sequenced_dt)
 
 ## Sequenced Index cases who were interviewed in Partner DB
 sequenced_and_interviewed <- intersect(genomic_db_sequenced, partner_db$StudyIDFrom)
@@ -161,6 +133,9 @@ table(sequenced_and_interviewed_db$DemoGender)/sum(table(sequenced_and_interview
 table(sequenced_and_interviewed_db$DemoRace) #race
 table(sequenced_and_interviewed_db$DemoRace)/sum(table(sequenced_and_interviewed_db$DemoRace))
 
+compare_descriptives(dt=sequenced_and_interviewed_db)
+
+
 
 ## Sequenced Index cases who were interviewed in Partner DB and named at least one partner
 
@@ -168,14 +143,11 @@ sequenced_and_named_pt_idx <- which(genomic_db_sequenced_dt$StudyID %in% index_c
 sequenced_and_named_pt_dt <- genomic_db_sequenced_dt[sequenced_and_named_pt_idx,]
 dim(sequenced_and_named_pt_dt)
 
-table(sequenced_and_named_pt_dt$DemoGender) #gender
-table(sequenced_and_named_pt_dt$DemoGender)/sum(table(sequenced_and_named_pt_dt$DemoGender))
-
+compare_descriptives(dt=sequenced_and_named_pt_dt)
 
 ## Named partners in the genomic DB
 named_partners_in_genomic_dt <- genomic_db_sequenced_dt[id_named_partners_in_genomic_db,]
 dim(named_partners_in_genomic_dt)
 
-table(named_partners_in_genomic_dt$DemoGender) #gender
-table(named_partners_in_genomic_dt$DemoGender)/sum(table(named_partners_in_genomic_dt$DemoGender))
+compare_descriptives(dt=named_partners_in_genomic_dt)
 
