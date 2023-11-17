@@ -8,7 +8,7 @@ library(RColorBrewer)
 # Structuring the data with the average values
 overall_data <- data.frame(
   Category = c("Named_Mean", "Contacted_Mean", "Tested_Mean", "Diagnosed_Mean", "Sequenced_Mean"),
-  Value = c(1343/497, 880/497, 338/497, 154/497, 152/497)
+  Value = c(1342, 880, 338, 152, 152)
 )
 
 # Adjusting the factor levels and labels for the Category column
@@ -34,24 +34,24 @@ my_colors <- c("Named" = set1_colors[1],
 
 
 # Create the labels
-labels_n = c("n=1343", "n=880", "n=338", "n=154", "n=152")
+labels_n = c("1342", "880 (66%)", "338 (38%)", "152 (45%)", "152 (100%)")
 
 # Updated plot code
 p_overall <- ggplot(overall_data, aes(x = Category, y = Value, fill = Category)) +
   geom_bar(stat = "identity", position = "dodge") +
-  geom_text(aes(label=labels_n), vjust=-0.5, size=6, fontface="bold") +
+  geom_text(aes(label=labels_n), vjust=-0.5, size=10, fontface="bold") +
   labs(title = "",
-       y = "Mean Number of Partners per Index Case",
+       y = "Total Partners",
        x = "") +
   scale_fill_manual(values=my_colors) +  # Setting colors manually
-  scale_y_continuous(limits = c(0, 3)) +
+  scale_y_continuous(limits = c(0, 1500)) +
   theme_minimal() +
   theme(
     plot.title = element_text(size = 18, face = "bold"),
-    axis.title.x = element_blank(),
-    axis.title.y = element_text(size = 18, face = "bold", color = "black"),
+    axis.title.x = element_text(size = 22, face = "bold", color = "black"),
+    axis.title.y = element_text(size = 20, face = "bold", color = "black"),
     axis.text.y = element_text(size = 16, face = "bold", color = "black"),
-    axis.text.x = element_text(size = 18, face = "bold", color = "black"),
+    axis.text.x = element_text(size = 24, face = "bold", color = "black"),
     legend.position = "none"   # This will remove the legend
   )
 

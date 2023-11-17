@@ -40,8 +40,8 @@ individuals_dt <- as.data.table(read.csv(paste0(data_dir, "/Individuals.csv")))
 dim(net_dt)
 ```
 
-
-The partner data are `r nrow(net_dt)` observations and `r ncol(net_dt)` variables.
+The partner data are `r nrow(net_dt)` observations and `r ncol(net_dt)`
+variables.
 
 How many unique persons (sources of targets) are in the partner
 database?
@@ -50,7 +50,6 @@ database?
 ind_in_partner_db <- unique(c(net_dt$StudyIDFrom, net_dt$StudyIDTo))
 length(ind_in_partner_db)
 ```
-
 
 How many unique index persons are in the partner database?
 
@@ -240,7 +239,16 @@ Ans:
 
 -   [ Of these,
     `r length(which(!is.na(individuals_dt[individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo]$ClusteredPhyloAny)))`
-    are clustered phylogenetically.]{style="background-color: #FFFF00"}
+    are clustered phylogenetically.]{style="background-color: #FFFF00"} (per `clusteredphyloany`)
+
+-   [ Of these,
+    `r table(individuals_dt[individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo]$ClusteredHIVTrace005, exclude=NULL)`
+    are clustered phylogenetically.]{style="background-color: #FFFF00"} (per `Trace 005`) - subtract blank entries
+    
+-   [ Of these,
+    `r table(individuals_dt[individuals_in_net_dt_studyidfrom_wo_emptyStudyIDTo]$ClusteredHIVTrace015, exclude=NULL)`
+    are clustered phylogenetically.]{style="background-color: #FFFF00"} (per `Trace 005`) - subtract blank entries
+
 
 Of the partners of the newly diagnosed persons in the contact tracing
 database, how many nominated other persons? How many are clustered with
@@ -262,8 +270,12 @@ Ans:
 
 -   [ Of these,
     `r length(which(!is.na(individuals_dt[individuals_in_net_dt_studyidto_witout_empty_StudyIDTo]$ClusteredPhyloAny)))`
-    clustered phylogenetically with someone who named them.
-    ]{style="background-color: #FFFF00"}
+    clustered phylogenetically with someone who named them (per clusteredphyloany).
+    ]{style="background-color: #FFFF00"}. 
+    
+- For the equivalent measures for Trace 005 and 015, see the number of missing entries in 
+`r table(individuals_dt[individuals_in_net_dt_studyidto_witout_empty_StudyIDTo]$ClusteredHIVTrace005, exclude = NULL)` and
+`r table(individuals_dt[individuals_in_net_dt_studyidto_witout_empty_StudyIDTo]$ClusteredHIVTrace015, exclude = NULL)`
 
 What is the Jaccard Similarity Coefficient for the individuals database
 and partner contact tracing database?

@@ -25,6 +25,7 @@ net_dt <- eda_env$net_dt
 named_pt_idx_005 <- eda_env$named_pt_idx_005 
 named_pt_idx_015 <- eda_env$named_pt_idx_015
 ```
+
 # Create a named partner network object
 
 ```{r}
@@ -181,7 +182,8 @@ sum(unlist(y)) #number of edges across all molecular clusters
 # Regresssions
 
 ## Table 4A: Logistic regression on index case being genetically 
-linked to at least one of their named partners
+linked to at least one of their named partners 
+[i.e, Characterization of Molecular Clusters in Named Partners]
 
 ### Prepare data for regression analysis
 
@@ -207,20 +209,25 @@ individuals_dt_w_index_persons_in_015 <- individuals_dt[index_person_idx_in_015,
 dim(individuals_dt_w_index_persons_in_015)
 
 index_person_idx_in_clusteredphyloany <- which(individuals_dt$ClusteredPhyloAny != "")
-index_persons_in_clusteredphyloany <- individuals_dt$StudyID[index_person_idx_in_clusteredphyloany]
 length(index_person_idx_in_clusteredphyloany)
+
+index_persons_in_clusteredphyloany <- individuals_dt$StudyID[index_person_idx_in_clusteredphyloany]
 length(which(is.na(individuals_dt$ClusteredPhyloAny)))
+
 individuals_dt_w_index_persons_in_clusteredphyloany <- individuals_dt[index_person_idx_in_clusteredphyloany,]
 dim(individuals_dt_w_index_persons_in_clusteredphyloany)
 ```
-
+[Thus, there are `r nrow(individuals_dt_w_index_persons_in_clusteredphyloany)`
+    who are clustered phylogenetically by the `phyloany` method.
+    Of these, `r length(which(individuals_dt_w_index_persons_in_clusteredphyloany$named_partner_indicator == 1))`]{style="background-color: #FFFF00"}
+    
 - How many of these index persons from each molecular clustering variable are in the named partner list?
 
 ```{r}
 #named_pt_net%v% "vertex.names"
 trace005_persons_in_named_pt_net_idx <- which((index_persons_in_005) %in% (named_pt_net %v% "vertex.names"))
 trace015_persons_in_named_pt_net_idx <- which((index_persons_in_015) %in% (named_pt_net %v% "vertex.names"))
-clusteredphyloany_persons_in_named_pt_net_idx <- which((index_persons_in_015) %in% (named_pt_net %v% "vertex.names"))
+clusteredphyloany_persons_in_named_pt_net_idx <- which((index_persons_in_clusteredphyloany) %in% (named_pt_net %v% "vertex.names"))
 
 individuals_dt_w_index_persons_in_005$named_partner_indicator <- 0
 individuals_dt_w_index_persons_in_005$named_partner_indicator[trace005_persons_in_named_pt_net_idx] <- 1
@@ -238,6 +245,8 @@ individuals_dt_w_index_persons_in_clusteredphyloany$named_partner_indicator[
 individuals_dt_w_index_persons_in_clusteredphyloany$named_partner_indicator <-
   as.factor(individuals_dt_w_index_persons_in_clusteredphyloany$named_partner_indicator)
 
+dim(individuals_dt_w_index_persons_in_clusteredphyloany)
+table(individuals_dt_w_index_persons_in_clusteredphyloany$named_partner_indicator, exclude = NULL)
 ```
 
 
@@ -383,9 +392,12 @@ factor(individuals_dt_w_index_persons_in_clusteredphyloany$named_partner_indicat
 
 ## age at HIV diagnosis
 summary(individuals_dt_w_index_persons_in_clusteredphyloany$HIVDxAge)
-individuals_dt_w_index_persons_in_clusteredphyloany %>%
+res <-
+  individuals_dt_w_index_persons_in_clusteredphyloany %>%
   group_by(named_partner_indicator) %>%
-  summarise(mean_HIVDxAge = mean(HIVDxAge, na.rm = TRUE))
+  summarise(mean_HIVDxAge = mean(HIVDxAge, na.rm = TRUE),
+            n=n())
+print(res)
 ```
 
 
@@ -477,8 +489,10 @@ result_clusteredphyloany <- run_analysis(individuals_dt_w_index_persons_in_clust
 ```
 
 
-## Table 4B: Logistic regression on named partners being genetically linked to the index case. 
-
+## Table: Logistic regression on named partners being genetically linked to 
+the index case. 
+(i.e., Characterization of Molecular Clusters in Named Partnerships)
+ 
 ### Prepare the data
 
 - How many persons appear in the named partner dataset?
@@ -660,6 +674,58 @@ results_015_converse <- run_analysis_clustering(individuals_in_named_pt_net_dt, 
 results_phyloany_converse <- run_analysis_clustering(individuals_in_named_pt_net_dt, "phyloany")
 ```
 
+
+### 005 cluster
+```{r}
+table(individuals_in_named_pt_net_dt$indicator_005_cluster, exclude = NULL)
+#table(individuals_dt_w_index_persons_in_015$named_partner_indicator, exclude = NULL)
+
+## DemoGender
+table(individuals_in_named_pt_net_dt$DemoGender, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$DemoGender, exclude = NULL) +
+  factor(individuals_in_named_pt_net_dt$indicator_005_cluster, exclude = NULL)
+   )
+   
+## DemoRace
+table(individuals_in_named_pt_net_dt$DemoRace, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$DemoRace, exclude = NULL) +
+  factor(individuals_in_named_pt_net_dt$indicator_005_cluster, exclude = NULL)
+   )
+
+## Sequence
+table(individuals_in_named_pt_net_dt$RecodedSequenceSubtype, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$RecodedSequenceSubtype, exclude = NULL) +
+factor(individuals_in_named_pt_net_dt$indicator_005_cluster, exclude = NULL)
+ )
+
+## MSM
+table(individuals_in_named_pt_net_dt$RiskMSM, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$RiskMSM, exclude = NULL) +
+factor(individuals_in_named_pt_net_dt$indicator_005_cluster, exclude = NULL)
+ )
+
+## Heterosexual
+table(individuals_in_named_pt_net_dt$RiskHeterosexual, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$RiskHeterosexual, exclude = NULL) +
+factor(individuals_in_named_pt_net_dt$indicator_005_cluster, exclude = NULL)
+ )
+
+## IDU
+table(individuals_in_named_pt_net_dt$RiskIDU, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$RiskIDU, exclude = NULL) +
+factor(individuals_in_named_pt_net_dt$indicator_005_cluster, exclude = NULL)
+ )
+
+## age at HIV diagnosis
+summary(individuals_in_named_pt_net_dt$HIVDxAge)
+individuals_in_named_pt_net_dt %>%
+  group_by(indicator_005_cluster) %>%
+  summarise(mean_HIVDxAge = mean(HIVDxAge, na.rm = TRUE))
+```
+
+
+
+### 015 cluster
 ```{r}
 table(individuals_in_named_pt_net_dt$indicator_015_cluster, exclude = NULL)
 #table(individuals_dt_w_index_persons_in_015$named_partner_indicator, exclude = NULL)
@@ -707,4 +773,62 @@ individuals_in_named_pt_net_dt %>%
   summarise(mean_HIVDxAge = mean(HIVDxAge, na.rm = TRUE))
 ```
 
+
+### phyloanycluster
+```{r}
+table(individuals_in_named_pt_net_dt$indicator_phyloany_cluster, exclude = NULL)
+#table(individuals_dt_w_index_persons_in_015$named_partner_indicator, exclude = NULL)
+
+## DemoGender
+table(individuals_in_named_pt_net_dt$DemoGender, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$DemoGender, exclude = NULL) +
+  factor(individuals_in_named_pt_net_dt$indicator_phyloany_cluster, exclude = NULL)
+   )
+   
+## DemoRace
+table(individuals_in_named_pt_net_dt$DemoRace, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$DemoRace, exclude = NULL) +
+  factor(individuals_in_named_pt_net_dt$indicator_phyloany_cluster, exclude = NULL)
+   )
+
+## Sequence
+table(individuals_in_named_pt_net_dt$RecodedSequenceSubtype, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$RecodedSequenceSubtype, exclude = NULL) +
+factor(individuals_in_named_pt_net_dt$indicator_phyloany_cluster, exclude = NULL)
+ )
+
+## MSM
+table(individuals_in_named_pt_net_dt$RiskMSM, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$RiskMSM, exclude = NULL) +
+factor(individuals_in_named_pt_net_dt$indicator_phyloany_cluster, exclude = NULL)
+ )
+
+## Heterosexual
+table(individuals_in_named_pt_net_dt$RiskHeterosexual, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$RiskHeterosexual, exclude = NULL) +
+factor(individuals_in_named_pt_net_dt$indicator_phyloany_cluster, exclude = NULL)
+ )
+
+## IDU
+table(individuals_in_named_pt_net_dt$RiskIDU, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$RiskIDU, exclude = NULL) +
+factor(individuals_in_named_pt_net_dt$indicator_phyloany_cluster, exclude = NULL)
+ )
+
+## age at HIV diagnosis
+summary(individuals_in_named_pt_net_dt$HIVDxAge)
+res <-
+  individuals_in_named_pt_net_dt %>%
+  group_by(indicator_phyloany_cluster) %>%
+  summarise(mean_HIVDxAge = mean(HIVDxAge, na.rm = TRUE),
+            n=n())
+print(res)
+```
+
+[Thus, there are `r length(individuals_in_named_pt_net_dt$indicator_phyloany_cluster)`
+    who are in named partnerships in partner DB. 
+    OF these, `r length(which(individuals_in_named_pt_net_dt$indicator_phyloany_cluster == 1))` clustered phylogenetically by the `phyloany` method, and
+    `r length(which(individuals_in_named_pt_net_dt$indicator_phyloany_cluster == 0))`
+    did not]{style="background-color: #FFFF00"}
+    
 
