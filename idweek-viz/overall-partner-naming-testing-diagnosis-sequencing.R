@@ -1,0 +1,58 @@
+rm(list=ls())
+
+# Loading necessary libraries
+library(tidyr)
+library(ggplot2)
+library(RColorBrewer)
+
+# Structuring the data with the average values
+overall_data <- data.frame(
+  Category = c("Named_Mean", "Contacted_Mean", "Tested_Mean", "Diagnosed_Mean", "Sequenced_Mean"),
+  Value = c(1342, 880, 338, 152, 152)
+)
+
+# Adjusting the factor levels and labels for the Category column
+overall_data$Category <- factor(overall_data$Category, 
+                                levels = c("Named_Mean", 
+                                           "Contacted_Mean",
+                                           "Tested_Mean",
+                                           "Diagnosed_Mean",
+                                           "Sequenced_Mean"),
+                                labels = c("Named", 
+                                           "Contacted",
+                                           "Tested", 
+                                           "Diagnosed", 
+                                           "Sequenced"))
+
+# Color settings
+set1_colors <- brewer.pal(8, "Set1")
+my_colors <- c("Named" = set1_colors[1], 
+               "Contacted" = set1_colors[2],
+               "Tested" = set1_colors[3],     
+               "Diagnosed" = set1_colors[4],  
+               "Sequenced" = set1_colors[5]) 
+
+
+# Create the labels
+labels_n = c("1342", "880 (66%)", "338 (38%)", "152 (45%)", "152 (100%)")
+
+# Updated plot code
+p_overall <- ggplot(overall_data, aes(x = Category, y = Value, fill = Category)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label=labels_n), vjust=-0.5, size=10, fontface="bold") +
+  labs(title = "",
+       y = "Total Partners",
+       x = "") +
+  scale_fill_manual(values=my_colors) +  # Setting colors manually
+  scale_y_continuous(limits = c(0, 1500)) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 18, face = "bold"),
+    axis.title.x = element_text(size = 22, face = "bold", color = "black"),
+    axis.title.y = element_text(size = 20, face = "bold", color = "black"),
+    axis.text.y = element_text(size = 16, face = "bold", color = "black"),
+    axis.text.x = element_text(size = 24, face = "bold", color = "black"),
+    legend.position = "none"   # This will remove the legend
+  )
+
+print(p_overall)
