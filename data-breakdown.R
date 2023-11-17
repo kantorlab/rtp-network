@@ -153,7 +153,7 @@ compare_descriptives(dt=named_partners_in_genomic_dt)
 
 # Cascade Table ("Table 2") -------------
 
-## row 1 - combined categories (all)
+## category 1 - combined categories (all)
 length(index_cases_who_named_partners) # row 1 - all
 length(unique(partner_db_non_missing_studyidto$StudyIDTo))
 table(partner_db_non_missing_studyidto$ClientReached, exclude = NULL)
@@ -175,6 +175,38 @@ named_partners_tested_studyidto <-
 
 length(named_partners_tested_studyidto) 
 
+unique_named_pt_contacts_reported_by_IPs <- 
+  partner_db_non_missing_studyidto$StudyIDTo
+
+length(which(unique_named_pt_contacts_reported_by_IPs %in% 
+               genomic_db_sequenced_dt$StudyID))
+
+named_contacts_in_genomic_dataset <- 
+  unique_named_pt_contacts_reported_by_IPs[which(unique_named_pt_contacts_reported_by_IPs %in% 
+                                                   genomic_db_sequenced_dt$StudyID)]
+length(named_contacts_in_genomic_dataset) # number of reported partners in genomic database
+
+
+named_contacts_rows_from_genomic_dt <- 
+  genomic_db_sequenced_dt[StudyID %in% named_contacts_in_genomic_dataset,,]
+dim(named_contacts_rows_from_genomic_dt)
+
+table(substr(named_contacts_rows_from_genomic_dt$HIVDxDate, 1, 4), exclude = NULL)
+sum(table(substr(named_contacts_rows_from_genomic_dt$HIVDxDate, 1, 4), exclude = NULL))
+length(named_contacts_rows_from_genomic_dt$HIVDxDate)
+length(which(named_contacts_rows_from_genomic_dt$HIVDxDate == ""))
+table(genomic_db_sequenced_dt[StudyID %in% 
+                                named_contacts_in_genomic_dataset,,]$HIVDxDate, exclude = NULL)
+
+table(genomic_db_sequenced_dt[StudyID %in% 
+                                named_contacts_in_genomic_dataset,,]$Sequence, exclude = NULL)
+
+
+length(intersect(genomic_db_sequenced, partner_db$StudyIDTo))
+length(Reduce(intersect, list(genomic_db_sequenced, partner_db$StudyIDFrom, 
+                              partner_db$StudyIDTo)))
+
+
 ## msm breakdown
 msm_in_genomic_db_who_named_partners <-
   genomic_db[StudyID %in% index_cases_who_named_partners & RiskMSM == "True",,]
@@ -188,39 +220,49 @@ length(unique(partner_db_of_msm_who_named_partners$StudyIDTo))
 table(partner_db_of_msm_who_named_partners$HIVTested, exclude = NULL)
 
 msm_reported_partners_in_individuals_dt <- 
-  intersect(genomic_db$StudyID, partner_db_of_msm_who_named_partners$StudyIDTo)
+  intersect(genomic_db_sequenced_dt$StudyID, partner_db_of_msm_who_named_partners$StudyIDTo)
 
-sum(table(genomic_db[which(genomic_db$StudyID %in% msm_reported_partners_in_individuals_dt),]$HIVDxDate, exclude = NULL))
+sum(table(genomic_db[which(genomic_db_sequenced_dt$StudyID %in% 
+                             msm_reported_partners_in_individuals_dt),]$HIVDxDate, exclude = NULL))
 table(genomic_db[which(genomic_db$StudyID %in% msm_reported_partners_in_individuals_dt),]$Sequence, exclude = NULL)
 
-# sequenced
-length(intersect(genomic_db_sequenced, partner_db$StudyIDTo))
-length(Reduce(intersect, list(genomic_db_sequenced, partner_db$StudyIDFrom, partner_db$StudyIDTo)))
+## idu breakdown
+idu_in_genomic_db_who_named_partners <-
+  genomic_db[StudyID %in% index_cases_who_named_partners & RiskIDU == "True",,]
+nrow(idu_in_genomic_db_who_named_partners)
 
-length(which(partner_db$StudyIDTo %in% genomic_db$StudyID))
-length(which(partner_db_non_missing_studyidto$StudyIDTo %in% genomic_db$StudyID))
+partner_db_of_idu_who_named_partners <- 
+  partner_db[StudyIDFrom %in% idu_in_genomic_db_who_named_partners$StudyID,,] 
+dim(partner_db_of_idu_who_named_partners)
+length(unique(partner_db_of_idu_who_named_partners$StudyIDFrom))
+length(unique(partner_db_of_idu_who_named_partners$StudyIDTo))
+table(partner_db_of_idu_who_named_partners$HIVTested, exclude = NULL)
+
+idu_reported_partners_in_individuals_dt <- 
+  intersect(genomic_db_sequenced_dt$StudyID, partner_db_of_idu_who_named_partners$StudyIDTo)
+
+sum(table(genomic_db[which(genomic_db_sequenced_dt$StudyID %in% 
+                             idu_reported_partners_in_individuals_dt),]$HIVDxDate, exclude = NULL))
+table(genomic_db[which(genomic_db$StudyID %in% idu_reported_partners_in_individuals_dt),]$Sequence, exclude = NULL)
+
+## hrh breakdown
+hrh_in_genomic_db_who_named_partners <-
+  genomic_db[StudyID %in% index_cases_who_named_partners & RiskHeterosexual == "True",,]
+nrow(hrh_in_genomic_db_who_named_partners)
+
+partner_db_of_hrh_who_named_partners <- 
+  partner_db[StudyIDFrom %in% hrh_in_genomic_db_who_named_partners$StudyID,,] 
+dim(partner_db_of_hrh_who_named_partners)
+length(unique(partner_db_of_hrh_who_named_partners$StudyIDFrom))
+length(unique(partner_db_of_hrh_who_named_partners$StudyIDTo))
+table(partner_db_of_hrh_who_named_partners$HIVTested, exclude = NULL)
+
+hrh_reported_partners_in_indivhrhals_dt <- 
+  intersect(genomic_db_sequenced_dt$StudyID, partner_db_of_hrh_who_named_partners$StudyIDTo)
+
+sum(table(genomic_db[which(genomic_db_sequenced_dt$StudyID %in% 
+                             hrh_reported_partners_in_indivhrhals_dt),]$HIVDxDate, exclude = NULL))
+table(genomic_db[which(genomic_db$StudyID %in% hrh_reported_partners_in_indivhrhals_dt),]$Sequence, exclude = NULL)
 
 
-# sequenced - MSM
-genomic_db_msm <-
-  genomic_db %>%
-  filter(RiskMSM == "True") %>%
-  pull(StudyID)
-
-length(genomic_db_msm)
-length(unique(genomic_db_msm))
-sum(genomic_db_msm %in% partner_db$StudyIDTo)
-
-genomic_db_msm_sequenced_id <-
-  genomic_db %>%
-  filter(Sequence == "True" & RiskMSM == "True") %>%
-  pull(StudyID)
-  
-length(genomic_db_msm_sequenced_id)
-length(unique(genomic_db_msm_sequenced_id))
-sum(genomic_db_msm_sequenced_id %in% partner_db$StudyIDTo)
-
-
-sum(genomic_db_msm_sequenced_id %in% 
-      unique(c(partner_db$StudyIDTo, partner_db$StudyIDFrom)))
 
