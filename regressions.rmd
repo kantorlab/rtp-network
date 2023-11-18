@@ -6,7 +6,7 @@ editor_options:
     wrap: 72
 ---
 
-# Setup
+## Setup
 
 ```{r setup, include=FALSE}
 rm(list=ls())
@@ -18,7 +18,7 @@ library(stringi)
 library(network)
 ```
 
-# Load the data
+## Load the data
 
 ```{r}
 #eda_env <- readRDS("/users/akhann16/code/rtp-network/out/eda_objects.rds")
@@ -33,7 +33,7 @@ partner_db <- as.data.table(read.csv("/gpfs/data/rkantor/rtp/shared_dir/ContactT
 genomic_db <- as.data.table(read.csv(paste0(data_dir, "/Individuals.csv")))
 ```
 
-# Create a named partner network object
+## Create a named partner network object
 
 ```{r}
 net_dt_el <- cbind(partner_db$StudyIDFrom, partner_db$StudyIDTo)
@@ -44,7 +44,7 @@ head(net %v% "vertex.names")
 named_pt_net <- net
 ```
 
-# Utilities
+## Utilities
 
 ```{r}
 source("utils/create-edgelists-from-mol-clusters.R")
@@ -52,7 +52,7 @@ source("utils/regressions-functions.R")
 source("utils/split-counts-by-attributes.R")
 ```
 
-# Recode Sequence Subtype as B/non-B (needed for regressions):
+## Recode Sequence Subtype as B/non-B (needed for regressions):
 
 ```{r}
 genomic_db$RecodedSequenceSubtype <- 
@@ -63,9 +63,9 @@ genomic_db$RecodedSequenceSubtype <-
 table(genomic_db$RecodedSequenceSubtype, exclude = NULL)
 ```
 
-# Create edgelists from molecular clusters
+## Create edgelists from molecular clusters
 
-## Apply function
+### Apply function
 
 Start by converting the unified individuals dataset to an edgelist
 depending on cluster identity by molecular cluster identification
@@ -97,7 +97,7 @@ hivtrace015_edgelist <-
 
 ```
 
-## Test the result
+### Test the result
 
 -   For Trace 005
 
@@ -129,14 +129,13 @@ sum(unlist(y)) #number of edges across all molecular clusters
 (sum(unlist(y)) == nrow(phylo_edgelist))
 ```
 
-# Regresssions
 
-## Table 4A: Logistic regression on index case being genetically
+## Regresssions
 
-linked to at least one of their named partners [i.e, Characterization of
-Molecular Clusters in Named Partners]
 
-### Prepare data for regression analysis
+### Predict Partner Naming from Molecular Clusters
+
+Prepare data for regression analysis
 
 -   How many index persons are in the HIVTrace005, HIVTrace015 and
     ClusteredPhyloAny datasets?
@@ -214,7 +213,8 @@ split_named_pt_indicator_counts_by_attributes(data=genomic_db_w_index_persons_in
 
 ```
 
-# Regressions Analysis: Predict Partner Naming from Molecular Clusters
+### Conduct Analysis
+
 
 ```{r}
 result_005 <- predict_named_partner_indicator(genomic_db_w_index_persons_in_005)
@@ -223,7 +223,8 @@ result_clusteredphyloany <-predict_named_partner_indicator(
   genomic_db_w_index_persons_in_clusteredphyloany)
 ```
 
-# Regressions Analysis: Predict Molecular Clustering of Named Partnerships
+
+### Predict Molecular Clustering of Named Partnerships
 
 ### Prepare the data
 
