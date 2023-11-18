@@ -19,7 +19,10 @@ genomic_db <- as.data.table(read.csv(paste0(data_dir, "/Individuals.csv")))
 
 
 # Utilites -------------
+
 source("utils/compare-descriptives-function.R")
+source("utils/compute-cascade.R")
+
 
 # Descriptives -------------
 
@@ -187,12 +190,20 @@ named_contacts_in_genomic_dataset <-
 length(named_contacts_in_genomic_dataset) # number of reported partners in genomic database
 
 
+## verify that there are 152 common participants between 
+## persons in the genomic dataset and partners named in the contact tracing dataset
+
 named_contacts_rows_from_genomic_dt <- 
   genomic_db_sequenced_dt[StudyID %in% named_contacts_in_genomic_dataset,,]
 dim(named_contacts_rows_from_genomic_dt)
 
+length(intersect(genomic_db_sequenced_dt$StudyID, named_contacts_in_genomic_dataset))
+
+## check diagnosis dates for the intersection of named partners with genomic databse
 table(substr(named_contacts_rows_from_genomic_dt$HIVDxDate, 1, 4), exclude = NULL)
 sum(table(substr(named_contacts_rows_from_genomic_dt$HIVDxDate, 1, 4), exclude = NULL))
+
+
 length(named_contacts_rows_from_genomic_dt$HIVDxDate)
 length(which(named_contacts_rows_from_genomic_dt$HIVDxDate == ""))
 table(genomic_db_sequenced_dt[StudyID %in% 
@@ -215,9 +226,30 @@ nrow(msm_in_genomic_db_who_named_partners)
 partner_db_of_msm_who_named_partners <- 
   partner_db[StudyIDFrom %in% msm_in_genomic_db_who_named_partners$StudyID,,] 
 dim(partner_db_of_msm_who_named_partners)
+
+table(partner_db_of_msm_who_named_partners$ClientReached, exclude = NULL)
 length(unique(partner_db_of_msm_who_named_partners$StudyIDFrom))
+
+
+msm_named_partners_tested_countstudyidfrom <- 
+  partner_db_of_msm_who_named_partners %>%
+  filter(HIVTested == 1) %>%
+  pull(StudyIDFrom) %>%
+  unique()
+
+length(msm_named_partners_tested_countstudyidfrom)
+
+msm_named_partners_tested_studyidto <- 
+  partner_db_of_msm_who_named_partners %>%
+  filter(HIVTested == 1) %>%
+  pull(StudyIDTo) %>%
+  unique() 
+
+length(msm_named_partners_tested_studyidto) 
+
 length(unique(partner_db_of_msm_who_named_partners$StudyIDTo))
 table(partner_db_of_msm_who_named_partners$HIVTested, exclude = NULL)
+
 
 msm_reported_partners_in_individuals_dt <- 
   intersect(genomic_db_sequenced_dt$StudyID, partner_db_of_msm_who_named_partners$StudyIDTo)
@@ -234,9 +266,28 @@ nrow(idu_in_genomic_db_who_named_partners)
 partner_db_of_idu_who_named_partners <- 
   partner_db[StudyIDFrom %in% idu_in_genomic_db_who_named_partners$StudyID,,] 
 dim(partner_db_of_idu_who_named_partners)
+
 length(unique(partner_db_of_idu_who_named_partners$StudyIDFrom))
 length(unique(partner_db_of_idu_who_named_partners$StudyIDTo))
 table(partner_db_of_idu_who_named_partners$HIVTested, exclude = NULL)
+table(partner_db_of_idu_who_named_partners$ClientReached, exclude = NULL)
+
+idu_named_partners_tested_countstudyidfrom <- 
+  partner_db_of_idu_who_named_partners %>%
+  filter(HIVTested == 1) %>%
+  pull(StudyIDFrom) %>%
+  unique()
+
+length(idu_named_partners_tested_countstudyidfrom)
+
+idu_named_partners_tested_studyidto <- 
+  partner_db_of_idu_who_named_partners %>%
+  filter(HIVTested == 1) %>%
+  pull(StudyIDTo) %>%
+  unique() 
+
+length(idu_named_partners_tested_studyidto) 
+
 
 idu_reported_partners_in_individuals_dt <- 
   intersect(genomic_db_sequenced_dt$StudyID, partner_db_of_idu_who_named_partners$StudyIDTo)
@@ -253,9 +304,27 @@ nrow(hrh_in_genomic_db_who_named_partners)
 partner_db_of_hrh_who_named_partners <- 
   partner_db[StudyIDFrom %in% hrh_in_genomic_db_who_named_partners$StudyID,,] 
 dim(partner_db_of_hrh_who_named_partners)
+
 length(unique(partner_db_of_hrh_who_named_partners$StudyIDFrom))
 length(unique(partner_db_of_hrh_who_named_partners$StudyIDTo))
 table(partner_db_of_hrh_who_named_partners$HIVTested, exclude = NULL)
+table(partner_db_of_hrh_who_named_partners$ClientReached, exclude = NULL)
+
+hrh_named_partners_tested_countstudyidfrom <- 
+  partner_db_of_hrh_who_named_partners %>%
+  filter(HIVTested == 1) %>%
+  pull(StudyIDFrom) %>%
+  unique()
+
+length(hrh_named_partners_tested_countstudyidfrom)
+
+hrh_named_partners_tested_studyidto <- 
+  partner_db_of_hrh_who_named_partners %>%
+  filter(HIVTested == 1) %>%
+  pull(StudyIDTo) %>%
+  unique() 
+
+length(hrh_named_partners_tested_studyidto) 
 
 hrh_reported_partners_in_indivhrhals_dt <- 
   intersect(genomic_db_sequenced_dt$StudyID, partner_db_of_hrh_who_named_partners$StudyIDTo)
