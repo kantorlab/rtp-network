@@ -218,120 +218,33 @@ length(Reduce(intersect, list(genomic_db_sequenced, partner_db$StudyIDFrom,
                               partner_db$StudyIDTo)))
 
 
-## msm breakdown
-msm_in_genomic_db_who_named_partners <-
-  genomic_db[StudyID %in% index_cases_who_named_partners & RiskMSM == "True",,]
-nrow(msm_in_genomic_db_who_named_partners)
+## all
+compute_cascade("all")
 
-partner_db_of_msm_who_named_partners <- 
-  partner_db[StudyIDFrom %in% msm_in_genomic_db_who_named_partners$StudyID,,] 
-dim(partner_db_of_msm_who_named_partners)
+## msm 
+compute_cascade("msm")
 
-table(partner_db_of_msm_who_named_partners$ClientReached, exclude = NULL)
-length(unique(partner_db_of_msm_who_named_partners$StudyIDFrom))
+## idu 
+compute_cascade("idu")
 
+## hrh 
+compute_cascade("hrh")
 
-msm_named_partners_tested_countstudyidfrom <- 
-  partner_db_of_msm_who_named_partners %>%
-  filter(HIVTested == 1) %>%
-  pull(StudyIDFrom) %>%
-  unique()
+## white
+compute_cascade("white")
 
-length(msm_named_partners_tested_countstudyidfrom)
+## black
+compute_cascade("black")
 
-msm_named_partners_tested_studyidto <- 
-  partner_db_of_msm_who_named_partners %>%
-  filter(HIVTested == 1) %>%
-  pull(StudyIDTo) %>%
-  unique() 
+## asian
+compute_cascade("asian")
 
-length(msm_named_partners_tested_studyidto) 
+## other
+compute_cascade("other")
 
-length(unique(partner_db_of_msm_who_named_partners$StudyIDTo))
-table(partner_db_of_msm_who_named_partners$HIVTested, exclude = NULL)
+## hispanic
+compute_cascade("hispanic")
 
-
-msm_reported_partners_in_individuals_dt <- 
-  intersect(genomic_db_sequenced_dt$StudyID, partner_db_of_msm_who_named_partners$StudyIDTo)
-
-sum(table(genomic_db[which(genomic_db_sequenced_dt$StudyID %in% 
-                             msm_reported_partners_in_individuals_dt),]$HIVDxDate, exclude = NULL))
-table(genomic_db[which(genomic_db$StudyID %in% msm_reported_partners_in_individuals_dt),]$Sequence, exclude = NULL)
-
-## idu breakdown
-idu_in_genomic_db_who_named_partners <-
-  genomic_db[StudyID %in% index_cases_who_named_partners & RiskIDU == "True",,]
-nrow(idu_in_genomic_db_who_named_partners)
-
-partner_db_of_idu_who_named_partners <- 
-  partner_db[StudyIDFrom %in% idu_in_genomic_db_who_named_partners$StudyID,,] 
-dim(partner_db_of_idu_who_named_partners)
-
-length(unique(partner_db_of_idu_who_named_partners$StudyIDFrom))
-length(unique(partner_db_of_idu_who_named_partners$StudyIDTo))
-table(partner_db_of_idu_who_named_partners$HIVTested, exclude = NULL)
-table(partner_db_of_idu_who_named_partners$ClientReached, exclude = NULL)
-
-idu_named_partners_tested_countstudyidfrom <- 
-  partner_db_of_idu_who_named_partners %>%
-  filter(HIVTested == 1) %>%
-  pull(StudyIDFrom) %>%
-  unique()
-
-length(idu_named_partners_tested_countstudyidfrom)
-
-idu_named_partners_tested_studyidto <- 
-  partner_db_of_idu_who_named_partners %>%
-  filter(HIVTested == 1) %>%
-  pull(StudyIDTo) %>%
-  unique() 
-
-length(idu_named_partners_tested_studyidto) 
-
-
-idu_reported_partners_in_individuals_dt <- 
-  intersect(genomic_db_sequenced_dt$StudyID, partner_db_of_idu_who_named_partners$StudyIDTo)
-
-sum(table(genomic_db[which(genomic_db_sequenced_dt$StudyID %in% 
-                             idu_reported_partners_in_individuals_dt),]$HIVDxDate, exclude = NULL))
-table(genomic_db[which(genomic_db$StudyID %in% idu_reported_partners_in_individuals_dt),]$Sequence, exclude = NULL)
-
-## hrh breakdown
-hrh_in_genomic_db_who_named_partners <-
-  genomic_db[StudyID %in% index_cases_who_named_partners & RiskHeterosexual == "True",,]
-nrow(hrh_in_genomic_db_who_named_partners)
-
-partner_db_of_hrh_who_named_partners <- 
-  partner_db[StudyIDFrom %in% hrh_in_genomic_db_who_named_partners$StudyID,,] 
-dim(partner_db_of_hrh_who_named_partners)
-
-length(unique(partner_db_of_hrh_who_named_partners$StudyIDFrom))
-length(unique(partner_db_of_hrh_who_named_partners$StudyIDTo))
-table(partner_db_of_hrh_who_named_partners$HIVTested, exclude = NULL)
-table(partner_db_of_hrh_who_named_partners$ClientReached, exclude = NULL)
-
-hrh_named_partners_tested_countstudyidfrom <- 
-  partner_db_of_hrh_who_named_partners %>%
-  filter(HIVTested == 1) %>%
-  pull(StudyIDFrom) %>%
-  unique()
-
-length(hrh_named_partners_tested_countstudyidfrom)
-
-hrh_named_partners_tested_studyidto <- 
-  partner_db_of_hrh_who_named_partners %>%
-  filter(HIVTested == 1) %>%
-  pull(StudyIDTo) %>%
-  unique() 
-
-length(hrh_named_partners_tested_studyidto) 
-
-hrh_reported_partners_in_indivhrhals_dt <- 
-  intersect(genomic_db_sequenced_dt$StudyID, partner_db_of_hrh_who_named_partners$StudyIDTo)
-
-sum(table(genomic_db[which(genomic_db_sequenced_dt$StudyID %in% 
-                             hrh_reported_partners_in_indivhrhals_dt),]$HIVDxDate, exclude = NULL))
-table(genomic_db[which(genomic_db$StudyID %in% hrh_reported_partners_in_indivhrhals_dt),]$Sequence, exclude = NULL)
-
-
+## nonhispanic
+compute_cascade("nonhispanic")
 
