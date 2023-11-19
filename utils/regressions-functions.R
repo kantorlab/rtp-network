@@ -3,7 +3,7 @@
 predict_named_partner_indicator<- 
   # Predict Partner Naming from Molecular Clusters
   
-  function(dataset) {
+  function(dataset, molClusterType) {
   # Model 1: DemoGender
   
   # recode DemoGender to combine XMF and not reported into one category
@@ -14,8 +14,20 @@ predict_named_partner_indicator<-
   # relevel DemoGender to make Female the reference category
   dataset$DemoGender <- relevel(dataset$DemoGender, ref = "F")
   
-  #fit model
-  m1 <- glm(named_partner_indicator ~ DemoGender, data = dataset, family = "binomial")
+  #fit models
+  corstr <- "exchangeable"
+  
+  if (molClusterType == "clusteredphyloany"){
+    id = dataset$ClusteredPhyloAny
+  } else if (molClusterType == "trace005"){
+    id = dataset$ClusteredHIVTrace005
+  } else if (molClusterType == "trace015"){
+    id = dataset$ClusteredHIVTrace015
+  }
+  
+  browser()
+  m1 <- geem(named_partner_indicator ~ DemoGender, data = dataset, 
+             family = "binomial", id=id, corstr=corstr)
   m1_summary <- summary(m1)
   xtabs1 <- xtabs(~ factor(named_partner_indicator, exclude = NULL) + 
                     factor(DemoGender, exclude = NULL), data = dataset)

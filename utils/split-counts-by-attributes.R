@@ -54,10 +54,11 @@ split_named_pt_indicator_counts_by_attributes <-
   
   ## age at HIV diagnosis
   summary(data$HIVDxAge)
-  return_objs[["hivdxage"]] <-
-    data %>%
-    group_by(named_partner_indicator) %>%
-    summarise(mean_HIVDxAge = mean(HIVDxAge, na.rm = TRUE))
-
+  grouped_data <- data %>% group_by(named_partner_indicator)
+  res <- summarise(grouped_data, mean_HIVDxAge = mean(HIVDxAge, na.rm = TRUE))
+  
+  return_objs[["hivdxage"]][["total"]] <- summary(data$HIVDxAge)
+  return_objs[["hivdxage"]][["grouped"]] <- res
+  
   return(return_objs)
   }

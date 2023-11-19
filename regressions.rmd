@@ -16,6 +16,8 @@ library(data.table)
 library(dplyr)
 library(stringi)
 library(network)
+#library(geeM)
+library(geepack)
 ```
 
 ## Load the data
@@ -30,7 +32,37 @@ library(network)
 data_dir <- "/gpfs/data/rkantor/rtp/datasets/D51_20230512_unified"
 list.files(path=data_dir)
 partner_db <- as.data.table(read.csv("/gpfs/data/rkantor/rtp/shared_dir/ContactTracingNetwork20230726.csv"))
-genomic_db <- as.data.table(read.csv(paste0(data_dir, "/Individuals.csv")))
+genomic_db_full <- as.data.table(read.csv(paste0(data_dir, "/Individuals.csv")))
+```
+
+## Use factor types where appropriate in coding variables for genomic_db
+
+```{r}
+genomic_db_full$StudyID <- factor(genomic_db_full$StudyID)
+genomic_db_full$DemoGender <- factor(genomic_db_full$DemoGender)
+genomic_db_full$DemoRace <- factor(genomic_db_full$DemoRace)
+genomic_db_full$DemoHispanic <- factor(genomic_db_full$DemoHispanic)
+genomic_db_full$DemoBirthCountry <- factor(genomic_db_full$DemoBirthCountry)
+genomic_db_full$RiskPrimary <- factor(genomic_db_full$RiskPrimary)
+genomic_db_full$RiskMSM <- factor(genomic_db_full$RiskMSM)
+genomic_db_full$RiskIDU <- factor(genomic_db_full$RiskIDU)
+genomic_db_full$RiskHeterosexual <- factor(genomic_db_full$RiskHeterosexual)
+genomic_db_full$Sequence <- factor(genomic_db_full$Sequence)
+genomic_db_full$SequenceSubtype <- factor(genomic_db_full$SequenceSubtype)
+genomic_db_full$ClusteredHIVTrace005 <- factor(genomic_db_full$ClusteredHIVTrace005)
+genomic_db_full$ClusteredHIVTrace015 <- factor(genomic_db_full$ClusteredHIVTrace015)
+genomic_db_full$ClusteredPhyloAny <- factor(genomic_db_full$ClusteredPhyloAny)
+```
+
+## Select the `genomic_db_full` columns used further in the analysis
+
+```{r}
+genomic_db <- 
+  genomic_db_full %>% 
+  select(StudyID, DemoGender, DemoRace, DemoHispanic, 
+         HIVDxAge, HIVDxDate, RiskMSM, RiskIDU, 
+         RiskHeterosexual, Sequence, SequenceSubtype, 
+         ClusteredHIVTrace005, ClusteredHIVTrace015, ClusteredPhyloAny)
 ```
 
 ## Create a named partner network object
@@ -209,19 +241,91 @@ table(genomic_db_w_index_persons_in_clusteredphyloany$named_partner_indicator, e
 
 split_named_pt_indicator_counts_by_attributes(data=genomic_db_w_index_persons_in_005)
 split_named_pt_indicator_counts_by_attributes(genomic_db_w_index_persons_in_015)
-split_named_pt_indicator_counts_by_attributes(data=genomic_db_w_index_persons_in_clusteredphyloany)
 
+phyloany_named_pt_res <- 
+  split_named_pt_indicator_counts_by_attributes(data=
+                                        genomic_db_w_index_persons_in_clusteredphyloany)
+phyloany_named_pt_res$hivdxage
 ```
 
 ### Conduct Analysis
 
-
 ```{r}
-result_005 <- predict_named_partner_indicator(genomic_db_w_index_persons_in_005)
-result_015 <- predict_named_partner_indicator(genomic_db_w_index_persons_in_015)
-result_clusteredphyloany <-predict_named_partner_indicator(
-  genomic_db_w_index_persons_in_clusteredphyloany)
+#na_val <- c(which(genomic_db_w_index_persons_in_005$DemoGender == ""))
+#data2 <- genomic_db_w_index_persons_in_clusteredphyloany
+m1 <- geeglm(as.numeric(as.character(named_partner_indicator)) ~ 
+             DemoGender, 
+           data = genomic_db_w_index_persons_in_clusteredphyloany, 
+            family = "binomial", 
+           id=ClusteredPhyloAny, 
+           corstr="exchangeable")
+summary(m1)
+
+m2 <- geeglm(as.numeric(as.character(named_partner_indicator)) ~ 
+             DemoRace, 
+           data = genomic_db_w_index_persons_in_clusteredphyloany, 
+            family = "binomial", 
+           id=ClusteredPhyloAny, 
+           corstr="exchangeable")
+summary(m2)
+
+m3 <- geeglm(as.numeric(as.character(named_partner_indicator)) ~ 
+             RecodedSequenceSubtype, 
+           data = genomic_db_w_index_persons_in_clusteredphyloany, 
+            family = "binomial", 
+           id=ClusteredPhyloAny, 
+           corstr="exchangeable")
+summary(m3)
+
+m4 <- geeglm(as.numeric(as.character(named_partner_indicator)) ~ 
+             RiskMSM, 
+           data = genomic_db_w_index_persons_in_clusteredphyloany, 
+            family = "binomial", 
+           id=ClusteredPhyloAny, 
+           corstr="exchangeable")
+summary(m4)
+
+m5 <- geeglm(as.numeric(as.character(named_partner_indicator)) ~ 
+             RiskHeterosexual, 
+           data = genomic_db_w_index_persons_in_clusteredphyloany, 
+            family = "binomial", 
+           id=ClusteredPhyloAny, 
+           corstr="exchangeable")
+summary(m5)
+
+m6 <- geeglm(as.numeric(as.character(named_partner_indicator)) ~ 
+             RiskIDU, 
+           data = genomic_db_w_index_persons_in_clusteredphyloany, 
+            family = "binomial", 
+           id=ClusteredPhyloAny, 
+           corstr="exchangeable")
+summary(m6)
+
+# m7 <- geeglm(as.numeric(as.character(named_partner_indicator)) ~ 
+#              HIVDxAge, 
+#            data = genomic_db_w_index_persons_in_clusteredphyloany, 
+#             family = "binomial", 
+#            id=ClusteredPhyloAny, 
+#            corstr="exchangeable")
+# summary(m7)
+
 ```
+
+
+# ```{r}
+# result_005 <- predict_named_partner_indicator(
+#   genomic_db_w_index_persons_in_005,
+#   molClusterType="trace005")
+# 
+# result_015 <- predict_named_partner_indicator(
+#   genomic_db_w_index_persons_in_015,
+#   molClusterType="trace015")
+# 
+# result_clusteredphyloany <-
+#   predict_named_partner_indicator(
+#   genomic_db_w_index_persons_in_clusteredphyloany,
+#   molClusterType="clusteredphyloany")
+# ```
 
 
 ### Predict Molecular Clustering of Named Partnerships

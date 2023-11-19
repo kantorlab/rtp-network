@@ -36,13 +36,22 @@ create_edgelists <- function(data, cluster_col, edgelist_prefix) {
       next
     }
     
+    #browser()
     # Use combn() to get all combinations of nodes within the current cluster
-    edges <- combn(nodes, 2) %>%
-      t() %>%
-      as.data.frame() %>%
-      filter(V1 != V2) %>%
-      distinct() %>%
-      rename(source = V1, target = V2)
+    # edges <- combn(nodes, 2) %>%
+    #   t() %>%
+    #   as.data.frame() %>%
+    #   filter(V1 != V2) %>%
+    #   distinct() %>%
+    #   rename(source = V1, target = V2)
+    
+    # Create the edges dataframe
+    transposed_matrix <- t(combn(nodes, 2))
+    edges <- data.frame(V1 = transposed_matrix[, 1], V2 = transposed_matrix[, 2])
+    
+    # Now apply the filter function
+    edges <- dplyr::filter(edges, V1 != V2)
+    
     
     # Add a column indicating the cluster ID for each edge
     edges$cluster_id <- cluster_id
