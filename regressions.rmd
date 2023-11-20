@@ -30,7 +30,9 @@ library(network)
 data_dir <- "/gpfs/data/rkantor/rtp/datasets/D51_20230512_unified"
 list.files(path=data_dir)
 partner_db <- as.data.table(read.csv("/gpfs/data/rkantor/rtp/shared_dir/ContactTracingNetwork20230726.csv"))
-genomic_db <- as.data.table(read.csv(paste0(data_dir, "/Individuals.csv")))
+genomic_db_full <- as.data.table(read.csv(paste0(data_dir, "/Individuals.csv")))
+
+genomic_db <- genomic_db_full[Sequence == "True",,]
 ```
 
 ## Create a named partner network object
@@ -209,7 +211,9 @@ table(genomic_db_w_index_persons_in_clusteredphyloany$named_partner_indicator, e
 
 split_named_pt_indicator_counts_by_attributes(data=genomic_db_w_index_persons_in_005)
 split_named_pt_indicator_counts_by_attributes(genomic_db_w_index_persons_in_015)
-split_named_pt_indicator_counts_by_attributes(data=genomic_db_w_index_persons_in_clusteredphyloany)
+
+phyloany_indicator_atts <- 
+  split_named_pt_indicator_counts_by_attributes(data=genomic_db_w_index_persons_in_clusteredphyloany)
 
 ```
 
@@ -218,8 +222,10 @@ split_named_pt_indicator_counts_by_attributes(data=genomic_db_w_index_persons_in
 
 ```{r}
 result_005 <- predict_named_partner_indicator(genomic_db_w_index_persons_in_005)
+
 result_015 <- predict_named_partner_indicator(genomic_db_w_index_persons_in_015)
-result_clusteredphyloany <-predict_named_partner_indicator(
+
+result_clusteredphyloany <- predict_named_partner_indicator(
   genomic_db_w_index_persons_in_clusteredphyloany)
 ```
 
@@ -319,7 +325,8 @@ results_005_converse <- predict_clustering_indicator(individuals_in_named_pt_net
 results_015_converse <- predict_clustering_indicator(individuals_in_named_pt_net_dt, "015")
 
 # Run the analysis for the phyloany clustering case
-results_phyloany_converse <- predict_clustering_indicator(individuals_in_named_pt_net_dt, "phyloany")
+results_phyloany_converse <- 
+  predict_clustering_indicator(individuals_in_named_pt_net_dt, "phyloany")
 ```
 
 ### 005 cluster
