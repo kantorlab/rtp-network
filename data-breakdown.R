@@ -102,12 +102,16 @@ table(partner_db[id_unique_named_partners,]$ClientReached, exclude=NULL)
 
 # How many sequenced persons cluster phylogenetically?
 seq_pers_cluster_phylo <- nrow(genomic_db_sequenced_dt) - length(which(is.na(genomic_db_sequenced_dt$ClusteredPhyloAny)))
+seq_pers_cluster_phylo
+nrow(genomic_db_sequenced_dt)
 seq_pers_cluster_phylo/nrow(genomic_db_sequenced_dt)
 
 # How many index cases (who appear in partner DB) and are sequenced are found to cluster phylogenetically?
 seq_index_cases_nmd_pts <- which(genomic_db_sequenced_dt$StudyID %in% index_cases_who_named_partners)
 seq_index_cases_nmd_pts_dt <- genomic_db_sequenced_dt[seq_index_cases_nmd_pts,]
 ans1 <- nrow(seq_index_cases_nmd_pts_dt) -  length(which(is.na(seq_index_cases_nmd_pts_dt$ClusteredPhyloAny)))
+ans1
+nrow(seq_index_cases_nmd_pts_dt)
 ans1/nrow(seq_index_cases_nmd_pts_dt)
 
 # How many named partners (who appear in partner DB) and are sequenced are found to cluster phylogenetically?
@@ -115,6 +119,8 @@ sequenced_who_are_named_pts <- (intersect(genomic_db_sequenced, partner_db$Study
 sequenced_who_are_named_pts_id <- which(genomic_db_sequenced_dt$StudyID %in% sequenced_who_are_named_pts)
 sequenced_who_are_named_pts_dt <- genomic_db_sequenced_dt[sequenced_who_are_named_pts_id,] 
 ans2 <- nrow(sequenced_who_are_named_pts_dt) -  length(which(is.na(sequenced_who_are_named_pts_dt$ClusteredPhyloAny)))
+ans2
+nrow(sequenced_who_are_named_pts_dt)
 ans2/nrow(sequenced_who_are_named_pts_dt)
 
 # Comparison Table ("Table 1") -------------
