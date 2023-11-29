@@ -16,8 +16,8 @@ library(data.table)
 library(dplyr)
 library(stringi)
 library(network)
-#library(geeM)
-library(geepack)
+library(geeM)
+#library(geepack)
 ```
 
 ## Load the data
@@ -251,17 +251,27 @@ phyloany_named_pt_res$hivdxage
 ### Conduct Analysis
 
 ```{r}
-#na_val <- c(which(genomic_db_w_index_persons_in_005$DemoGender == ""))
-#data2 <- genomic_db_w_index_persons_in_clusteredphyloany
-m1 <- geeglm(as.numeric(as.character(named_partner_indicator)) ~ 
-             DemoGender, 
-           data = genomic_db_w_index_persons_in_clusteredphyloany, 
+
+table(genomic_db_w_index_persons_in_clusteredphyloany$DemoGender, 
+      exclude = NULL)
+
+m1_clean_dt <- 
+  genomic_db_w_index_persons_in_clusteredphyloany %>%
+  select(named_partner_indicator, ClusteredPhyloAny, DemoGender) %>%
+  filter(DemoGender != "") %>%
+   mutate(DemoGender = droplevels(DemoGender))
+
+table(m1_clean_dt$DemoGender, exclude = NULL)
+
+m1 <- geem(as.numeric(as.character(named_partner_indicator)) ~ 
+               DemoGender, 
+           data = m1_clean_dt, 
             family = "binomial", 
            id=ClusteredPhyloAny, 
            corstr="exchangeable")
 summary(m1)
 
-m2 <- geeglm(as.numeric(as.character(named_partner_indicator)) ~ 
+m2 <- geem(as.numeric(as.character(named_partner_indicator)) ~ 
              DemoRace, 
            data = genomic_db_w_index_persons_in_clusteredphyloany, 
             family = "binomial", 
@@ -269,7 +279,7 @@ m2 <- geeglm(as.numeric(as.character(named_partner_indicator)) ~
            corstr="exchangeable")
 summary(m2)
 
-m3 <- geeglm(as.numeric(as.character(named_partner_indicator)) ~ 
+m3 <- geem(as.numeric(as.character(named_partner_indicator)) ~ 
              RecodedSequenceSubtype, 
            data = genomic_db_w_index_persons_in_clusteredphyloany, 
             family = "binomial", 
@@ -277,7 +287,7 @@ m3 <- geeglm(as.numeric(as.character(named_partner_indicator)) ~
            corstr="exchangeable")
 summary(m3)
 
-m4 <- geeglm(as.numeric(as.character(named_partner_indicator)) ~ 
+m4 <- geem(as.numeric(as.character(named_partner_indicator)) ~ 
              RiskMSM, 
            data = genomic_db_w_index_persons_in_clusteredphyloany, 
             family = "binomial", 
@@ -285,7 +295,7 @@ m4 <- geeglm(as.numeric(as.character(named_partner_indicator)) ~
            corstr="exchangeable")
 summary(m4)
 
-m5 <- geeglm(as.numeric(as.character(named_partner_indicator)) ~ 
+m5 <- geem(as.numeric(as.character(named_partner_indicator)) ~ 
              RiskHeterosexual, 
            data = genomic_db_w_index_persons_in_clusteredphyloany, 
             family = "binomial", 
@@ -293,7 +303,7 @@ m5 <- geeglm(as.numeric(as.character(named_partner_indicator)) ~
            corstr="exchangeable")
 summary(m5)
 
-m6 <- geeglm(as.numeric(as.character(named_partner_indicator)) ~ 
+m6 <- geem(as.numeric(as.character(named_partner_indicator)) ~ 
              RiskIDU, 
            data = genomic_db_w_index_persons_in_clusteredphyloany, 
             family = "binomial", 
@@ -301,13 +311,24 @@ m6 <- geeglm(as.numeric(as.character(named_partner_indicator)) ~
            corstr="exchangeable")
 summary(m6)
 
-# m7 <- geeglm(as.numeric(as.character(named_partner_indicator)) ~ 
-#              HIVDxAge, 
-#            data = genomic_db_w_index_persons_in_clusteredphyloany, 
-#             family = "binomial", 
-#            id=ClusteredPhyloAny, 
-#            corstr="exchangeable")
-# summary(m7)
+table(genomic_db_w_index_persons_in_clusteredphyloany$named_partner_indicator, 
+      exclude = NULL)
+
+table(genomic_db_w_index_persons_in_clusteredphyloany$HIVDxAge, 
+      exclude = NULL)
+
+m7_dt <- genomic_db_w_index_persons_in_clusteredphyloany %>%
+  select(named_partner_indicator, HIVDxAge, ClusteredPhyloAny)
+
+m7_clean_dt <- na.omit(m7_dt)
+
+m7 <- geem(as.numeric(as.character(named_partner_indicator)) ~
+             as.numeric(HIVDxAge),
+           data = m7_clean_dt,
+            family = "binomial",
+           id=ClusteredPhyloAny,
+           corstr="exchangeable")
+summary(m7)
 
 ```
 
