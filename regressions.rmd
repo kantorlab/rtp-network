@@ -6,8 +6,6 @@ editor_options:
     wrap: 72
 ---
 
-## Setup
-
 ```{r setup, include=FALSE}
 rm(list=ls())
 knitr::opts_chunk$set(echo = TRUE,
@@ -87,6 +85,10 @@ source("utils/split-counts-by-attributes.R")
 ## Recode Sequence Subtype as B/non-B (needed for regressions):
 
 ```{r}
+genomic_db$SequenceSubtype <- as.character(genomic_db$SequenceSubtype)
+
+table(genomic_db$SequenceSubtype, exclude = NULL)
+
 genomic_db$RecodedSequenceSubtype <- 
   ifelse(genomic_db$SequenceSubtype == "" | genomic_db$SequenceSubtype == "B", 
          genomic_db$SequenceSubtype, 
@@ -257,7 +259,7 @@ table(genomic_db_w_index_persons_in_clusteredphyloany$DemoGender,
 
 m1_clean_dt <- 
   genomic_db_w_index_persons_in_clusteredphyloany %>%
-  select(named_partner_indicator, ClusteredPhyloAny, DemoGender) %>%
+  select(StudyID, named_partner_indicator, ClusteredPhyloAny, DemoGender) %>%
   filter(DemoGender != "") %>%
    mutate(DemoGender = droplevels(DemoGender))
 
@@ -266,6 +268,7 @@ table(m1_clean_dt$DemoGender, exclude = NULL)
 m1 <- geem(as.numeric(as.character(named_partner_indicator)) ~ 
                DemoGender, 
            data = m1_clean_dt, 
+           #data = genomic_db_w_index_persons_in_clusteredphyloany, #DOES NOT CONVERGE WITH THIS
             family = "binomial", 
            id=ClusteredPhyloAny, 
            corstr="exchangeable")
@@ -333,20 +336,6 @@ summary(m7)
 ```
 
 
-# ```{r}
-# result_005 <- predict_named_partner_indicator(
-#   genomic_db_w_index_persons_in_005,
-#   molClusterType="trace005")
-# 
-# result_015 <- predict_named_partner_indicator(
-#   genomic_db_w_index_persons_in_015,
-#   molClusterType="trace015")
-# 
-# result_clusteredphyloany <-
-#   predict_named_partner_indicator(
-#   genomic_db_w_index_persons_in_clusteredphyloany,
-#   molClusterType="clusteredphyloany")
-# ```
 
 
 ### Predict Molecular Clustering of Named Partnerships
@@ -438,7 +427,8 @@ test_indicator_columns(individuals_in_named_pt_net_dt, "indicator_phyloany_clust
 
 ```{r}
 # Run the analysis for the 005 clustering case
-results_005_converse <- predict_clustering_indicator(individuals_in_named_pt_net_dt, "005")
+results_005_converse <- 
+  predict_clustering_indicator(individuals_in_named_pt_net_dt, "005")
 
 # Run the analysis for the 015 clustering case
 results_015_converse <- predict_clustering_indicator(individuals_in_named_pt_net_dt, "015")
@@ -605,3 +595,5 @@ who are in named partnerships in partner DB. OF these,
 clustered phylogenetically by the `phyloany` method, and
 `r length(which(individuals_in_named_pt_net_dt$indicator_phyloany_cluster == 0))`
 did not]{style="background-color: #FFFF00"}
+
+
