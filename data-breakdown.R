@@ -119,10 +119,23 @@ ans2/nrow(sequenced_who_are_named_pts_dt)
 
 # Comparison Table ("Table 1") -------------
 
-## Sequenced Index cases in Genomic DB
+## Column 1: Sequenced Index cases in Genomic DB
 length(unique(genomic_db_sequenced_dt$StudyID))
-
 compare_descriptives(dt=genomic_db_sequenced_dt)
+
+
+## Suggested Column 2: Descriptors on Contact Tracing Database 
+length(partner_individuals)
+head(partner_individuals)
+
+length(which(partner_individuals %in% genomic_db$StudyID))
+length(which(partner_individuals_from %in% genomic_db$StudyID))
+
+length(which(partner_individuals %in% genomic_db_sequenced_dt$StudyID))
+length(which(partner_individuals_from %in% genomic_db_sequenced_dt$StudyID))
+length(which(partner_individuals_to %in% genomic_db_sequenced_dt$StudyID))
+length(which(!partner_individuals_to %in% partner_individuals_from))
+partner_individuals_to[which(!partner_individuals_to %in% partner_individuals_from)]
 
 ## Sequenced Index cases who were interviewed in Partner DB
 sequenced_and_interviewed <- intersect(genomic_db_sequenced, partner_db$StudyIDFrom)
