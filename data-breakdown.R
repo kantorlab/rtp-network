@@ -117,6 +117,39 @@ sequenced_who_are_named_pts_dt <- genomic_db_sequenced_dt[sequenced_who_are_name
 ans2 <- nrow(sequenced_who_are_named_pts_dt) -  length(which(is.na(sequenced_who_are_named_pts_dt$ClusteredPhyloAny)))
 ans2/nrow(sequenced_who_are_named_pts_dt)
 
+
+# Grant Resubmission Question -------------
+
+## Table
+  # & High & Low
+  # Contact tracing & 
+  #                 ICs not naming each other (but naming others) &	
+  #                 ICs named each other only
+
+## How many index cases are not naming each other?
+
+  #number of index cases
+  length(unique(genomic_db_sequenced_dt$StudyID))
+
+  #number of index cases who named partners
+  length(index_cases_who_named_partners) 
+
+  #unique individuals who are named
+  partner_individuals_to
+  length(partner_individuals_to)
+
+  #how many named partners are themselves index cases 
+  length(which(partner_individuals_to %in% unique(genomic_db_sequenced_dt$StudyID)))
+
+  #how many named partners are themselves index cases who named partners
+  length(which(partner_individuals_to %in% index_cases_who_named_partners))
+
+  #how many named partners are not index cases
+  length(which(!partner_individuals_to %in% unique(genomic_db_sequenced_dt$StudyID)))
+
+  #how many named partners are not index cases who named partners
+  length(which(!partner_individuals_to %in% index_cases_who_named_partners))
+
 # Comparison Table ("Table 1") -------------
 
 ## Column 1: Sequenced Index cases in Genomic DB
