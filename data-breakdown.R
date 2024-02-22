@@ -135,20 +135,22 @@ ans2/nrow(sequenced_who_are_named_pts_dt)
   length(index_cases_who_named_partners) 
 
   #unique individuals who are named
-  partner_individuals_to
-  length(partner_individuals_to)
+  head(partner_individuals_to)
+  blank_partner_study_id <- which(partner_individuals_to == "")
+  non_blank_partner_individuals_to <- partner_individuals_to[-blank_partner_study_id]
+  length(non_blank_partner_individuals_to)
 
   #how many named partners are themselves index cases 
-  length(which(partner_individuals_to %in% unique(genomic_db_sequenced_dt$StudyID)))
+  length(which(non_blank_partner_individuals_to %in% unique(genomic_db_sequenced_dt$StudyID)))
 
   #how many named partners are themselves index cases who named partners
-  length(which(partner_individuals_to %in% index_cases_who_named_partners))
+  length(which(non_blank_partner_individuals_to %in% index_cases_who_named_partners))
 
   #how many named partners are not index cases
-  length(which(!partner_individuals_to %in% unique(genomic_db_sequenced_dt$StudyID)))
+  length(which(!non_blank_partner_individuals_to %in% unique(genomic_db_sequenced_dt$StudyID)))
 
   #how many named partners are not index cases who named partners
-  length(which(!partner_individuals_to %in% index_cases_who_named_partners))
+  length(which(!non_blank_partner_individuals_to %in% index_cases_who_named_partners))
 
 # Comparison Table ("Table 1") -------------
 
