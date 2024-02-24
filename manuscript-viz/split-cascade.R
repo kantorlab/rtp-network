@@ -1,40 +1,57 @@
+rm(list=ls())
+
 library(tidyr)
 library(ggplot2)
+library(here)
 
 # Behavior Data
+msm_denom <- 274
+pwid_denom <- 26
+hrh_denom <- 159
+
 df <- data.frame(
   Grouping = c("MSM", "PWID", "HRH"),
-  Named_Mean = c(794/275, 70/26, 318/160),
-  Tested_Mean = c(262/275, 16/26, 134/160),
-  Diagnosed_Mean = c(81/275, 12/26, 31/160),
-  Sequenced_Mean = c(79/275, 12/26, 31/160),
-  N = c("(n=275)", "(n=26)", "(n=160)")
+  Named_Mean = c(666/msm_denom, 52/pwid_denom, 279/hrh_denom),
+  Tested_Mean = c(262/msm_denom, 16/pwid_denom, 133/hrh_denom),
+  Diagnosed_Mean = c(79/msm_denom, 12/pwid_denom, 31/hrh_denom),
+  Sequenced_Mean = c(79/msm_denom, 12/pwid_denom, 31/hrh_denom),
+  N = c(paste0("(n=", msm_denom, ")"), paste0("(n=", pwid_denom, ")"), paste0("(n=", hrh_denom, ")"))
 )
+
 df_long <- df %>%
   gather(Category, Value, -Grouping, -N)
 df_long$Category <- factor(df_long$Category, levels = c("Named_Mean", "Tested_Mean", "Diagnosed_Mean", "Sequenced_Mean"))
 
 # Race Data
+white_denom <- 312
+black_denom <- 132
+asian_denom <- 15
+other_denom <- 28
+
 df_race <- data.frame(
   Grouping = c("White", "Black", "Asian", "Other"),
-  Named_Mean = c(861/313, 273/133, 23/16, 72/28),
-  Tested_Mean = c(311/313, 93/133, 8/16, 23/28),
-  Diagnosed_Mean = c(88/313, 34/133, 3/16, 7/28),
-  Sequenced_Mean = c(86/313, 34/133, 3/16, 7/28),
-  N = c("(n=313)", "(n=133)", "(n=16)", "(n=28)")
+  Named_Mean = c(740/white_denom, 234/black_denom, 22/asian_denom, 61/other_denom),
+  Tested_Mean = c(311/white_denom, 93/black_denom, 7/asian_denom, 23/other_denom),
+  Diagnosed_Mean = c(85/white_denom, 34/black_denom, 3/asian_denom, 7/other_denom),
+  Sequenced_Mean = c(85/white_denom, 34/black_denom, 3/asian_denom, 7/other_denom),
+  N = c(paste0("(n=", white_denom, ")"), paste0("(n=", black_denom, ")"), paste0("(n=", asian_denom, ")"), paste0("(n=", other_denom, ")"))
 )
+
 df_race_long <- df_race %>%
   gather(Category, Value, -Grouping, -N)
 df_race_long$Category <- factor(df_race_long$Category, levels = c("Named_Mean", "Tested_Mean", "Diagnosed_Mean", "Sequenced_Mean"))
 
 # Ethnicity Data
+hispanic_denom <- 140
+nonhispanic_denom <- 354
+
 df_ethnicity <- data.frame(
   Grouping = c("Hispanic", "Not Hispanic"),
-  Named_Mean = c(322/140, 928/357),
-  Tested_Mean = c(99/140, 338/357),
-  Diagnosed_Mean = c(40/140, 91/357),
-  Sequenced_Mean = c(40/140, 89/357),
-  N = c("(n=140)", "(n=357)")
+  Named_Mean = c(266/hispanic_denom, 806/nonhispanic_denom),
+  Tested_Mean = c(99/hispanic_denom, 337/nonhispanic_denom),
+  Diagnosed_Mean = c(40/hispanic_denom, 88/nonhispanic_denom),
+  Sequenced_Mean = c(40/hispanic_denom, 88/nonhispanic_denom),
+  N = c(paste0("(n=", hispanic_denom, ")"), paste0("(n=", nonhispanic_denom, ")"))
 )
 df_ethnicity_long <- df_ethnicity %>%
   gather(Category, Value, -Grouping, -N)
@@ -49,7 +66,8 @@ combined_df <- rbind(df_long, df_race_long, df_ethnicity_long)
 # Plot
 p <- ggplot(combined_df, aes(x = Grouping, y = Value, fill = Category)) +
   geom_bar(stat = "identity", position = "dodge") +
-  geom_text(aes(label = N, y = 0), vjust = 1.5, hjust = 0.5, size = 8, fontface="bold", color = "black") +
+  geom_text(aes(label = N, y = 0), vjust = 1.5, hjust = 0.5, size = 3.5, fontface="plain", color = "black") +
+  #geom_text(aes(label = N, y = 0), color = "black")
   labs(y = "Mean Number of Partners per Index Case") +
   #scale_fill_brewer(palette="Set1", breaks=c("Named_Mean", "Tested_Mean", "Diagnosed_Mean", "Sequenced_Mean"), labels=c("Named", "Tested", "Diagnosed", "Sequenced"), name="Category") +
   scale_fill_brewer(palette="Set1", breaks=c("Named_Mean", "Tested_Mean", "Diagnosed_Mean", "Sequenced_Mean"), labels=c("Named", "Tested", "Diagnosed", "Sequenced"), name=NULL)+
@@ -57,19 +75,21 @@ p <- ggplot(combined_df, aes(x = Grouping, y = Value, fill = Category)) +
   theme(
     #plot.title = element_text(size = 18, face = "bold"),
     plot.title = element_blank(),
-    axis.text.x = element_text(size = 12, face = "bold", color = "black"),
-    axis.title.y = element_text(size = 12, face = "bold", color = "black"),
-    axis.title.x = element_blank(),
+    axis.text.x = element_text(face="bold"),
+    axis.title.y = element_text(face="bold"),
+    axis.title.x = element_text(face="bold"),
     #axis.text.x = element_text(size = 14, angle = 45, hjust = 1),
-    axis.text.y = element_text(size = 12, face = "bold", color = "black"),
-    legend.text = element_text(size = 12, face = "bold"),
-    #legend.title = element_text(size = 16),
+    axis.text.y = element_text(),
+    legend.text = element_text(),
+    #legend.title = element_text(size = asian_denom),
     strip.text = element_text(size = 12, face = "bold", color = "black"),
     strip.background = element_rect(fill = "lightgray", color = "black", linewidth = 1)
   ) +
   facet_wrap(~Type, scales = "free_x", ncol = 3) +
   ylim(0, max(combined_df$Value) + 0.1*max(combined_df$Value))
 
-#pdf("cascade-breakdown.pdf", width=28, height=12)
+loc_to_save <- here("manuscript-viz", "split_cascade.pdf")
 print(p)
-#dev.off()
+ggsave(loc_to_save, plot = p, 
+      width = 8, height = 6, dpi = 300)
+
