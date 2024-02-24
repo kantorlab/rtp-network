@@ -86,5 +86,5 @@ p <- ggplot(combined_df, aes(x = Grouping, y = Value, fill = Category)) +
 loc_to_save <- here("manuscript-viz", "split_cascade.pdf")
 print(p)
 ggsave(loc_to_save, plot = p, 
-      width = 8, height = 6, dpi = 300)
+      width = 12, height = 6, dpi = 300)
 
