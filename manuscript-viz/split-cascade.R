@@ -67,21 +67,16 @@ combined_df <- rbind(df_long, df_race_long, df_ethnicity_long)
 p <- ggplot(combined_df, aes(x = Grouping, y = Value, fill = Category)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_text(aes(label = N, y = 0), vjust = 1.5, hjust = 0.5, size = 3.5, fontface="plain", color = "black") +
-  #geom_text(aes(label = N, y = 0), color = "black")
   labs(y = "Mean Number of Partners per Index Case") +
-  #scale_fill_brewer(palette="Set1", breaks=c("Named_Mean", "Tested_Mean", "Diagnosed_Mean", "Sequenced_Mean"), labels=c("Named", "Tested", "Diagnosed", "Sequenced"), name="Category") +
   scale_fill_brewer(palette="Set1", breaks=c("Named_Mean", "Tested_Mean", "Diagnosed_Mean", "Sequenced_Mean"), labels=c("Named", "Tested", "Diagnosed", "Sequenced"), name=NULL)+
   theme_minimal() +
   theme(
-    #plot.title = element_text(size = 18, face = "bold"),
     plot.title = element_blank(),
     axis.text.x = element_text(face="bold"),
     axis.title.y = element_text(face="bold"),
     axis.title.x = element_text(face="bold"),
-    #axis.text.x = element_text(size = 14, angle = 45, hjust = 1),
     axis.text.y = element_text(),
     legend.text = element_text(),
-    #legend.title = element_text(size = asian_denom),
     strip.text = element_text(size = 12, face = "bold", color = "black"),
     strip.background = element_rect(fill = "lightgray", color = "black", linewidth = 1)
   ) +
