@@ -1,17 +1,14 @@
 compute_cascade <- function(cat){
   
-  allowed_cats <- c("all", "msm", "idu", "hrh", 
+  allowed_cats <- c("msm", "idu", "hrh", 
                       "white", "black", "asian", "other",
                       "hispanic", "nonhispanic")
   
   if(!cat %in% allowed_cats) {
-    stop(paste0("Invalid group. Must be one of ", allowed_groups, "."))
+    stop(paste0("Invalid group. Must be one of ", allowed_cats, "."))
   }
   
-  
-  if (cat == "all"){
-    cat_in_genomic_db_who_named_partners <- genomic_db[StudyID %in% index_cases_who_named_partners,,]
-  } else if (cat == "msm"){
+ if (cat == "msm"){
     cat_in_genomic_db_who_named_partners <- 
       genomic_db[StudyID %in% index_cases_who_named_partners & RiskMSM == "True",,]
   } else if (cat == "hrh"){

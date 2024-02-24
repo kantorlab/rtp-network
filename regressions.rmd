@@ -338,7 +338,8 @@ summary(m7)
 
 
 
-### Predict Molecular Clustering of Named Partnerships
+
+## Predict Molecular Clustering of Named Partnerships
 
 ### Prepare the data
 
@@ -426,15 +427,7 @@ test_indicator_columns(individuals_in_named_pt_net_dt, "indicator_phyloany_clust
 ### Apply the function
 
 ```{r}
-# Run the analysis for the 005 clustering case
-results_005_converse <- 
-  predict_clustering_indicator(individuals_in_named_pt_net_dt, "005")
 
-# Run the analysis for the 015 clustering case
-results_015_converse <- predict_clustering_indicator(individuals_in_named_pt_net_dt, "015")
-
-# Run the analysis for the phyloany clustering case
-results_phyloany_converse <- predict_clustering_indicator(individuals_in_named_pt_net_dt, "phyloany")
 ```
 
 ### 005 cluster
@@ -595,5 +588,145 @@ who are in named partnerships in partner DB. OF these,
 clustered phylogenetically by the `phyloany` method, and
 `r length(which(individuals_in_named_pt_net_dt$indicator_phyloany_cluster == 0))`
 did not]{style="background-color: #FFFF00"}
+
+
+```{r}
+
+table(individuals_in_named_pt_net_dt$DemoGender, 
+      exclude = NULL)
+
+#######
+
+m1_clean_dt_converse <- 
+   individuals_in_named_pt_net_dt  %>%
+  select(StudyID, indicator_phyloany_cluster, ClusteredPhyloAny, DemoGender) %>%
+  filter(DemoGender != "") %>%
+   mutate(DemoGender = droplevels(DemoGender))
+
+table(m1_clean_dt_converse$DemoGender, exclude = NULL)
+
+m1_converse <- geem(as.numeric(as.character(indicator_phyloany_cluster)) ~ 
+               DemoGender, 
+           data = m1_clean_dt_converse, 
+            family = "binomial", 
+           id=ClusteredPhyloAny, 
+           corstr="exchangeable")
+summary(m1_converse)
+
+#######
+
+m2_clean_dt_converse <- 
+   individuals_in_named_pt_net_dt  %>%
+  select(StudyID, indicator_phyloany_cluster, ClusteredPhyloAny, DemoRace) %>%
+  filter(DemoRace != "") %>%
+   mutate(DemoRace = droplevels(DemoRace))
+
+table(m2_clean_dt_converse$DemoRace, exclude = NULL)
+
+m2_converse <- geem(as.numeric(as.character(indicator_phyloany_cluster)) ~ 
+               DemoRace, 
+           data = m2_clean_dt_converse, 
+            family = "binomial", 
+           id=ClusteredPhyloAny, 
+           corstr="exchangeable")
+summary(m2_converse)
+
+######
+
+m3_clean_dt_converse <- individuals_in_named_pt_net_dt %>%
+  select(StudyID, indicator_phyloany_cluster, ClusteredPhyloAny, RecodedSequenceSubtype) %>%
+  filter(RecodedSequenceSubtype != "") %>%
+  mutate(RecodedSequenceSubtype = factor(RecodedSequenceSubtype), # Convert to factor first
+         RecodedSequenceSubtype = droplevels(RecodedSequenceSubtype)) # Then drop levels
+
+table(m3_clean_dt_converse$RecodedSequenceSubtype, exclude = NULL)
+
+m3_converse <- geem(as.numeric(as.character(indicator_phyloany_cluster)) ~ 
+               RecodedSequenceSubtype, 
+           data = m3_clean_dt_converse, 
+            family = "binomial", 
+           id=ClusteredPhyloAny, 
+           corstr="exchangeable")
+summary(m3_converse)
+
+######
+
+m4_clean_dt_converse <- 
+   individuals_in_named_pt_net_dt  %>%
+  select(StudyID, indicator_phyloany_cluster, ClusteredPhyloAny, RiskMSM) %>%
+  filter(RiskMSM != "") %>%
+   mutate(RiskMSM = droplevels(RiskMSM))
+
+table(m4_clean_dt_converse$RiskMSM, exclude = NULL)
+
+m4_converse <- geem(as.numeric(as.character(indicator_phyloany_cluster)) ~ 
+               RiskMSM, 
+           data = m4_clean_dt_converse, 
+            family = "binomial", 
+           id=ClusteredPhyloAny, 
+           corstr="exchangeable")
+summary(m4_converse)
+
+#####
+
+m5_clean_dt_converse <- 
+   individuals_in_named_pt_net_dt  %>%
+  select(StudyID, indicator_phyloany_cluster, ClusteredPhyloAny, RiskHeterosexual) %>%
+  filter(RiskHeterosexual != "") %>%
+   mutate(RiskHeterosexual = droplevels(RiskHeterosexual))
+
+table(m5_clean_dt_converse$RiskHeterosexual, exclude = NULL)
+
+m5_converse <- geem(as.numeric(as.character(indicator_phyloany_cluster)) ~ 
+               RiskHeterosexual, 
+           data = m5_clean_dt_converse, 
+            family = "binomial", 
+           id=ClusteredPhyloAny, 
+           corstr="exchangeable")
+summary(m5_converse)
+
+#####
+
+m6_clean_dt_converse <- 
+   individuals_in_named_pt_net_dt  %>%
+  select(StudyID, indicator_phyloany_cluster, ClusteredPhyloAny, RiskIDU) %>%
+  filter( RiskIDU!= "") %>%
+   mutate( RiskIDU= droplevels(RiskIDU))
+
+table(m6_clean_dt_converse$RiskIDU, exclude = NULL)
+
+m6_converse <- geem(as.numeric(as.character(indicator_phyloany_cluster)) ~ 
+               RiskIDU, 
+           data = m6_clean_dt_converse, 
+            family = "binomial", 
+           id=ClusteredPhyloAny, 
+           corstr="exchangeable")
+summary(m6_converse)
+
+#####
+
+table(genomic_db_w_index_persons_in_clusteredphyloany$named_partner_indicator, 
+      exclude = NULL)
+
+table(genomic_db_w_index_persons_in_clusteredphyloany$HIVDxAge, 
+      exclude = NULL)
+
+
+m7_clean_dt_converse <- individuals_in_named_pt_net_dt %>%
+  select(StudyID, indicator_phyloany_cluster, ClusteredPhyloAny, HIVDxAge) %>%
+  mutate(HIVDxAge = as.numeric(HIVDxAge))
+
+m7_converse <- geem(as.numeric(as.character(indicator_phyloany_cluster)) ~ 
+               HIVDxAge, 
+           data = m7_clean_dt_converse, 
+            family = "binomial", 
+           id=ClusteredPhyloAny, 
+           corstr="exchangeable")
+summary(m7_converse)
+
+
+
+```
+
 
 

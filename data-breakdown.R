@@ -267,7 +267,7 @@ length(Reduce(intersect, list(genomic_db_sequenced, partner_db$StudyIDFrom,
 
 
 ## all
-compute_cascade("all")
+#compute_cascade("all")
 
 ## msm 
 compute_cascade("msm")
@@ -295,4 +295,5 @@ compute_cascade("hispanic")
 
 ## nonhispanic
 compute_cascade("nonhispanic")
+
 
