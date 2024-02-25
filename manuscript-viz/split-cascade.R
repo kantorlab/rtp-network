@@ -12,6 +12,8 @@ hrh_denom <- 159
 df <- data.frame(
   Grouping = c("MSM", "PWID", "HRH"),
   Named_Mean = c(666/msm_denom, 52/pwid_denom, 279/hrh_denom),
+  Contact_Attempted_Mean = c(420/msm_denom, 27/pwid_denom, 196/hrh_denom),
+  Reached_Mean = c(383/msm_denom, 26/pwid_denom, 181/hrh_denom),
   Tested_Mean = c(262/msm_denom, 16/pwid_denom, 133/hrh_denom),
   Diagnosed_Mean = c(79/msm_denom, 12/pwid_denom, 31/hrh_denom),
   Sequenced_Mean = c(79/msm_denom, 12/pwid_denom, 31/hrh_denom),
@@ -20,7 +22,20 @@ df <- data.frame(
 
 df_long <- df %>%
   gather(Category, Value, -Grouping, -N)
-df_long$Category <- factor(df_long$Category, levels = c("Named_Mean", "Tested_Mean", "Diagnosed_Mean", "Sequenced_Mean"))
+
+levels = c("Named_Mean", 
+              "Contact_Attempted_Mean",
+              "Reached_Mean",
+              "Tested_Mean", 
+              "Diagnosed_Mean", 
+              "Sequenced_Mean"
+              )
+              
+
+df_long$Category <- 
+  factor(df_long$Category, 
+    levels = levels
+  )
 
 # Race Data
 white_denom <- 312
@@ -31,6 +46,8 @@ other_denom <- 28
 df_race <- data.frame(
   Grouping = c("White", "Black", "Asian", "Other"),
   Named_Mean = c(740/white_denom, 234/black_denom, 22/asian_denom, 61/other_denom),
+  Contact_Attempted_Mean = c(478/white_denom, 142/black_denom, 10/asian_denom, 33/other_denom),
+  Reached_Mean = c(439/white_denom, 131/black_denom, 10/asian_denom, 30/other_denom), 
   Tested_Mean = c(311/white_denom, 93/black_denom, 7/asian_denom, 23/other_denom),
   Diagnosed_Mean = c(85/white_denom, 34/black_denom, 3/asian_denom, 7/other_denom),
   Sequenced_Mean = c(85/white_denom, 34/black_denom, 3/asian_denom, 7/other_denom),
@@ -39,7 +56,8 @@ df_race <- data.frame(
 
 df_race_long <- df_race %>%
   gather(Category, Value, -Grouping, -N)
-df_race_long$Category <- factor(df_race_long$Category, levels = c("Named_Mean", "Tested_Mean", "Diagnosed_Mean", "Sequenced_Mean"))
+df_race_long$Category <- factor(df_race_long$Category, 
+  levels = levels)
 
 # Ethnicity Data
 hispanic_denom <- 140
@@ -48,6 +66,8 @@ nonhispanic_denom <- 354
 df_ethnicity <- data.frame(
   Grouping = c("Hispanic", "Not Hispanic"),
   Named_Mean = c(266/hispanic_denom, 806/nonhispanic_denom),
+  Contact_Attempted_Mean = c(156/hispanic_denom, 522/nonhispanic_denom),
+  Reached_Mean = c(141/hispanic_denom, 481/nonhispanic_denom),
   Tested_Mean = c(99/hispanic_denom, 337/nonhispanic_denom),
   Diagnosed_Mean = c(40/hispanic_denom, 88/nonhispanic_denom),
   Sequenced_Mean = c(40/hispanic_denom, 88/nonhispanic_denom),
@@ -55,7 +75,11 @@ df_ethnicity <- data.frame(
 )
 df_ethnicity_long <- df_ethnicity %>%
   gather(Category, Value, -Grouping, -N)
-df_ethnicity_long$Category <- factor(df_ethnicity_long$Category, levels = c("Named_Mean", "Tested_Mean", "Diagnosed_Mean", "Sequenced_Mean"))
+
+df_ethnicity_long$Category <- 
+  factor(df_ethnicity_long$Category, 
+    levels = levels
+    )
 
 # Combine All Data
 df_long$Type <- "Behavior"
@@ -68,7 +92,11 @@ p <- ggplot(combined_df, aes(x = Grouping, y = Value, fill = Category)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_text(aes(label = N, y = 0), vjust = 1.5, hjust = 0.5, size = 3.5, fontface="plain", color = "black") +
   labs(y = "Mean Number of Partners per Index Case") +
-  scale_fill_brewer(palette="Set1", breaks=c("Named_Mean", "Tested_Mean", "Diagnosed_Mean", "Sequenced_Mean"), labels=c("Named", "Tested", "Diagnosed", "Sequenced"), name=NULL)+
+  scale_fill_brewer(
+    palette="Set1", 
+    breaks=levels, 
+    labels=c("Named", "Attempted", "Reached", 
+            "Tested", "Diagnosed", "Sequenced"), name=NULL)+
   theme_minimal() +
   theme(
     plot.title = element_blank(),
