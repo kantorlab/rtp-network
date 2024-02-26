@@ -78,6 +78,9 @@ length(which(!genomic_db_sequenced %in% partner_individuals))
 length(which(partner_individuals %in% genomic_db_sequenced))
 length(which(!partner_individuals %in% genomic_db_sequenced))
 
+length(which(partner_individuals %in% genomic_db_sequenced))/length(partner_individuals)
+length(which(partner_individuals %in% genomic_db_sequenced))/length(genomic_db_sequenced)
+
 # How many named partners are also sequenced 
 named_partners_in_genomic_db <- intersect(genomic_db_sequenced, partner_db$StudyIDTo)
 id_named_partners_in_genomic_db <- which(genomic_db_sequenced %in% named_partners_in_genomic_db)
