@@ -247,6 +247,8 @@ split_named_pt_indicator_counts_by_attributes(genomic_db_w_index_persons_in_015)
 phyloany_named_pt_res <- 
   split_named_pt_indicator_counts_by_attributes(data=
                                         genomic_db_w_index_persons_in_clusteredphyloany)
+
+phyloany_named_pt_res #distribution of naming and not naming molecular cluster members 
 phyloany_named_pt_res$hivdxage
 ```
 
@@ -273,6 +275,9 @@ m1 <- geem(as.numeric(as.character(named_partner_indicator)) ~
            id=ClusteredPhyloAny, 
            corstr="exchangeable")
 summary(m1)
+
+genomic_db_w_index_persons_in_clusteredphyloany$DemoRace <- 
+  relevel(genomic_db_w_index_persons_in_clusteredphyloany$DemoRace, ref = "Black")
 
 m2 <- geem(as.numeric(as.character(named_partner_indicator)) ~ 
              DemoRace, 
@@ -339,7 +344,7 @@ summary(m7)
 
 
 
-## Predict Molecular Clustering of Named Partnerships
+## Predict Molecular Clustering in Named Partnerships
 
 ### Prepare the data
 
@@ -367,6 +372,8 @@ named_pts_in_clusteredphyloany <- which((named_pt_net %v% "vertex.names") %in% i
 length(named_pts_in_clusteredphyloany)
 named_pts_in_phyloany_clusters_vname <- (named_pt_net %v% "vertex.names")[named_pts_in_clusteredphyloany]
 
+named_pts_not_in_clusteredphyloany <- which(!(named_pt_net %v% "vertex.names") %in% index_persons_in_clusteredphyloany)
+length(named_pts_not_in_clusteredphyloany)
 ```
 
 -   For each clustering algorithm, we want to add an indicator column to
@@ -565,7 +572,7 @@ xtabs(~factor(individuals_in_named_pt_net_dt$RiskHeterosexual, exclude = NULL) +
 factor(individuals_in_named_pt_net_dt$indicator_phyloany_cluster, exclude = NULL)
  )
 
-## IDU
+## PWID
 table(individuals_in_named_pt_net_dt$RiskIDU, exclude = NULL)
 xtabs(~factor(individuals_in_named_pt_net_dt$RiskIDU, exclude = NULL) +
 factor(individuals_in_named_pt_net_dt$indicator_phyloany_cluster, exclude = NULL)
@@ -583,7 +590,7 @@ print(res)
 
 [Thus, there are
 `r length(individuals_in_named_pt_net_dt$indicator_phyloany_cluster)`
-who are in named partnerships in partner DB. OF these,
+who are naming or being named as partners in partner DB. OF these,
 `r length(which(individuals_in_named_pt_net_dt$indicator_phyloany_cluster == 1))`
 clustered phylogenetically by the `phyloany` method, and
 `r length(which(individuals_in_named_pt_net_dt$indicator_phyloany_cluster == 0))`
@@ -618,8 +625,9 @@ summary(m1_converse)
 m2_clean_dt_converse <- 
    individuals_in_named_pt_net_dt  %>%
   select(StudyID, indicator_phyloany_cluster, ClusteredPhyloAny, DemoRace) %>%
-  filter(DemoRace != "") %>%
-   mutate(DemoRace = droplevels(DemoRace))
+  #filter(DemoRace != "") %>%
+   mutate(DemoRace = droplevels(DemoRace)) %>%
+   mutate(DemoRace = relevel(DemoRace, ref = "Black"))
 
 table(m2_clean_dt_converse$DemoRace, exclude = NULL)
 
@@ -635,9 +643,9 @@ summary(m2_converse)
 
 m3_clean_dt_converse <- individuals_in_named_pt_net_dt %>%
   select(StudyID, indicator_phyloany_cluster, ClusteredPhyloAny, RecodedSequenceSubtype) %>%
-  filter(RecodedSequenceSubtype != "") %>%
-  mutate(RecodedSequenceSubtype = factor(RecodedSequenceSubtype), # Convert to factor first
-         RecodedSequenceSubtype = droplevels(RecodedSequenceSubtype)) # Then drop levels
+  #filter(RecodedSequenceSubtype != "") %>%
+   mutate(RecodedSequenceSubtype = factor(RecodedSequenceSubtype)) %>% # Convert to factor first
+   mutate(RecodedSequenceSubtype = relevel(RecodedSequenceSubtype, ref = "B"))
 
 table(m3_clean_dt_converse$RecodedSequenceSubtype, exclude = NULL)
 
@@ -654,8 +662,8 @@ summary(m3_converse)
 m4_clean_dt_converse <- 
    individuals_in_named_pt_net_dt  %>%
   select(StudyID, indicator_phyloany_cluster, ClusteredPhyloAny, RiskMSM) %>%
-  filter(RiskMSM != "") %>%
-   mutate(RiskMSM = droplevels(RiskMSM))
+  #filter(RiskMSM != "") %>%
+  mutate(RiskMSM = droplevels(RiskMSM))
 
 table(m4_clean_dt_converse$RiskMSM, exclude = NULL)
 
@@ -672,7 +680,7 @@ summary(m4_converse)
 m5_clean_dt_converse <- 
    individuals_in_named_pt_net_dt  %>%
   select(StudyID, indicator_phyloany_cluster, ClusteredPhyloAny, RiskHeterosexual) %>%
-  filter(RiskHeterosexual != "") %>%
+  #filter(RiskHeterosexual != "") %>%
    mutate(RiskHeterosexual = droplevels(RiskHeterosexual))
 
 table(m5_clean_dt_converse$RiskHeterosexual, exclude = NULL)
@@ -690,7 +698,7 @@ summary(m5_converse)
 m6_clean_dt_converse <- 
    individuals_in_named_pt_net_dt  %>%
   select(StudyID, indicator_phyloany_cluster, ClusteredPhyloAny, RiskIDU) %>%
-  filter( RiskIDU!= "") %>%
+ # filter( RiskIDU!= "") %>%
    mutate( RiskIDU= droplevels(RiskIDU))
 
 table(m6_clean_dt_converse$RiskIDU, exclude = NULL)
