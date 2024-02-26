@@ -182,8 +182,8 @@ index_person_idx_in_005 <- which(genomic_db$ClusteredHIVTrace005 != "")
 index_persons_in_005 <- genomic_db$StudyID[index_person_idx_in_005]
 length(index_person_idx_in_005)
 length(which(genomic_db$ClusteredHIVTrace005 == ""))
-length(which(genomic_db$ClusteredHIVTrace005 == "")) == 
-         table(genomic_db$ClusteredHIVTrace005)[[]]
+#length(which(genomic_db$ClusteredHIVTrace005 == "")) == 
+#         table(genomic_db$ClusteredHIVTrace005)[[]]
 genomic_db_w_index_persons_in_005 <- genomic_db[index_person_idx_in_005,]
 dim(genomic_db_w_index_persons_in_005)
 
@@ -191,8 +191,8 @@ index_person_idx_in_015 <- which(genomic_db$ClusteredHIVTrace015 != "")
 index_persons_in_015 <- genomic_db$StudyID[index_person_idx_in_015]
 length(index_person_idx_in_015)
 length(which(genomic_db$ClusteredHIVTrace015 == ""))
-length(which(genomic_db$ClusteredHIVTrace015 == "")) == 
-         table(genomic_db$ClusteredHIVTrace015)[[]]
+# length(which(genomic_db$ClusteredHIVTrace015 == "")) == 
+#          table(genomic_db$ClusteredHIVTrace015)[[]]
 genomic_db_w_index_persons_in_015 <- genomic_db[index_person_idx_in_015,]
 dim(genomic_db_w_index_persons_in_015)
 
