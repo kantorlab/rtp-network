@@ -60,7 +60,10 @@ genomic_db <-
   select(StudyID, DemoGender, DemoRace, DemoHispanic, 
          HIVDxAge, HIVDxDate, RiskMSM, RiskIDU, 
          RiskHeterosexual, Sequence, SequenceSubtype, 
-         ClusteredHIVTrace005, ClusteredHIVTrace015, ClusteredPhyloAny)
+         ClusteredHIVTrace005, ClusteredHIVTrace015, ClusteredPhyloAny) %>%
+         filter(Sequence == "True") %>%
+         mutate(Sequence = droplevels(Sequence))
+table(genomic_db$Sequence)
 ```
 
 ## Create a named partner network object
@@ -199,7 +202,9 @@ length(index_person_idx_in_clusteredphyloany)
 index_persons_in_clusteredphyloany <- genomic_db$StudyID[index_person_idx_in_clusteredphyloany]
 length(which(is.na(genomic_db$ClusteredPhyloAny)))
 
-genomic_db_w_index_persons_in_clusteredphyloany <- genomic_db[index_person_idx_in_clusteredphyloany,]
+genomic_db_w_index_persons_in_clusteredphyloany <- 
+  genomic_db[index_person_idx_in_clusteredphyloany,]
+
 dim(genomic_db_w_index_persons_in_clusteredphyloany)
 ```
 
@@ -431,11 +436,6 @@ test_indicator_columns(individuals_in_named_pt_net_dt, "indicator_phyloany_clust
 
 ```
 
-### Apply the function
-
-```{r}
-
-```
 
 ### 005 cluster
 
