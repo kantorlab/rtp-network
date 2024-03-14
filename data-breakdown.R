@@ -22,6 +22,7 @@ genomic_db <- as.data.table(read.csv(paste0(data_dir, "/Individuals.csv")))
 
 source("utils/compare-descriptives-function.R")
 source("utils/compute-cascade.R")
+source("utils/compute_data_overview.R")
 
 
 # Descriptives -------------
@@ -34,6 +35,90 @@ genomic_db_sequenced <- genomic_db$StudyID[genomic_db_sequenced_id]
 genomic_db_sequenced_dt <- genomic_db[genomic_db_sequenced_id,]
 dim(genomic_db_sequenced_dt)
 
+# Overview of the Partner Contact Tracing Database -------------
+
+######################
+
+dim(partner_db)
+glimpse(partner_db)
+#summary(partner_db)
+
+n_unique_studyidfrom <- unique(partner_db$StudyIDFrom)
+n_unique_studyidto <- unique(partner_db$StudyIDTo)
+
+length(n_unique_studyidfrom)
+length(n_unique_studyidto)
+
+length(unique(c(n_unique_studyidfrom, n_unique_studyidto)))
+
+## how many unique study id's from and to
+table(!duplicated(partner_db$StudyIDFrom), exclude=NULL) #this is not duplicated
+table(!duplicated(partner_db$StudyIDTo), exclude=NULL) #this is not duplicated
+
+## how many study ids from provided identifiable partner data (i.e., non-blank study id to)?
+partner_db_non_missing_studyidto <- partner_db[which(partner_db$StudyIDTo != ""), ]
+
+dim(partner_db_non_missing_studyidto)
+
+table(!duplicated(partner_db_non_missing_studyidto$StudyIDFrom), exclude=NULL) #this is not duplicated
+table(!duplicated(partner_db_non_missing_studyidto$StudyIDTo), exclude=NULL) #this is not duplicated
+
+n_unique_studyidfrom_non_missing_studyidto <- unique(partner_db_non_missing_studyidto$StudyIDFrom)
+n_unique_studyidto_non_missing_studyidto <- unique(partner_db_non_missing_studyidto$StudyIDTo)
+
+length(c(n_unique_studyidfrom_non_missing_studyidto))
+length(c(n_unique_studyidto_non_missing_studyidto))
+
+length(
+  unique(
+    c(n_unique_studyidfrom_non_missing_studyidto,
+      n_unique_studyidto_non_missing_studyidto
+    )
+  )
+)
+
+## interview characteristics
+table(partner_db_non_missing_studyidto$InterviewRank, exclude = NULL)
+
+## date of referral 
+tab_yr_referral <- 
+  table(substr(partner_db_non_missing_studyidto$DateofReferral, 1, 4), exclude = NULL)
+
+
+summary(referral_yrs) #the 2022 year should be ignored
+
+## Parnter notifiability, if reached, PCRS accepted, 
+table(partner_db_non_missing_studyidto$CanNotify, exclude = NULL) 
+table(partner_db_non_missing_studyidto$ClientReached, exclude = NULL) 
+table(partner_db_non_missing_studyidto$AcceptPCRS, exclude = NULL) 
+
+## if PCRS not accepted, why not
+table(partner_db_non_missing_studyidto$NoAcceptWhy, exclude = NULL) 
+
+## Date of HIV Test Final
+table(substr(partner_db_non_missing_studyidto$DateofHIVTest_Final, 1, 4), 
+      exclude = NULL) 
+
+## Referred to HIV Test
+table(partner_db$ReferredToHIVTest, exclude = NULL)
+
+## Final HIV Test
+table(partner_db$HIVTestResult_Final, exclude = NULL)
+
+## Tested for HIV
+table(partner_db_non_missing_studyidto$HIVTested, exclude=NULL)
+
+sum(table(partner_db_non_missing_studyidto$HIVTested, exclude=NULL))
+
+table(partner_db_non_missing_studyidto$HIVTestResult_Final, exclude=NULL)
+
+## Referred to Prep
+table(partner_db_non_missing_studyidto$referredToPrEP, exclude=NULL)
+
+
+
+######################
+
 # Compute intersections between sequenced persons in genomic db and partnerdb
 length(intersect(genomic_db_sequenced, partner_db$StudyIDFrom))
 length(intersect(genomic_db_sequenced, partner_db$StudyIDTo))
@@ -41,7 +126,6 @@ length(intersect(partner_db$StudyIDFrom, partner_db$StudyIDTo))
 length(Reduce(intersect, list(genomic_db_sequenced, partner_db$StudyIDFrom, partner_db$StudyIDTo)))
 
 # How many of the interviewed index cases who are also in the genomic DB provided identifiable partner data?
-partner_db_non_missing_studyidto <- partner_db[which(partner_db$StudyIDTo != ""), ]
 index_cases_who_named_partners <- intersect(genomic_db_sequenced, partner_db_non_missing_studyidto$StudyIDFrom)
 length(index_cases_who_named_partners)
 
@@ -121,7 +205,7 @@ ans2 <- nrow(sequenced_who_are_named_pts_dt) -  length(which(is.na(sequenced_who
 ans2/nrow(sequenced_who_are_named_pts_dt)
 
 # Distribution of Molecular Clusters  -------------
-  ## See here/molecular-cluster-analysis.R
+  ## See `here/molecular-cluster-analysis.R`
 
 
 # Grant Resubmission Question -------------
