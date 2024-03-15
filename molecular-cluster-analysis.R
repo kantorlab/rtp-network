@@ -10,7 +10,6 @@ library(sna)
 
 # Setup ---------------------------
 
-setwd("/users/akhann16/code/rtp-network/out") #on rstudio (VIA OOD)
 par(mar=c(1,1,1,1)) #for figures
 ls()
 
