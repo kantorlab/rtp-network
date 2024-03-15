@@ -23,6 +23,10 @@ net_dt_old <- read.csv(paste0(data_dir, "/ContactTracingNetwork.csv"))
 net_dt <- read.csv("/gpfs/data/rkantor/rtp/shared_dir/ContactTracingNetwork20230726.csv")
 individuals_dt <- read.csv(paste0(data_dir, "/Individuals.csv"))
 
+
+
+# Preliminary Summaries ---------------------------
+
 dim(net_dt)
 str(net_dt)
 sort(colnames(net_dt))
@@ -35,6 +39,31 @@ colnames(individuals_dt)
 table(net_dt$InterviewRank, exclude = NULL)
 table(net_dt$InterviewRank, exclude = NULL)/
   sum(table(net_dt$InterviewRank, exclude = NULL))
+
+
+
+# Restrict `individuals_dt` only to persons who are sequenced ---------------------------
+
+table(individuals_dt$Sequence, exclude=NULL)
+individuals_dt_sequenced_id <- which(individuals_dt$Sequence == "True")
+length(individuals_dt_sequenced_id)
+individuals_dt_sequenced <- individuals_dt$StudyID[individuals_dt_sequenced_id]
+individuals_dt_sequenced_dt <- individuals_dt[individuals_dt_sequenced_id,]
+dim(individuals_dt_sequenced_dt)
+
+
+individuals_dt <- individuals_dt_sequenced_dt 
+## because we want to constrain the analysis only with those who have sequences sequences 
+
+
+
+# Restrict `net_dt` only to links where a partner is named ---------------------------
+
+net_dt_non_missing_studyidto <- net_dt[which(net_dt$StudyIDTo != ""), ]
+dim(net_dt_non_missing_studyidto)
+
+net_dt <- net_dt_non_missing_studyidto
+## because we want to constrain the analysis per the title of the section
 
 
 # Needed function ---------------------------
@@ -405,6 +434,7 @@ summary(a2)
 summary(b2)
 summary(c2)
 
+
 ## The `calc_persons_naming_within_cluster` gives the same answer 
 ## as the `calc_num_in_named_partners()` function above because:
 
@@ -422,9 +452,106 @@ summary(c2)
 # - Checks whether these named partners are also within the same cluster.
 # - Aggregates the results based on the number of instances where cluster individuals named partners from the same cluster.
 
-#Save Object ---------------------------
 
-#save.image(file="EDA.RData")
+
+# Create molecular links for the phylogenetic clusters ---------------------------
+
+## Adapt old code: https://github.com/kantorlab/rtp-network/blob/159c04c8ade62462b666159ff35549a352478c1f/archive/create_edgelists_from_molecular_clusters.R#L1-L103
+
+clusters <- 
+  individuals_dt %>% select(StudyID, ClusteredPhyloAny)
+head(clusters)
+
+head(clusters$ClusteredPhyloAny, 100)
+ids_in_phylo_clusters <- which(!is.na(clusters$ClusteredPhyloAny))
+length(ids_in_phylo_clusters)
+
+studyids_in_phylo_clusters <- individuals_dt$StudyID[ids_in_phylo_clusters]
+length(studyids_in_phylo_clusters)
+
+clusterIDs_phylo <- clusters$ClusteredPhyloAny[ids_in_phylo_clusters]
+length(clusterIDs_phylo)
+
+# create named list with study ids in each cluster 
+
+## phylo
+(table(individuals_dt$ClusteredPhyloAny, exclude = NULL))
+cluster_names_phylo <- names((table(individuals_dt$ClusteredPhyloAny, exclude = NULL)))[-1]
+
+study_ids_at_clusterid_phylo = as.list(rep(NA, length(cluster_names_phylo)))
+names(study_ids_at_clusterid_phylo) = cluster_names_phylo
+
+for (i in 1:length(study_ids_at_clusterid_phylo)){
+  study_ids_at_clusterid_phylo[[names(study_ids_at_clusterid_phylo)[i]]] <-  
+    (individuals_dt$StudyID[(which(individuals_dt$ClusteredPhyloAny == names(study_ids_at_clusterid_phylo)[[i]]))])
+}
+
+study_ids_at_clusterid_phylo
+length(study_ids_at_clusterid_phylo)
+
+# construct molecular edgelists
+
+el_matrix_phylo <- NULL
+
+for (i in 1:length(study_ids_at_clusterid_phylo)){
+  if (length(study_ids_at_clusterid_phylo[[i]]) > 1){
+    el_matrix_phylo <- rbind(el_matrix_phylo, t(combn(as.character(study_ids_at_clusterid_phylo[[i]]), 2)))
+  }
+}
+
+dim(el_matrix_phylo) 
+
+el_cluster_size <- NULL
+for (i in 1:length(study_ids_at_clusterid_phylo)){
+  el_cluster_size <- c(el_cluster_size, unlist(length(study_ids_at_clusterid_phylo[[i]])))
+}
+sort(el_cluster_size)
+
+n_ties <- unlist(lapply(el_cluster_size, function(x) choose(x, 2)))
+sum(n_ties)
+
+summary(el_cluster_size)
+
+
+# Investigate overlap between partner links and molecular links ---------------------------
+
+class(el_matrix_phylo)
+head(el_matrix_phylo)
+
+partner_net_el <- cbind(net_dt$StudyIDFrom, net_dt$StudyIDTo)
+class(partner_net_el)
+head(partner_net_el)
+
+# Convert matrices to data frames
+df1 <- as.data.frame(el_matrix_phylo, stringsAsFactors = FALSE)
+df2 <- as.data.frame(partner_net_el, stringsAsFactors = FALSE)
+
+# Create unique identifiers for each link, ignoring direction
+# Sort the nodes in each row before pasting together
+df1$uid <- apply(df1, 1, function(x) paste(sort(x), collapse = "-"))
+df2$uid <- apply(df2, 1, function(x) paste(sort(x), collapse = "-"))
+
+# Identify common links
+common_links <- intersect(df1$uid, df2$uid)
+
+# Count common links
+num_common_links <- length(common_links)
+
+# Print the number of common links
+print(num_common_links)
+
+## vanilla ovelap
+num_common_links/length(df1$uid)
+num_common_links/length(df2$uid)
+
+## jaccard index
+union_of_edge_sets <- unique(c(df1$uid,df2$uid))
+length(union_of_edge_sets)
+num_common_links/length(union_of_edge_sets)
+
+
+
+# Save Object ---------------------------
 
 # # Create an environment and assign the objects to it
 eda_env <- new.env()
