@@ -523,16 +523,31 @@ class(partner_net_el)
 head(partner_net_el)
 
 # Convert matrices to data frames
-df1 <- as.data.frame(el_matrix_phylo, stringsAsFactors = FALSE)
-df2 <- as.data.frame(partner_net_el, stringsAsFactors = FALSE)
+phylo_el <- as.data.frame(el_matrix_phylo, stringsAsFactors = FALSE)
+ct_el <- as.data.frame(partner_net_el, stringsAsFactors = FALSE)
+
+## any duplicated edges in ct_el (consider directionality)
+duplicates <- ct_el %>%
+  filter(duplicated(uid) | duplicated(uid, fromLast = TRUE))
+dim(duplicates) # duplicates occur because of interviews at multiple times
+
+ct_el_unique <- ct_el %>%
+  distinct(uid, .keep_all = TRUE) #keeping first occurence of each edge
+
+dim(ct_el_unique)
+
+
+
+
+
 
 # Create unique identifiers for each link, ignoring direction
 # Sort the nodes in each row before pasting together
-df1$uid <- apply(df1, 1, function(x) paste(sort(x), collapse = "-"))
-df2$uid <- apply(df2, 1, function(x) paste(sort(x), collapse = "-"))
+phylo_el$uid <- apply(phylo_el, 1, function(x) paste(sort(x), collapse = "-"))
+ct_el$uid <- apply(ct_el, 1, function(x) paste(sort(x), collapse = "-"))
 
 # Identify common links
-common_links <- intersect(df1$uid, df2$uid)
+common_links <- intersect(phylo_el$uid, ct_el$uid)
 
 # Count common links
 num_common_links <- length(common_links)
@@ -541,15 +556,31 @@ num_common_links <- length(common_links)
 print(num_common_links)
 
 ## vanilla ovelap
-num_common_links/length(df1$uid)
-num_common_links/length(df2$uid)
+num_common_links/length(phylo_el$uid)
+num_common_links/length(ct_el$uid)
 
 ## jaccard index
-union_of_edge_sets <- unique(c(df1$uid,df2$uid))
+union_of_edge_sets <- unique(c(phylo_el$uid,ct_el$uid))
 length(union_of_edge_sets)
 num_common_links/length(union_of_edge_sets)
 
+## How many partner contact tracing (social) network clusters?
+ct_net_unique <- network(ct_el_unique, directed=TRUE)
+gplot(ct_net_unique)
 
+set.network.attribute(ct_net_unique, "directed", FALSE) 
+##consider graph as undirected for counting clusters
+
+is.directed(ct_net_unique)  # Should return FALSE
+
+## compute the components (i.e., clusters) on the updated network
+num_components <- sna::components(ct_net_unique)
+print(paste("Number of connected components:", num_components))
+
+## distribution of cluster sizes
+component_sizes <- sna::component.dist(ct_net_unique)
+#head(component_sizes)
+summary(component_sizes$csize)
 
 # Save Object ---------------------------
 
