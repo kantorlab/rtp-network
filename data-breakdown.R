@@ -95,6 +95,8 @@ table(partner_db_non_missing_studyidto$AcceptPCRS, exclude = NULL)
 ## if PCRS not accepted, why not
 table(partner_db_non_missing_studyidto$NoAcceptWhy, exclude = NULL) 
 
+## THESE CAN INCLUDE DUPLICATES - SEE BELOW FOR CASCADE BASED ON UNIQUE COUNTS
+
 ## Date of HIV Test Final
 table(substr(partner_db_non_missing_studyidto$DateofHIVTest_Final, 1, 4), 
       exclude = NULL) 
@@ -304,19 +306,55 @@ compare_descriptives(dt=named_partners_in_genomic_dt)
 length(index_cases_who_named_partners) # row 1 - all
 length(unique(partner_db_non_missing_studyidto$StudyIDTo))
 table(partner_db_non_missing_studyidto$ClientReached, exclude = NULL)
+sum(table(partner_db_non_missing_studyidto$ClientReached, exclude = NULL))
+
 #table(partner_db_non_missing_studyidto$HIVTested, exclude = NULL)
 
+named_partners_contacted <- 
+  partner_db_non_missing_studyidto %>%
+  filter(ClientReached == 1) %>%
+  pull(StudyIDFrom) %>%
+  unique()
+
+length(named_partners_contacted)
+
+named_partners_not_contacted <- 
+  partner_db_non_missing_studyidto %>%
+  filter(ClientReached != 1 | is.na(ClientReached)) %>%
+  pull(StudyIDFrom) %>%
+  unique()
+
+length(named_partners_not_contacted)
+
+
 named_partners_tested_countstudyidfrom <- 
-  partner_db %>%
-  filter(HIVTested == 1) %>%
+  partner_db_non_missing_studyidto %>%
+  filter(HIVTested == 1 & ClientReached == 1) %>%
   pull(StudyIDFrom) %>%
   unique()
 
 length(named_partners_tested_countstudyidfrom)
 
-named_partners_tested_studyidto <- 
+named_partners_accepted_PCRS <- 
+  partner_db_non_missing_studyidto %>%
+  filter(AcceptPCRS == 1 & ClientReached == 1) %>%
+  pull(StudyIDTo) %>%
+  unique() 
+
+length(named_partners_accepted_PCRS) 
+
+
+named_partners_refer_HIVTest <- 
   partner_db %>%
-  filter(HIVTested == 1) %>%
+  filter(ReferredToHIVTest == 1 & ClientReached == 1) %>%
+  pull(StudyIDTo) %>%
+  unique() 
+
+length(named_partners_refer_HIVTest) 
+
+named_partners_tested_studyidto <- 
+  partner_db_non_missing_studyidto %>%
+  filter(HIVTested == 1 & ClientReached == 1) %>%
   pull(StudyIDTo) %>%
   unique() 
 
