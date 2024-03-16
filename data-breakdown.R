@@ -22,7 +22,7 @@ genomic_db <- as.data.table(read.csv(paste0(data_dir, "/Individuals.csv")))
 
 source("utils/compare-descriptives-function.R")
 source("utils/compute-cascade.R")
-source("utils/compute_data_overview.R")
+
 
 
 # Descriptives -------------
@@ -85,7 +85,7 @@ tab_yr_referral <-
   table(substr(partner_db_non_missing_studyidto$DateofReferral, 1, 4), exclude = NULL)
 
 
-summary(referral_yrs) #the 2022 year should be ignored
+summary(as.numeric(tab_yr_referral))
 
 ## Parnter notifiability, if reached, PCRS accepted, 
 table(partner_db_non_missing_studyidto$CanNotify, exclude = NULL) 
@@ -101,20 +101,26 @@ table(substr(partner_db_non_missing_studyidto$DateofHIVTest_Final, 1, 4),
 
 ## Referred to HIV Test
 table(partner_db$ReferredToHIVTest, exclude = NULL)
+table(partner_db_non_missing_studyidto$ReferredToHIVTest, exclude = NULL)
 
 ## Final HIV Test
 table(partner_db$HIVTestResult_Final, exclude = NULL)
+table(partner_db_non_missing_studyidto$HIVTestResult_Final, exclude = NULL)
+
 
 ## Tested for HIV
+table(partner_db$HIVTested, exclude=NULL)
 table(partner_db_non_missing_studyidto$HIVTested, exclude=NULL)
 
+sum(table(partner_db$HIVTested, exclude=NULL))
 sum(table(partner_db_non_missing_studyidto$HIVTested, exclude=NULL))
 
+table(partner_db$HIVTestResult_Final, exclude=NULL)
 table(partner_db_non_missing_studyidto$HIVTestResult_Final, exclude=NULL)
 
 ## Referred to Prep
+table(partner_db$referredToPrEP, exclude=NULL)
 table(partner_db_non_missing_studyidto$referredToPrEP, exclude=NULL)
-
 
 
 ######################
