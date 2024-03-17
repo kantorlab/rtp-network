@@ -526,6 +526,13 @@ head(partner_net_el)
 phylo_el <- as.data.frame(el_matrix_phylo, stringsAsFactors = FALSE)
 ct_el <- as.data.frame(partner_net_el, stringsAsFactors = FALSE)
 
+
+phylo_el$uid <- apply(phylo_el, 1, function(x) paste(sort(x), collapse = "-"))
+ct_el$uid <- apply(ct_el, 1, function(x) paste(sort(x), collapse = "-"))
+
+head(phylo_el)
+head(ct_el)
+
 ## any duplicated edges in ct_el (consider directionality)
 duplicates <- ct_el %>%
   filter(duplicated(uid) | duplicated(uid, fromLast = TRUE))
@@ -536,15 +543,6 @@ ct_el_unique <- ct_el %>%
 
 dim(ct_el_unique)
 
-
-
-
-
-
-# Create unique identifiers for each link, ignoring direction
-# Sort the nodes in each row before pasting together
-phylo_el$uid <- apply(phylo_el, 1, function(x) paste(sort(x), collapse = "-"))
-ct_el$uid <- apply(ct_el, 1, function(x) paste(sort(x), collapse = "-"))
 
 # Identify common links
 common_links <- intersect(phylo_el$uid, ct_el$uid)
