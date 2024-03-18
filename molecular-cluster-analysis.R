@@ -564,7 +564,7 @@ num_common_links/length(union_of_edge_sets)
 
 ## How many partner contact tracing (social) network clusters?
 ct_net_unique <- network(ct_el_unique, directed=TRUE)
-gplot(ct_net_unique)
+#gplot(ct_net_unique) #commented out for saving time
 
 set.network.attribute(ct_net_unique, "directed", FALSE) 
 ##consider graph as undirected for counting clusters
@@ -579,6 +579,14 @@ print(paste("Number of connected components:", num_components))
 component_sizes <- sna::component.dist(ct_net_unique)
 #head(component_sizes)
 summary(component_sizes$csize)
+
+
+# Plot molecular network
+phylo_net <- network(phylo_el, directed=TRUE)
+phylo_net
+
+gplot(phylo_net)
+
 
 # Save Object ---------------------------
 
