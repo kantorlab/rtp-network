@@ -313,18 +313,38 @@ sum(table(partner_db_non_missing_studyidto$ClientReached, exclude = NULL))
 named_partners_contacted <- 
   partner_db_non_missing_studyidto %>%
   filter(ClientReached == 1) %>%
+  #pull(StudyIDFrom) %>%
+  pull(StudyIDTo) %>%
+  unique()
+length(named_partners_contacted)
+
+num_index_cases_whose_partners_contacted <- 
+  partner_db %>%
+  filter(ClientReached == 1) %>%
   pull(StudyIDFrom) %>%
+  #pull(StudyIDTo) %>%
   unique()
 
-length(named_partners_contacted)
+length(num_index_cases_whose_partners_contacted)
 
 named_partners_not_contacted <- 
   partner_db_non_missing_studyidto %>%
   filter(ClientReached != 1 | is.na(ClientReached)) %>%
-  pull(StudyIDFrom) %>%
+  #filter(ClientReached != 1) %>%
+  #pull(StudyIDFrom) %>%
+  pull(StudyIDTo) %>%
   unique()
 
 length(named_partners_not_contacted)
+
+
+num_index_cases_whose_partners_not_contacted <- 
+  partner_db_non_missing_studyidto %>%
+    filter(ClientReached != 1 | is.na(ClientReached)) %>%
+    pull(StudyIDFrom) %>%
+    #pull(StudyIDTo) %>%
+    unique()
+length(num_index_cases_whose_partners_not_contacted)
 
 
 named_partners_tested_countstudyidfrom <- 
@@ -345,7 +365,7 @@ length(named_partners_accepted_PCRS)
 
 
 named_partners_refer_HIVTest <- 
-  partner_db %>%
+  partner_db_non_missing_studyidto %>%
   filter(ReferredToHIVTest == 1 & ClientReached == 1) %>%
   pull(StudyIDTo) %>%
   unique() 
