@@ -167,6 +167,16 @@ gplot(ct_net_matrix, gmode="graph", displaylabels = FALSE, vertex.col=ct_node_co
 
 table(ct_node_colors)
 
+# Increase node size
+node_size <- 1.5  # Adjust as necessary
+
+# Define bright colors for nodes
+bright_node_colors <- ifelse(ct_net_ids %in% common_node_ids, "limegreen", "orange")
+
+# Plot using gplot with increased node size and bright colors
+gplot(ct_net_matrix, gmode="graph", displaylabels = FALSE, 
+      vertex.col=bright_node_colors, edge.col=ct_edge_colors, 
+      vertex.cex=node_size, edge.lwd=4)
 
 
 # Alternate using ct_net_unique -------------------------------------------------------------------------
