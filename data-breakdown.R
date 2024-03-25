@@ -319,7 +319,7 @@ named_partners_contacted <-
 length(named_partners_contacted)
 
 num_index_cases_whose_partners_contacted <- 
-  partner_db %>%
+  partner_db_non_missing_studyidto %>%
   filter(ClientReached == 1) %>%
   pull(StudyIDFrom) %>%
   #pull(StudyIDTo) %>%
