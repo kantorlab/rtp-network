@@ -15,6 +15,12 @@ ls()
 
 ### 
 
+
+# Set seed ---------------------------
+
+set.seed(1234567)
+
+
 # Read data ---------------------------
 
 data_dir <- "/gpfs/data/rkantor/rtp/datasets/D51_20230512_unified"
@@ -582,10 +588,10 @@ summary(component_sizes$csize)
 
 
 # Plot molecular network
-phylo_net <- network(phylo_el, directed=TRUE)
+phylo_net <- network(phylo_el, directed=FALSE)
 phylo_net
 
-gplot(phylo_net)
+#gplot(phylo_net, usearrows = FALSE)
 
 
 # Save Object ---------------------------
@@ -597,6 +603,14 @@ eda_env$net_dt <- net_dt
 eda_env$named_pt_idx_005 <- a
 eda_env$named_pt_idx_015 <- b
 eda_env$named_pt_idx_clusteredphyloany <- c
+eda_env$ct_net_unique <- ct_net_unique
+eda_env$phylo_net <- phylo_net
+eda_env$common_links <- common_links
+eda_env$phylo_el <- phylo_el
+eda_env$ct_el <- ct_el
+eda_env$ct_el_unique <- ct_el_unique
+
+
 
 # Save the environment as an RDS file
 saveRDS(eda_env, "eda_objects.rds")
