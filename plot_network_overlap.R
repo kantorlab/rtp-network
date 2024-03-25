@@ -94,7 +94,7 @@ common_edges_df <- data.frame(
 ct_el_unique$common = with(ct_el_unique, paste(V1, V2, sep = "-") %in% common_links)
 phylo_el$common = with(phylo_el, paste(V1, V2, sep = "-") %in% common_links)
 
-# Plot -------------------------------------------------------------------------
+# Plot contact tracing network with common elements -------------------------------------------------------------------------
 
 ct_net_unique
 
@@ -118,8 +118,6 @@ ct_node_colors <- ifelse(ct_net_ids %in% common_node_ids, "green", "red")
 phylo_node_colors <- ifelse(phylo_net_ids %in% common_node_ids, "green", "red")
 
 # Convert the network objects to adjacency matrices
-ct_net_matrix <- network::as.sociomatrix(ct_net_unique)
-phylo_net_matrix <- network::as.sociomatrix(phylo_net)
 
 # Now plot with gplot
 # gplot(ct_net_matrix, gmode="graph", displaylabels = FALSE, 
@@ -128,15 +126,32 @@ phylo_net_matrix <- network::as.sociomatrix(phylo_net)
 
 table(ct_node_colors)
 
-# Increase node size
+## increase node size
 node_size <- 1.5  # Adjust as necessary
 
-# Define bright colors for nodes
+## define bright colors for nodes
 bright_node_colors <- ifelse(ct_net_ids %in% common_node_ids, "limegreen", "orange")
 
-# Plot using gplot with increased node size and bright colors
+## plot contact tracing network 
 set.seed(1234567)
-gplot(ct_net_matrix, gmode="graph", displaylabels = FALSE, 
+gplot(ct_net_unique, gmode="graph", displaylabels = FALSE, 
       vertex.col=bright_node_colors, edge.col=ct_edge_colors, 
       vertex.cex=node_size, edge.lwd=4)
+
+
+## plot phylo network 
+phylo_net
+
+
+bright_node_colors_phylo <- ifelse(phylo_net_ids %in% common_node_ids, "limegreen", "orange")
+
+set.seed(1234567)
+gplot(phylo_net, 
+      gmode="graph", 
+      displaylabels = FALSE, 
+      vertex.col=bright_node_colors_phylo, 
+      edge.col=phylo_edge_colors, 
+      vertex.cex=node_size, 
+      edge.lwd=4)
+
 
