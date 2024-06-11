@@ -451,6 +451,11 @@ compute_cascade("hispanic")
 compute_cascade("nonhispanic")
 
 
-
-
-
+## Meeting with Meghan:
+# > tested_tested_final_dt <- cbind.data.frame(partner_db_non_missing_studyidto$StudyIDFrom,
+#                                              +                                         partner_db_non_missing_studyidto$StudyIDTo,
+#                                              +                                         partner_db_non_missing_studyidto$HIVTested,
+#                                              +                                         partner_db_non_missing_studyidto$HIVTestResult_Final) 
+# 
+# 
+# 
