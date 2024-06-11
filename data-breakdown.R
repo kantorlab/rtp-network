@@ -5,7 +5,6 @@ rm(list=ls())
 library(data.table)
 library(dplyr)
 library(stringi)
-library(network)
 
 
 # Datasets -------------
@@ -105,6 +104,37 @@ tab_yr_referral <-
 
 
 summary(as.numeric(tab_yr_referral))
+mean(tab_yr_referral)
+
+## compute number of index cases and named partners per year
+
+  partner_db_non_missing_studyidto <- partner_db_non_missing_studyidto %>%
+    mutate(Year = substr(DateofReferral, 1, 4))
+
+  ### count unique StudyIDFrom for each year (index cases)
+  index_cases_per_year <- partner_db_non_missing_studyidto %>%
+    group_by(Year) %>%
+    summarize(IndexCases = n_distinct(StudyIDFrom))
+
+  ### count unique StudyIDTo for each year (named partners)
+  named_partners_per_year <- partner_db_non_missing_studyidto %>%
+    group_by(Year) %>%
+    summarize(NamedPartners = n_distinct(StudyIDTo))
+
+  ### merge the results
+  yearly_summary <- index_cases_per_year %>%
+    left_join(named_partners_per_year, by = "Year")
+
+  ### print the summary
+  print(yearly_summary)
+  
+  summary(yearly_summary$IndexCases) #Index Cases 
+  yearly_summary$Year[which.min(yearly_summary$IndexCases)]
+  yearly_summary$Year[which.max(yearly_summary$IndexCases)]
+
+  summary(yearly_summary$NamedPartners) #Named Partners
+  yearly_summary$Year[which.min(yearly_summary$NamedPartners)]
+  yearly_summary$Year[which.min(yearly_summary$NamedPartners)]
 
 ## Parnter notifiability, if reached, PCRS accepted, 
 table(partner_db_non_missing_studyidto$CanNotify, exclude = NULL) 
