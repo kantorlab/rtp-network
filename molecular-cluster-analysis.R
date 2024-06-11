@@ -532,7 +532,6 @@ head(partner_net_el)
 phylo_el <- as.data.frame(el_matrix_phylo, stringsAsFactors = FALSE)
 ct_el <- as.data.frame(partner_net_el, stringsAsFactors = FALSE)
 
-
 phylo_el$uid <- apply(phylo_el, 1, function(x) paste(sort(x), collapse = "-"))
 ct_el$uid <- apply(ct_el, 1, function(x) paste(sort(x), collapse = "-"))
 
@@ -609,7 +608,6 @@ eda_env$common_links <- common_links
 eda_env$phylo_el <- phylo_el
 eda_env$ct_el <- ct_el
 eda_env$ct_el_unique <- ct_el_unique
-
 
 
 # Save the environment as an RDS file

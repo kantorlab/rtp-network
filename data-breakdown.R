@@ -35,6 +35,15 @@ genomic_db_sequenced <- genomic_db$StudyID[genomic_db_sequenced_id]
 genomic_db_sequenced_dt <- genomic_db[genomic_db_sequenced_id,]
 dim(genomic_db_sequenced_dt)
 
+# How many sequenced persons are in a molecular cluster
+
+n_not_in_cluster <- 
+  length(which(is.na(genomic_db_sequenced_dt$ClusteredPhyloAny)))
+
+n_present_in_cluster <- nrow(genomic_db_sequenced_dt) - n_not_in_cluster
+
+n_present_in_cluster
+
 # Overview of the Partner Contact Tracing Database -------------
 
 ######################
@@ -57,11 +66,21 @@ table(!duplicated(partner_db$StudyIDTo), exclude=NULL) #this is not duplicated
 
 ## how many study ids from provided identifiable partner data (i.e., non-blank study id to)?
 partner_db_non_missing_studyidto <- partner_db[which(partner_db$StudyIDTo != ""), ]
-
 dim(partner_db_non_missing_studyidto)
 
 table(!duplicated(partner_db_non_missing_studyidto$StudyIDFrom), exclude=NULL) #this is not duplicated
 table(!duplicated(partner_db_non_missing_studyidto$StudyIDTo), exclude=NULL) #this is not duplicated
+
+## which pairings of studyidfrom and studyidto are not duplicated
+el_partner_db_non_missing_studyidto <- 
+  partner_db_non_missing_studyidto %>%
+  select(StudyIDFrom, StudyIDTo)
+
+duplicated_rows_in_el <- which(duplicated(el_partner_db_non_missing_studyidto))
+
+# partner_db_non_missing_studyidto <- partner_db_non_missing_studyidto[-duplicated_rows_in_el,]
+# class(partner_db_non_missing_studyidto)
+# dim(partner_db_non_missing_studyidto)
 
 n_unique_studyidfrom_non_missing_studyidto <- unique(partner_db_non_missing_studyidto$StudyIDFrom)
 n_unique_studyidto_non_missing_studyidto <- unique(partner_db_non_missing_studyidto$StudyIDTo)
@@ -124,6 +143,9 @@ table(partner_db_non_missing_studyidto$HIVTestResult_Final, exclude=NULL)
 table(partner_db$referredToPrEP, exclude=NULL)
 table(partner_db_non_missing_studyidto$referredToPrEP, exclude=NULL)
 
+## Already Index?
+table(partner_db_non_missing_studyidto$AlreadyIndex, exclude = NULL)
+sum(table(partner_db_non_missing_studyidto$AlreadyIndex, exclude = NULL))
 
 ######################
 
@@ -459,3 +481,5 @@ compute_cascade("nonhispanic")
 # 
 # 
 # 
+
+
