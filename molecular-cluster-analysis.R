@@ -30,7 +30,6 @@ net_dt <- read.csv("/gpfs/data/rkantor/rtp/shared_dir/ContactTracingNetwork20230
 individuals_dt <- read.csv(paste0(data_dir, "/Individuals.csv"))
 
 
-
 # Preliminary Summaries ---------------------------
 
 dim(net_dt)
