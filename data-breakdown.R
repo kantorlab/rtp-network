@@ -204,7 +204,7 @@ length(intersected_persons_without_named_partner)
 # How many total partners are named by the index cases in the genomic DB who named partners?
 length(unique(partner_db_non_missing_studyidto$StudyIDTo))
 
-# Compute Jaccard coefficient
+# Compute Jaccard coefficient (person-level) ---------
 
 ## identify unique individuals
 partner_individuals_from <- unique(partner_db$StudyIDFrom)
@@ -280,6 +280,8 @@ ans2/nrow(sequenced_who_are_named_pts_dt)
   ans3 <- nrow(persons_in_both_db_dt) -  length(which(is.na(persons_in_both_db_dt$ClusteredPhyloAny)))
   ans3/nrow(persons_in_both_db_dt)
 
+# Compute Jaccard coefficient (person-level) ---------
+  ## See https://github.com/kantorlab/rtp-network/blob/138e5f9b0c80e103f1cd383099c4b04ca757d948/molecular-cluster-analysis.R#L521-L567
 
 # Distribution of Molecular Clusters  -------------
   ## See `here/molecular-cluster-analysis.R`
