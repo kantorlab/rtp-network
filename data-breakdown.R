@@ -134,7 +134,12 @@ mean(tab_yr_referral)
 
   summary(yearly_summary$NamedPartners) #Named Partners
   yearly_summary$Year[which.min(yearly_summary$NamedPartners)]
-  yearly_summary$Year[which.min(yearly_summary$NamedPartners)]
+  yearly_summary$Year[which.max(yearly_summary$NamedPartners)]
+
+
+## Distribution of size and number of partner naming clusters
+  ### see https://github.com/kantorlab/rtp-network/blob/b87b4ddbb253b21d620eb69e1b2edccd0ae5f36d/molecular-cluster-analysis.R#L570-L586
+
 
 ## Parnter notifiability, if reached, PCRS accepted, 
 table(partner_db_non_missing_studyidto$CanNotify, exclude = NULL) 
@@ -177,12 +182,14 @@ table(partner_db_non_missing_studyidto$referredToPrEP, exclude=NULL)
 table(partner_db_non_missing_studyidto$AlreadyIndex, exclude = NULL)
 sum(table(partner_db_non_missing_studyidto$AlreadyIndex, exclude = NULL))
 
-######################
+###################### 
+
+# OVERLAP METRICS ----------
 
 # Compute intersections between sequenced persons in genomic db and partnerdb
 length(intersect(genomic_db_sequenced, partner_db$StudyIDFrom))
 length(intersect(genomic_db_sequenced, partner_db$StudyIDTo))
-length(intersect(partner_db$StudyIDFrom, partner_db$StudyIDTo))
+length(intersect(genomic_db_sequenced, partner_db$StudyIDTo))
 length(Reduce(intersect, list(genomic_db_sequenced, partner_db$StudyIDFrom, partner_db$StudyIDTo)))
 
 # How many of the interviewed index cases who are also in the genomic DB provided identifiable partner data?
@@ -263,6 +270,16 @@ sequenced_who_are_named_pts_id <- which(genomic_db_sequenced_dt$StudyID %in% seq
 sequenced_who_are_named_pts_dt <- genomic_db_sequenced_dt[sequenced_who_are_named_pts_id,] 
 ans2 <- nrow(sequenced_who_are_named_pts_dt) -  length(which(is.na(sequenced_who_are_named_pts_dt$ClusteredPhyloAny)))
 ans2/nrow(sequenced_who_are_named_pts_dt)
+
+# How many of the persons in both databases
+  ## (i.e., intersect(genomic_db_sequenced, partner_individuals)) 
+  ## are found to cluster phylogenetically?
+  persons_in_both_db <- intersect(genomic_db_sequenced, partner_individuals)
+  persons_in_both_db_id <- which(genomic_db_sequenced_dt$StudyID %in% persons_in_both_db)
+  persons_in_both_db_dt <- genomic_db_sequenced_dt[persons_in_both_db_id, ] 
+  ans3 <- nrow(persons_in_both_db_dt) -  length(which(is.na(persons_in_both_db_dt$ClusteredPhyloAny)))
+  ans3/nrow(persons_in_both_db_dt)
+
 
 # Distribution of Molecular Clusters  -------------
   ## See `here/molecular-cluster-analysis.R`
