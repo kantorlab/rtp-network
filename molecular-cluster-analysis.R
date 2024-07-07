@@ -570,6 +570,9 @@ num_common_links/length(union_of_edge_sets)
 ct_net_unique <- network(ct_el_unique, directed=TRUE)
 #gplot(ct_net_unique) #commented out for saving time
 
+## Check number of nodes and edges
+ct_net_unique
+
 set.network.attribute(ct_net_unique, "directed", FALSE) 
 ##consider graph as undirected for counting clusters
 
@@ -611,4 +614,3 @@ eda_env$ct_el_unique <- ct_el_unique
 
 # Save the environment as an RDS file
 saveRDS(eda_env, "eda_objects.rds")
-
