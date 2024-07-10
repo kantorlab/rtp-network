@@ -182,7 +182,7 @@ table(partner_db_non_missing_studyidto$referredToPrEP, exclude=NULL)
 table(partner_db_non_missing_studyidto$AlreadyIndex, exclude = NULL)
 sum(table(partner_db_non_missing_studyidto$AlreadyIndex, exclude = NULL))
 
-###################### 
+######################
 
 # OVERLAP METRICS ----------
 
@@ -191,6 +191,8 @@ length(intersect(genomic_db_sequenced, partner_db$StudyIDFrom))
 length(intersect(genomic_db_sequenced, partner_db$StudyIDTo))
 length(intersect(genomic_db_sequenced, partner_db$StudyIDTo))
 length(Reduce(intersect, list(genomic_db_sequenced, partner_db$StudyIDFrom, partner_db$StudyIDTo)))
+
+length(intersect(partner_db$StudyIDFrom, partner_db$StudyIDTo))
 
 # How many of the interviewed index cases who are also in the genomic DB provided identifiable partner data?
 index_cases_who_named_partners <- intersect(genomic_db_sequenced, partner_db_non_missing_studyidto$StudyIDFrom)
