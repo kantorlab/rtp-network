@@ -76,6 +76,26 @@ el_partner_db_non_missing_studyidto <-
   select(StudyIDFrom, StudyIDTo)
 
 duplicated_rows_in_el <- which(duplicated(el_partner_db_non_missing_studyidto))
+dim(duplicated_rows_in_el)
+
+## how many index cases provided identifiable partner data
+length(unique((partner_db_non_missing_studyidto$StudyIDFrom)))
+
+## how many index cases did not provide identifiable partner data at at least one interview
+dt_with_unnamed_partners <- partner_db[which(partner_db$StudyIDTo == ""), ]
+length(unique(dt_with_unnamed_partners$StudyIDFrom))
+
+# how many index cases did not name partners at any of their interviews
+unique_studyidfrom_non_missing <- unique(partner_db_non_missing_studyidto$StudyIDFrom)
+unique_studyidfrom_unnamed <- unique(dt_with_unnamed_partners$StudyIDFrom)
+index_cases_no_partners <- setdiff(unique_studyidfrom_unnamed, unique_studyidfrom_non_missing)
+
+length(index_cases_no_partners)
+
+length(index_cases_no_partners)+length(unique((partner_db_non_missing_studyidto$StudyIDFrom)))
+
+## how many unique partners named
+length(unique((partner_db_non_missing_studyidto$StudyIDTo)))
 
 # partner_db_non_missing_studyidto <- partner_db_non_missing_studyidto[-duplicated_rows_in_el,]
 # class(partner_db_non_missing_studyidto)
@@ -534,3 +554,8 @@ compute_cascade("nonhispanic")
 # 
 
 
+# Genomic Dabatabase --------
+## Number of persons diagnosed per year
+
+tab_gdb_hvdxyr <- table(as.numeric(substr(genomic_db_sequenced_dt$HIVDxDate, 1, 4)))
+tab_gdb_hvdxyr
