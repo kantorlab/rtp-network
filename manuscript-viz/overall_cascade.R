@@ -45,14 +45,14 @@ p_overall <- ggplot(overall_data, aes(x = Category, y = Value, fill = Category))
             fontface="bold") +
   labs(title = "",
        y = "Total Partners",
-       x = "") +
+       x = "Cascade Categories") +
   scale_fill_manual(values=my_colors) +  # Setting colors manually
   scale_y_continuous(limits = c(0, 1500)) +
   theme_minimal() +
   theme(
     plot.title = element_text(size = 12, face = "bold"),
-    axis.title.x = element_text(size = 12, face = "bold", color = "black"),
-    axis.title.y = element_text(size = 12, face = "bold", color = "black"),
+    axis.title.x = element_text(size = 18, face = "bold", color = "blue"),
+    axis.title.y = element_text(size = 18, face = "bold", color = "blue"),
     axis.text.y = element_text(size = 12, face = "bold", color = "black"),
     axis.text.x = element_text(size = 12, face = "bold", color = "black"),
     legend.position = "none"   # This will remove the legend
