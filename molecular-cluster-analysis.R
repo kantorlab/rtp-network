@@ -595,7 +595,78 @@ phylo_net
 #gplot(phylo_net, usearrows = FALSE)
 
 
+# Overlap with 005 ---------------------------
+
+## See https://github.com/kantorlab/rtp-network/blob/159c04c8ade62462b666159ff35549a352478c1f/archive/create_edgelists_from_molecular_clusters.R#L1-L103
+
+clusters_trace <- 
+  individuals_dt %>% select(StudyID, ClusteredHIVTrace005, ClusteredHIVTrace015)
+head(clusters_trace)
+
+## 005
+head(clusters$ClusteredHIVTrace005, 100)
+ids_in_005_clusters <- which(substr(clusters_trace$ClusteredHIVTrace005, 1, 3) == "HIV")
+length(ids_in_005_clusters)
+
+studyids_in_005_clusters <- individuals_dt$StudyID[ids_in_005_clusters]
+length(studyids_in_005_clusters)
+
+clusterIDs_005 <- clusters_trace$ClusteredHIVTrace005[ids_in_005_clusters]
+length(clusterIDs_005)
+
+## create named list with study ids in each cluster 
+(table(individuals_dt$ClusteredHIVTrace005, exclude = NULL))
+cluster_names_005 <- names((table(individuals_dt$ClusteredHIVTrace005, exclude = NULL)))[-1]
+
+study_ids_at_clusterid_005 = as.list(rep(NA, length(cluster_names_005)))
+names(study_ids_at_clusterid_005) = cluster_names_005
+
+for (i in 1:length(study_ids_at_clusterid_005)){
+  study_ids_at_clusterid_005[[names(study_ids_at_clusterid_005)[i]]] <-  
+    (individuals_dt$StudyID[(which(individuals_dt$ClusteredHIVTrace005 == names(study_ids_at_clusterid_005)[[i]]))])
+}
+
+study_ids_at_clusterid_005
+length(study_ids_at_clusterid_005)
+head(study_ids_at_clusterid_005)
+
+## create edgelist
+el_matrix_005 <- matrix(ncol = 2, nrow = 0)
+
+## iterate over each cluster
+for (i in 1:length(study_ids_at_clusterid_005)) {
+  # Check if the cluster has more than one ID
+  if (length(study_ids_at_clusterid_005[[i]]) > 1) {
+    # Create combinations of pairs and add to the edgelist
+    el_matrix_005 <- rbind(el_matrix_005, t(combn(as.character(study_ids_at_clusterid_005[[i]]), 2)))
+  }
+}
+
+head(el_matrix_005)
+dim(el_matrix_005) 
+
+el_df_005 <- as.data.frame(el_matrix_005, stringsAsFactors = FALSE)
+names(el_df_005) <- c("Source", "Target")
+
+el_df_005$uid <- apply(el_df_005, 1, 
+  function(x) paste(sort(x), collapse = "-"))
+head(el_df_005)
+
+common_links_005 <- intersect(el_df_005$uid, ct_el$uid)
+length(common_links_005)
+
+num_common_links/length(ct_el$uid)
+num_common_links/length(el_df_005$uid)
+
+
+
+
+
+
+
+
 # Save Object ---------------------------
+
 
 # # Create an environment and assign the objects to it
 eda_env <- new.env()
