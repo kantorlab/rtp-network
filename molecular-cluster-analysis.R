@@ -655,8 +655,68 @@ head(el_df_005)
 common_links_005 <- intersect(el_df_005$uid, ct_el$uid)
 length(common_links_005)
 
-num_common_links/length(ct_el$uid)
-num_common_links/length(el_df_005$uid)
+length(common_links_005)/length(ct_el$uid)
+length(common_links_005)/length(el_df_005$uid)
+
+
+# Overlap with 015 ---------------------------
+
+## 015
+head(clusters$ClusteredHIVTrace015, 100)
+ids_in_015_clusters <- which(substr(clusters_trace$ClusteredHIVTrace015, 1, 3) == "HIV")
+length(ids_in_015_clusters)
+
+studyids_in_015_clusters <- individuals_dt$StudyID[ids_in_015_clusters]
+length(studyids_in_015_clusters)
+
+clusterIDs_015 <- clusters_trace$ClusteredHIVTrace015[ids_in_015_clusters]
+length(clusterIDs_015)
+
+## create named list with study ids in each cluster 
+(table(individuals_dt$ClusteredHIVTrace015, exclude = NULL))
+cluster_names_015 <- names((table(individuals_dt$ClusteredHIVTrace015, exclude = NULL)))[-1]
+
+study_ids_at_clusterid_015 = as.list(rep(NA, length(cluster_names_015)))
+names(study_ids_at_clusterid_015) = cluster_names_015
+
+for (i in 1:length(study_ids_at_clusterid_015)){
+  study_ids_at_clusterid_015[[names(study_ids_at_clusterid_015)[i]]] <-  
+    (individuals_dt$StudyID[(which(individuals_dt$ClusteredHIVTrace015 == names(study_ids_at_clusterid_015)[[i]]))])
+}
+
+study_ids_at_clusterid_015
+length(study_ids_at_clusterid_015)
+head(study_ids_at_clusterid_015)
+
+## create edgelist
+el_matrix_015 <- matrix(ncol = 2, nrow = 0)
+
+## iterate over each cluster
+for (i in 1:length(study_ids_at_clusterid_015)) {
+  # Check if the cluster has more than one ID
+  if (length(study_ids_at_clusterid_015[[i]]) > 1) {
+    # Create combinations of pairs and add to the edgelist
+    el_matrix_015 <- rbind(el_matrix_015, t(combn(as.character(study_ids_at_clusterid_015[[i]]), 2)))
+  }
+}
+
+head(el_matrix_015)
+dim(el_matrix_015) 
+
+el_df_015 <- as.data.frame(el_matrix_015, stringsAsFactors = FALSE)
+names(el_df_015) <- c("Source", "Target")
+
+el_df_015$uid <- apply(el_df_015, 1, 
+  function(x) paste(sort(x), collapse = "-"))
+head(el_df_015)
+
+common_links_015 <- intersect(el_df_015$uid, ct_el$uid)
+length(common_links_015)
+
+length(common_links_015)
+
+length(common_links_015)/length(ct_el$uid)
+length(common_links_015)/length(el_df_015$uid)
 
 
 
