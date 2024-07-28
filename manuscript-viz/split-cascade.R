@@ -96,15 +96,16 @@ p <- ggplot(combined_df, aes(x = Grouping, y = Value, fill = Category)) +
     palette="Set1", 
     breaks=levels, 
     labels=c("Named", "Attempted", "Reached", 
-            "Tested", "Diagnosed", "Sequenced"), name=NULL)+
+            "Tested", "Diagnosed", "Sequenced"), name="Cascade Categories")+
   theme_minimal() +
   theme(
     plot.title = element_blank(),
     axis.text.x = element_text(face="bold"),
-    axis.title.y = element_text(face="bold"),
-    axis.title.x = element_text(face="bold"),
+    axis.title.y = element_text(face="bold", size=18, color="blue"),
+    axis.title.x = element_text(face="bold", size=18, color="blue"),
     axis.text.y = element_text(),
-    legend.text = element_text(),
+    legend.text = element_text(size=14),
+    legend.title = element_text(size = 16, face = "bold", color = "blue"), 
     strip.text = element_text(size = 12, face = "bold", color = "black"),
     strip.background = element_rect(fill = "lightgray", color = "black", linewidth = 1)
   ) +
