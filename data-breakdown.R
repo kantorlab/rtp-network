@@ -115,6 +115,10 @@ length(
   )
 )
 
+## How many partner naming links?
+   ## Computed at https://github.com/kantorlab/rtp-network/blob/1746d195fcd30880a79b6c9592145fc79f3c1077/molecular-cluster-analysis.R#L540-L549
+   ## The answer is 1373, adjusting for edges found at multiple interview points.   
+
 ## interview characteristics
 table(partner_db_non_missing_studyidto$InterviewRank, exclude = NULL)
 
