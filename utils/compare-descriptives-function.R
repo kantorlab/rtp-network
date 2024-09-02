@@ -22,6 +22,7 @@ compare_descriptives <- function(dt){
                                 labels = labels)]
   
   tab_hiv_diag_yr <- table(dt$hivdiagnosis_year_group)
+  num_tab_hiv_diag_yr  <- tab_hiv_diag_yr
   tab_hiv_diag_yr <- 
     table(dt$hivdiagnosis_year_group)/sum(
     table(dt$hivdiagnosis_year_group)
@@ -56,6 +57,7 @@ compare_descriptives <- function(dt){
   return_objs[["race"]] <- list(race, race_prop)
   return_objs[["ethnicity"]] <- list(ethnicity, ethnicity_prop)
   return_objs[["age_at_diag"]] <- list(summ_age_at_diag)
+  return_objs[["num_tab_hiv_diag_yr"]] <- list(num_tab_hiv_diag_yr)
   return_objs[["tab_hiv_diag_yr"]] <- list(tab_hiv_diag_yr)
   return_objs[["tab_subtype_b"]] <- list(tab_subtype_b_counts, tab_subtype_b_prop)
   return_objs[["msm"]] <- list(msm, msm_prop)
