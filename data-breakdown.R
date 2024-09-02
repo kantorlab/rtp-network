@@ -164,7 +164,6 @@ mean(tab_yr_referral)
 ## Distribution of size and number of partner naming clusters
   ### see https://github.com/kantorlab/rtp-network/blob/b87b4ddbb253b21d620eb69e1b2edccd0ae5f36d/molecular-cluster-analysis.R#L570-L586
 
-
 ## Parnter notifiability, if reached, PCRS accepted, 
 table(partner_db_non_missing_studyidto$CanNotify, exclude = NULL) 
 table(partner_db_non_missing_studyidto$ClientReached, exclude = NULL) 
@@ -228,7 +227,55 @@ intersected_persons_without_named_partner <- intersected_persons_partner_genomic
 length(intersected_persons_without_named_partner)  
 
 # How many total partners are named by the index cases in the genomic DB who named partners?
-length(unique(partner_db_non_missing_studyidto$StudyIDTo))
+row_id_sequenced_index_cases_who_named_pts <- which(partner_db_non_missing_studyidto$StudyIDFrom %in% index_cases_who_named_partners)
+n_total_pts_named_by_sequenced_index_cases_who_named_pts <- (partner_db_non_missing_studyidto$StudyIDTo[row_id_index_cases_who_named_pts])
+length(n_total_pts_named_by_sequenced_index_cases_who_named_pts) #total
+length(unique(n_total_pts_named_by_sequenced_index_cases_who_named_pts))
+
+# Compare this to all persons who named partners and
+  ## number of partners named by index cases in the CTDB (computed above)
+  length(c(n_unique_studyidfrom_non_missing_studyidto))
+  length(c(n_unique_studyidto_non_missing_studyidto))
+
+# For the named partners by index cases who were sequenced,  
+  ## how many appeared only in the CTDB?
+  el_partner_db_non_missing_studyidto <- (partner_db_non_missing_studyidto[,c(1:2)])
+  dim(el_partner_db_non_missing_studyidto)
+  all_nodes_el_partner_db_non_missing_studyidto <- 
+    c(el_partner_db_non_missing_studyidto$StudyIDFrom,
+      el_partner_db_non_missing_studyidto$StudyIDTo)
+ 
+  length(unique(all_nodes_el_partner_db_non_missing_studyidto))
+
+  length(which(
+    unique(n_total_pts_named_by_sequenced_index_cases_who_named_pts) %in%
+    all_nodes_el_partner_db_non_missing_studyidto))
+
+  ## how many appeared in both databases?
+  partners_named_by_index_cases_in_gdb <- 
+    (which(
+      unique(n_total_pts_named_by_sequenced_index_cases_who_named_pts) %in%
+      unique(genomic_db_sequenced_dt$StudyID)
+    )
+    )
+  length(partners_named_by_index_cases_in_gdb)
+
+  ## how many of the above are in a phylogenetic cluster?
+  
+  named_partners_genomic_db_sequenced_dt <- 
+    unique(n_total_pts_named_by_sequenced_index_cases_who_named_pts)[partners_named_by_index_cases_in_gdb]
+
+  length(named_partners_genomic_db_sequenced_dt)
+
+  row_ids_named_partners_in_gdb_sequenced <- 
+    genomic_db_sequenced_dt$StudyID %in% named_partners_genomic_db_sequenced_dt
+
+  table(row_ids_named_partners_in_gdb_sequenced)
+
+  table(genomic_db_sequenced_dt[row_ids_named_partners_in_gdb_sequenced]$ClusteredPhyloAny, 
+          exclude=NULL)
+  sum(table(genomic_db_sequenced_dt[row_ids_named_partners_in_gdb_sequenced]$ClusteredPhyloAny, 
+          exclude=NULL))
 
 # Compute Jaccard coefficient (person-level) ---------
 
