@@ -228,7 +228,7 @@ length(intersected_persons_without_named_partner)
 
 # How many total partners are named by the index cases in the genomic DB who named partners?
 row_id_sequenced_index_cases_who_named_pts <- which(partner_db_non_missing_studyidto$StudyIDFrom %in% index_cases_who_named_partners)
-n_total_pts_named_by_sequenced_index_cases_who_named_pts <- (partner_db_non_missing_studyidto$StudyIDTo[row_id_index_cases_who_named_pts])
+n_total_pts_named_by_sequenced_index_cases_who_named_pts <- (partner_db_non_missing_studyidto$StudyIDTo[row_id_sequenced_index_cases_who_named_pts])
 length(n_total_pts_named_by_sequenced_index_cases_who_named_pts) #total
 length(unique(n_total_pts_named_by_sequenced_index_cases_who_named_pts))
 
