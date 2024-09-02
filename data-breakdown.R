@@ -443,6 +443,13 @@ dim(named_partners_in_genomic_dt)
 
 compare_descriptives(dt=named_partners_in_genomic_dt) 
 
+## Named partners in the genomic DB who are sequenced
+named_sequenced_partners_in_gdb_dt <- genomic_db_sequenced_dt[row_ids_named_partners_in_gdb_sequenced,]
+#compare_descriptives(dt=named_partners_in_genomic_dt) 
+named_seq_pt_char <- compare_descriptives(dt=named_sequenced_partners_in_gdb_dt) 
+named_seq_pt_char
+named_seq_pt_char$num_tab_hiv_diag_yr
+named_seq_pt_char$tab_hiv_diag_yr
 
 # Cascade Table ("Table 2") -------------
 
