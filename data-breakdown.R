@@ -451,7 +451,7 @@ named_seq_pt_char
 named_seq_pt_char$num_tab_hiv_diag_yr
 named_seq_pt_char$tab_hiv_diag_yr
 
-# Cascade Table ("Table 2") -------------
+# Cascade Table (presented as a figure) -------------
 
 ## category 1 - combined categories (all)
 length(index_cases_who_named_partners) # row 1 - all
