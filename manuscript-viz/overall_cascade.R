@@ -64,3 +64,9 @@ print(p_overall)
 loc_to_save <- here("manuscript-viz", "overall_cascade.pdf")
 ggsave(loc_to_save, plot = p_overall, 
       width = 8, height = 6, dpi = 300)
+
+# RDS for multipanel plot
+saveRDS(list(p_overall=p_overall, 
+             labels_n=labels_n),
+        file = here("manuscript-viz", "p_overall.rds"))
+

@@ -117,3 +117,6 @@ print(p)
 ggsave(loc_to_save, plot = p, 
       width = 12, height = 6, dpi = 300)
 
+p_split <- p
+
+saveRDS(p_split, file = here("manuscript-viz", "p_split_cascade.rds"))
