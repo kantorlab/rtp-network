@@ -1,3 +1,5 @@
+rm(list=ls())
+
 # Load necessary libraries
 library(ggplot2)
 library(patchwork)
