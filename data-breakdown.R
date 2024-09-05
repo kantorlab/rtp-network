@@ -232,6 +232,24 @@ n_total_pts_named_by_sequenced_index_cases_who_named_pts <- (partner_db_non_miss
 length(n_total_pts_named_by_sequenced_index_cases_who_named_pts) #total
 length(unique(n_total_pts_named_by_sequenced_index_cases_who_named_pts))
 
+## Partner naming cascade for the persons who are named by the 494 overlapping persons between CTDB and GDB
+unique_n_total_pts_named_by_sequenced_index_cases_who_named_pts <- unique(n_total_pts_named_by_sequenced_index_cases_who_named_pts)
+row_id_unique_n_total_pts_named_by_sequenced_index_cases_who_named_pts <-
+  which(partner_db_non_missing_studyidto$StudyIDTo %in% unique_n_total_pts_named_by_sequenced_index_cases_who_named_pts)
+length(row_id_unique_n_total_pts_named_by_sequenced_index_cases_who_named_pts)
+
+pt_dt_named_pt_of_494 <- 
+  partner_db_non_missing_studyidto[row_id_unique_n_total_pts_named_by_sequenced_index_cases_who_named_pts,]
+dim(pt_dt_named_pt_of_494)
+
+table(pt_dt_named_pt_of_494$CanNotify, exclude=NULL)
+table(pt_dt_named_pt_of_494$ClientReached, exclude=NULL)
+table(pt_dt_named_pt_of_494$NoReachWhy, exclude=NULL)
+table(pt_dt_named_pt_of_494$HIVTested, exclude=NULL)
+table(pt_dt_named_pt_of_494$HIVTestResult_Final, exclude=NULL)
+table(pt_dt_named_pt_of_494$referredToPrEP, exclude=NULL)
+
+
 # Compare this to all persons who named partners and
   ## number of partners named by index cases in the CTDB (computed above)
   length(c(n_unique_studyidfrom_non_missing_studyidto))
@@ -272,8 +290,11 @@ length(unique(n_total_pts_named_by_sequenced_index_cases_who_named_pts))
 
   table(row_ids_named_partners_in_gdb_sequenced)
 
+  which((genomic_db_sequenced_dt[row_ids_named_partners_in_gdb_sequenced]$HIVDxDate) == "")
+    #HIV Un-Diagnosed?
+  
   table(genomic_db_sequenced_dt[row_ids_named_partners_in_gdb_sequenced]$ClusteredPhyloAny, 
-          exclude=NULL)
+          exclude=NULL) #clusteredphyloany
   sum(table(genomic_db_sequenced_dt[row_ids_named_partners_in_gdb_sequenced]$ClusteredPhyloAny, 
           exclude=NULL))
 
@@ -451,6 +472,7 @@ named_seq_pt_char
 named_seq_pt_char$num_tab_hiv_diag_yr
 named_seq_pt_char$tab_hiv_diag_yr
 
+    
 # Cascade Table (presented as a figure) -------------
 
 ## category 1 - combined categories (all)
