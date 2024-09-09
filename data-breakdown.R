@@ -520,13 +520,61 @@ num_index_cases_whose_partners_not_contacted <-
 length(num_index_cases_whose_partners_not_contacted)
 
 
-named_partners_tested_countstudyidfrom <- 
+named_partners_tested1_reached1_countstudyidfrom <- 
   partner_db_non_missing_studyidto %>%
   filter(HIVTested == 1 & ClientReached == 1) %>%
   pull(StudyIDFrom) %>%
   unique()
+length(named_partners_tested1_reached1_countstudyidfrom)
 
-length(named_partners_tested_countstudyidfrom)
+named_partners_tested1_countstudyidfrom <- 
+  partner_db_non_missing_studyidto %>%
+  filter(HIVTested == 1) %>%
+  pull(StudyIDFrom) %>%
+  unique()
+length(named_partners_tested1_countstudyidfrom)
+
+  ##############
+    ### what about the partners who were not tested?
+    ### were they previously tested?
+    length(named_partners_tested1_countstudyidfrom)
+    head(named_partners_tested1_countstudyidfrom)
+
+    length(partner_db_non_missing_studyidto$StudyIDTo)
+    head(partner_db_non_missing_studyidto$StudyIDTo)
+
+    # Extract partners who were not tested (HIVTested == 0 or NA)
+    partners_not_tested_dt <- partner_db_non_missing_studyidto %>%
+      filter(HIVTested != 1 | is.na(HIVTested))
+    table(partners_not_tested_dt$HIVTested, exclude=NULL)
+    sum(table(partners_not_tested_dt$HIVTested, exclude=NULL))
+
+    partners_not_tested_hivtest_not1_dt <-
+    partner_db_non_missing_studyidto %>%
+      filter(HIVTested != 1)
+    table(partners_not_tested_hivtest_not1_dt$HIVTested, exclude=NULL)
+    sum(table(partners_not_tested_hivtest_not1_dt$HIVTested, exclude=NULL))
+
+    not_tested_partners_id <- 
+      partners_not_tested_dt %>% 
+        pull(StudyIDTo) %>%
+        unique()
+    head(not_tested_partners_id)
+    length(not_tested_partners_id)
+
+    length(which(not_tested_partners_id %in% genomic_db_sequenced_dt$StudyID))
+
+    table(partners_not_tested_dt$AlreadyIndex, exclude=NULL)
+    sum(table(partners_not_tested_dt$AlreadyIndex, exclude=NULL))
+
+
+
+
+
+    
+
+
+  ##############
 
 named_partners_accepted_PCRS <- 
   partner_db_non_missing_studyidto %>%
