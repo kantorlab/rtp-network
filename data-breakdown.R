@@ -481,15 +481,41 @@ length(unique(partner_db_non_missing_studyidto$StudyIDTo))
 table(partner_db_non_missing_studyidto$ClientReached, exclude = NULL)
 sum(table(partner_db_non_missing_studyidto$ClientReached, exclude = NULL))
 
+
 #table(partner_db_non_missing_studyidto$HIVTested, exclude = NULL)
 
-named_partners_contacted <- 
+named_partners_reached <- 
   partner_db_non_missing_studyidto %>%
   filter(ClientReached == 1) %>%
   #pull(StudyIDFrom) %>%
   pull(StudyIDTo) %>%
   unique()
-length(named_partners_contacted)
+length(named_partners_reached)
+
+named_partners_already_index <- 
+  partner_db_non_missing_studyidto %>%
+  filter(AlreadyIndex == "true") %>%
+  #pull(StudyIDFrom) %>%
+  pull(StudyIDTo) %>%
+  unique()
+length(named_partners_already_index)
+
+named_partners_already_index_and_reached <- 
+  partner_db_non_missing_studyidto %>%
+  filter(AlreadyIndex == "true" & ClientReached == 1) %>%
+  #pull(StudyIDFrom) %>%
+  pull(StudyIDTo) %>%
+  unique()
+length(named_partners_already_index_and_reached)
+
+
+named_partners_not_reached <- 
+  partner_db_non_missing_studyidto %>%
+  filter(ClientReached != 1) %>%
+  #pull(StudyIDFrom) %>%
+  pull(StudyIDTo) %>%
+  unique()
+length(named_partners_not_reached)
 
 num_index_cases_whose_partners_contacted <- 
   partner_db_non_missing_studyidto %>%
@@ -497,7 +523,6 @@ num_index_cases_whose_partners_contacted <-
   pull(StudyIDFrom) %>%
   #pull(StudyIDTo) %>%
   unique()
-
 length(num_index_cases_whose_partners_contacted)
 
 named_partners_not_contacted <- 
@@ -509,6 +534,23 @@ named_partners_not_contacted <-
   unique()
 
 length(named_partners_not_contacted)
+
+partners_tested <- 
+  partner_db_non_missing_studyidto %>%
+  filter(HIVTested == 1) %>%
+  pull(StudyIDTo) %>%
+  unique()
+length(partners_tested)
+
+partners_not_tested <- 
+  partner_db_non_missing_studyidto %>%
+  filter(HIVTested != 1 | is.na(HIVTested)) %>%
+  pull(StudyIDTo) %>%
+  unique()
+length(partners_not_tested)
+
+length(which(partners_tested %in% genomic_db_sequenced_dt$StudyID))
+
 
 
 num_index_cases_whose_partners_not_contacted <- 
@@ -541,8 +583,19 @@ num_index_cases_with_partner_testednot1_testedNA <-
   unique()
 length(num_index_cases_with_partner_testednot1_testedNA)
 
+partners_testednot1 <- 
+  partner_db_non_missing_studyidto %>%
+  filter(HIVTested != 1) %>%
+  pull(StudyIDTo) %>%
+  unique()
+length(partners_testednot1)
 
-
+partners_testednot1_testedNA <- 
+  partner_db_non_missing_studyidto %>%
+  filter(HIVTested != 1 | is.na(HIVTested)) %>%
+  pull(StudyIDTo) %>%
+  unique()
+length(partners_testednot1_testedNA)
 
   ##############
     ### what about the partners who were not tested?
