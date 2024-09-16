@@ -1,0 +1,740 @@
+---
+title: "R Notebook"
+output: html_notebook
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+rm(list=ls())
+knitr::opts_chunk$set(echo = TRUE,
+                      root.dir = '~/code/rtp-network/out/')
+library(data.table)
+library(dplyr)
+library(stringi)
+library(network)
+library(geeM)
+#library(geepack)
+```
+
+## Load the data
+
+```{r}
+#eda_env <- readRDS("/users/akhann16/code/rtp-network/out/eda_objects.rds")
+#genomic_db <- eda_env$genomic_db
+#net_dt <- eda_env$net_dt 
+#named_pt_idx_005 <- eda_env$named_pt_idx_005 
+#named_pt_idx_015 <- eda_env$named_pt_idx_015
+
+data_dir <- "/gpfs/data/rkantor/rtp/datasets/D51_20230512_unified"
+list.files(path=data_dir)
+partner_db <- as.data.table(read.csv("/gpfs/data/rkantor/rtp/shared_dir/ContactTracingNetwork20230726.csv"))
+genomic_db_full <- as.data.table(read.csv(paste0(data_dir, "/Individuals.csv")))
+```
+
+## Use factor types where appropriate in coding variables for genomic_db
+
+```{r}
+genomic_db_full$StudyID <- factor(genomic_db_full$StudyID)
+genomic_db_full$DemoGender <- factor(genomic_db_full$DemoGender)
+genomic_db_full$DemoRace <- factor(genomic_db_full$DemoRace)
+genomic_db_full$DemoHispanic <- factor(genomic_db_full$DemoHispanic)
+genomic_db_full$DemoBirthCountry <- factor(genomic_db_full$DemoBirthCountry)
+genomic_db_full$RiskPrimary <- factor(genomic_db_full$RiskPrimary)
+genomic_db_full$RiskMSM <- factor(genomic_db_full$RiskMSM)
+genomic_db_full$RiskIDU <- factor(genomic_db_full$RiskIDU)
+genomic_db_full$RiskHeterosexual <- factor(genomic_db_full$RiskHeterosexual)
+genomic_db_full$Sequence <- factor(genomic_db_full$Sequence)
+genomic_db_full$SequenceSubtype <- factor(genomic_db_full$SequenceSubtype)
+genomic_db_full$ClusteredHIVTrace005 <- factor(genomic_db_full$ClusteredHIVTrace005)
+genomic_db_full$ClusteredHIVTrace015 <- factor(genomic_db_full$ClusteredHIVTrace015)
+genomic_db_full$ClusteredPhyloAny <- factor(genomic_db_full$ClusteredPhyloAny)
+```
+
+## Select the `genomic_db_full` columns used further in the analysis
+
+```{r}
+genomic_db <- 
+  genomic_db_full %>% 
+  select(StudyID, DemoGender, DemoRace, DemoHispanic, 
+         HIVDxAge, HIVDxDate, RiskMSM, RiskIDU, 
+         RiskHeterosexual, Sequence, SequenceSubtype, 
+         ClusteredHIVTrace005, ClusteredHIVTrace015, ClusteredPhyloAny) %>%
+         filter(Sequence == "True") %>%
+         mutate(Sequence = droplevels(Sequence))
+table(genomic_db$Sequence)
+```
+
+## Create a named partner network object
+
+```{r}
+net_dt_el <- cbind(partner_db$StudyIDFrom, partner_db$StudyIDTo)
+net <- as.network(net_dt_el, bipartite = F, directed = T)
+net
+length(net %v% "vertex.names")
+head(net %v% "vertex.names")
+named_pt_net <- net
+```
+
+## Utilities
+
+```{r}
+source("utils/create-edgelists-from-mol-clusters.R")
+source("utils/regressions-functions.R")
+source("utils/split-counts-by-attributes.R")
+```
+
+## Recode Sequence Subtype as B/non-B (needed for regressions):
+
+```{r}
+genomic_db$SequenceSubtype <- as.character(genomic_db$SequenceSubtype)
+
+table(genomic_db$SequenceSubtype, exclude = NULL)
+
+genomic_db$RecodedSequenceSubtype <- 
+  ifelse(genomic_db$SequenceSubtype == "" | genomic_db$SequenceSubtype == "B", 
+         genomic_db$SequenceSubtype, 
+         "non-B")
+
+table(genomic_db$RecodedSequenceSubtype, exclude = NULL)
+```
+
+## Create edgelists from molecular clusters
+
+### Apply function
+
+Start by converting the unified individuals dataset to an edgelist
+depending on cluster identity by molecular cluster identification
+technique.
+
+```{r}
+# Generate edgelists for ClusteredPhyloAny column
+phylo_data <-
+  genomic_db[!is.na(genomic_db$ClusteredPhyloAny),] 
+
+#function needs for NA vals in ClusteredPhyloAny to be removed for it to run
+phylo_edgelist <-
+  create_edgelists(data = phylo_data,
+                   cluster_col = "ClusteredPhyloAny",
+                   edgelist_prefix = "phylo_edgelist")
+
+
+# Generate edgelists for ClusteredHIVTrace005 column
+hivtrace005_edgelist <-
+  create_edgelists(data = genomic_db,
+                   cluster_col = "ClusteredHIVTrace005",
+                   edgelist_prefix = "005_edgelist")
+
+# Generate edgelists for ClusteredHIVTrace015 column
+hivtrace015_edgelist <-
+  create_edgelists(data = genomic_db,
+                   cluster_col = "ClusteredHIVTrace015",
+                   edgelist_prefix = "015_edgelist")
+
+```
+
+### Test the result
+
+-   For Trace 005
+
+```{r}
+x <- as.numeric(table(genomic_db$ClusteredHIVTrace005)[-1])
+y <- lapply(x, function (x) choose(x, 2))
+sum(unlist(y)) #number of edges across all molecular clusters
+
+(sum(unlist(y)) == nrow(hivtrace005_edgelist))
+```
+
+-   For Trace 015
+
+```{r}
+x <- as.numeric(table(genomic_db$ClusteredHIVTrace015)[-1])
+y <- lapply(x, function (x) choose(x, 2))
+sum(unlist(y)) #number of edges across all molecular clusters
+
+(sum(unlist(y)) == nrow(hivtrace015_edgelist))
+```
+
+-   For ClusteredPhyloAny
+
+```{r}
+x <- as.numeric(table(genomic_db$ClusteredPhyloAny))
+y <- lapply(x, function (x) choose(x, 2))
+sum(unlist(y)) #number of edges across all molecular clusters
+
+(sum(unlist(y)) == nrow(phylo_edgelist))
+```
+
+
+## Regresssions
+
+
+### Predict Partner Naming from Molecular Clusters
+
+Prepare data for regression analysis
+
+-   How many index persons are in the HIVTrace005, HIVTrace015 and
+    ClusteredPhyloAny datasets?
+
+```{r}
+index_person_idx_in_005 <- which(genomic_db$ClusteredHIVTrace005 != "")
+index_persons_in_005 <- genomic_db$StudyID[index_person_idx_in_005]
+length(index_person_idx_in_005)
+length(which(genomic_db$ClusteredHIVTrace005 == ""))
+#length(which(genomic_db$ClusteredHIVTrace005 == "")) == 
+#         table(genomic_db$ClusteredHIVTrace005)[[]]
+genomic_db_w_index_persons_in_005 <- genomic_db[index_person_idx_in_005,]
+dim(genomic_db_w_index_persons_in_005)
+
+index_person_idx_in_015 <- which(genomic_db$ClusteredHIVTrace015 != "")
+index_persons_in_015 <- genomic_db$StudyID[index_person_idx_in_015]
+length(index_person_idx_in_015)
+length(which(genomic_db$ClusteredHIVTrace015 == ""))
+# length(which(genomic_db$ClusteredHIVTrace015 == "")) == 
+#          table(genomic_db$ClusteredHIVTrace015)[[]]
+genomic_db_w_index_persons_in_015 <- genomic_db[index_person_idx_in_015,]
+dim(genomic_db_w_index_persons_in_015)
+
+index_person_idx_in_clusteredphyloany <- which(genomic_db$ClusteredPhyloAny != "")
+length(index_person_idx_in_clusteredphyloany)
+
+index_persons_in_clusteredphyloany <- genomic_db$StudyID[index_person_idx_in_clusteredphyloany]
+length(which(is.na(genomic_db$ClusteredPhyloAny)))
+
+genomic_db_w_index_persons_in_clusteredphyloany <- 
+  genomic_db[index_person_idx_in_clusteredphyloany,]
+
+dim(genomic_db_w_index_persons_in_clusteredphyloany)
+```
+
+[Thus, there are
+`r nrow(genomic_db_w_index_persons_in_clusteredphyloany)` who are
+clustered phylogenetically by the `phyloany` method. Of these,
+`r length(which(genomic_db_w_index_persons_in_clusteredphyloany$named_partner_indicator == 1))`]{style="background-color: #FFFF00"}
+
+-   How many of these index persons from each molecular clustering
+    variable are in the named partner list?
+
+```{r}
+#named_pt_net%v% "vertex.names"
+trace005_persons_in_named_pt_net_idx <- which((index_persons_in_005) %in% (named_pt_net %v% "vertex.names"))
+trace015_persons_in_named_pt_net_idx <- which((index_persons_in_015) %in% (named_pt_net %v% "vertex.names"))
+clusteredphyloany_persons_in_named_pt_net_idx <- which((index_persons_in_clusteredphyloany) %in% (named_pt_net %v% "vertex.names"))
+
+genomic_db_w_index_persons_in_005$named_partner_indicator <- 0
+genomic_db_w_index_persons_in_005$named_partner_indicator[trace005_persons_in_named_pt_net_idx] <- 1
+genomic_db_w_index_persons_in_005$named_partner_indicator <- as.factor(genomic_db_w_index_persons_in_005$named_partner_indicator)
+
+genomic_db_w_index_persons_in_015$named_partner_indicator <- 0
+genomic_db_w_index_persons_in_015$named_partner_indicator[trace015_persons_in_named_pt_net_idx] <- 1
+genomic_db_w_index_persons_in_015$named_partner_indicator <-
+  as.factor(genomic_db_w_index_persons_in_015$named_partner_indicator)
+
+genomic_db_w_index_persons_in_clusteredphyloany$named_partner_indicator <- 0
+genomic_db_w_index_persons_in_clusteredphyloany$named_partner_indicator[
+  clusteredphyloany_persons_in_named_pt_net_idx
+  ] <-  1
+genomic_db_w_index_persons_in_clusteredphyloany$named_partner_indicator <-
+  as.factor(genomic_db_w_index_persons_in_clusteredphyloany$named_partner_indicator)
+
+dim(genomic_db_w_index_persons_in_clusteredphyloany)
+table(genomic_db_w_index_persons_in_clusteredphyloany$named_partner_indicator, exclude = NULL)
+```
+
+-   Split the above counts by attributes
+
+```{r}
+
+split_named_pt_indicator_counts_by_attributes(data=genomic_db_w_index_persons_in_005)
+split_named_pt_indicator_counts_by_attributes(genomic_db_w_index_persons_in_015)
+
+phyloany_named_pt_res <- 
+  split_named_pt_indicator_counts_by_attributes(data=
+                                        genomic_db_w_index_persons_in_clusteredphyloany)
+
+phyloany_named_pt_res #distribution of naming and not naming molecular cluster members 
+phyloany_named_pt_res$hivdxage
+```
+
+### Conduct Analysis
+
+```{r}
+
+table(genomic_db_w_index_persons_in_clusteredphyloany$DemoGender, 
+      exclude = NULL)
+
+m1_clean_dt <- 
+  genomic_db_w_index_persons_in_clusteredphyloany %>%
+  select(StudyID, named_partner_indicator, ClusteredPhyloAny, DemoGender) %>%
+  filter(DemoGender != "") %>%
+   mutate(DemoGender = droplevels(DemoGender))
+
+table(m1_clean_dt$DemoGender, exclude = NULL)
+
+m1 <- geem(as.numeric(as.character(named_partner_indicator)) ~ 
+               DemoGender, 
+           data = m1_clean_dt, 
+           #data = genomic_db_w_index_persons_in_clusteredphyloany, #DOES NOT CONVERGE WITH THIS
+            family = "binomial", 
+           id=ClusteredPhyloAny, 
+           corstr="exchangeable")
+summary(m1)
+
+genomic_db_w_index_persons_in_clusteredphyloany$DemoRace <- 
+  relevel(genomic_db_w_index_persons_in_clusteredphyloany$DemoRace, ref = "Black")
+
+m2 <- geem(as.numeric(as.character(named_partner_indicator)) ~ 
+             DemoRace, 
+           data = genomic_db_w_index_persons_in_clusteredphyloany, 
+            family = "binomial", 
+           id=ClusteredPhyloAny, 
+           corstr="exchangeable")
+summary(m2)
+
+m3 <- geem(as.numeric(as.character(named_partner_indicator)) ~ 
+             RecodedSequenceSubtype, 
+           data = genomic_db_w_index_persons_in_clusteredphyloany, 
+            family = "binomial", 
+           id=ClusteredPhyloAny, 
+           corstr="exchangeable")
+summary(m3)
+
+m4 <- geem(as.numeric(as.character(named_partner_indicator)) ~ 
+             RiskMSM, 
+           data = genomic_db_w_index_persons_in_clusteredphyloany, 
+            family = "binomial", 
+           id=ClusteredPhyloAny, 
+           corstr="exchangeable")
+summary(m4)
+
+m5 <- geem(as.numeric(as.character(named_partner_indicator)) ~ 
+             RiskHeterosexual, 
+           data = genomic_db_w_index_persons_in_clusteredphyloany, 
+            family = "binomial", 
+           id=ClusteredPhyloAny, 
+           corstr="exchangeable")
+summary(m5)
+
+m6 <- geem(as.numeric(as.character(named_partner_indicator)) ~ 
+             RiskIDU, 
+           data = genomic_db_w_index_persons_in_clusteredphyloany, 
+            family = "binomial", 
+           id=ClusteredPhyloAny, 
+           corstr="exchangeable")
+summary(m6)
+
+table(genomic_db_w_index_persons_in_clusteredphyloany$named_partner_indicator, 
+      exclude = NULL)
+
+table(genomic_db_w_index_persons_in_clusteredphyloany$HIVDxAge, 
+      exclude = NULL)
+
+m7_dt <- genomic_db_w_index_persons_in_clusteredphyloany %>%
+  select(named_partner_indicator, HIVDxAge, ClusteredPhyloAny)
+
+m7_clean_dt <- na.omit(m7_dt)
+
+m7 <- geem(as.numeric(as.character(named_partner_indicator)) ~
+             as.numeric(HIVDxAge),
+           data = m7_clean_dt,
+            family = "binomial",
+           id=ClusteredPhyloAny,
+           corstr="exchangeable")
+summary(m7)
+
+```
+
+
+
+
+
+## Predict Molecular Clustering in Named Partnerships
+
+### Prepare the data
+
+-   How many persons appear in the named partner dataset?
+
+```{r}
+length(unique(named_pt_net%v% "vertex.names"))
+```
+
+-   How many of these named persons are in each of the three clusters?
+
+```{r}
+head(named_pt_net%v% "vertex.names", 25)
+named_pt_net
+
+named_pts_in_005_clusters_idx <- which((named_pt_net %v% "vertex.names") %in% index_persons_in_005)
+length(named_pts_in_005_clusters_idx)
+named_pts_in_005_clusters_vname <- (named_pt_net %v% "vertex.names")[named_pts_in_005_clusters_idx]
+
+named_pts_in_015_clusters_idx <- which((named_pt_net %v% "vertex.names") %in% index_persons_in_015)
+length(named_pts_in_015_clusters_idx)
+named_pts_in_015_clusters_vname <- (named_pt_net %v% "vertex.names")[named_pts_in_015_clusters_idx]
+
+named_pts_in_clusteredphyloany <- which((named_pt_net %v% "vertex.names") %in% index_persons_in_clusteredphyloany)
+length(named_pts_in_clusteredphyloany)
+named_pts_in_phyloany_clusters_vname <- (named_pt_net %v% "vertex.names")[named_pts_in_clusteredphyloany]
+
+named_pts_not_in_clusteredphyloany <- which(!(named_pt_net %v% "vertex.names") %in% index_persons_in_clusteredphyloany)
+length(named_pts_not_in_clusteredphyloany)
+```
+
+-   For each clustering algorithm, we want to add an indicator column to
+    individuals_in_named_pt_net_dt. The indicator is coded 1 if
+    individuals_in_named_pt_net_dt\$StudyID appears in
+    named_pts_in_005_clusters_vname (for instance), and 0 otherwise.
+
+```{r}
+individuals_idx_in_named_pt_net <- which(genomic_db$StudyID %in% (named_pt_net %v% "vertex.names"))
+individuals_in_named_pt_net_dt <- genomic_db[individuals_idx_in_named_pt_net,]
+dim(individuals_in_named_pt_net_dt)
+
+individuals_in_named_pt_net_dt <- individuals_in_named_pt_net_dt %>%
+  mutate(indicator_005_cluster = as.numeric(StudyID %in% named_pts_in_005_clusters_vname))
+
+individuals_in_named_pt_net_dt <- individuals_in_named_pt_net_dt %>%
+  mutate(indicator_015_cluster = as.numeric(StudyID %in% named_pts_in_015_clusters_vname))
+
+individuals_in_named_pt_net_dt <- individuals_in_named_pt_net_dt %>%
+  mutate(indicator_phyloany_cluster = as.numeric(StudyID %in% named_pts_in_phyloany_clusters_vname))
+
+```
+
+-   Test that the 3 indicator columns are correctly coded. The test
+    checks for the following:
+
+(1) False positives: StudyIDs marked with an indicator of 1 but not
+    present in the corresponding indicator;
+(2) False negatives: StudyIDs marked with an indicator of 0 but present
+    in the corresponding indicator;
+(3) Length Check: If the total number of rows marked as 1 in the
+    indicator column, which should be equal to the length of
+    named_pts_in_005_clusters_vname.
+
+```{r}
+test_indicator_columns <- function(data, column_name, comparison_vector) {
+  false_positives <- data[data[[column_name]] == 1 & !data$StudyID %in% comparison_vector,]
+  false_negatives <- data[data[[column_name]] == 0 & data$StudyID %in% comparison_vector,]
+  total_indicator_ones <- nrow(data[data[[column_name]] == 1, ])
+  length_of_vname <- length(comparison_vector)
+  
+  cat("Testing:", column_name, "\n")
+  if (nrow(false_positives) == 0 && nrow(false_negatives) == 0 && total_indicator_ones == length_of_vname) {
+    cat("All tests passed for", column_name, "\n\n")
+  } else {
+    cat("There are", nrow(false_positives), "false positives and", nrow(false_negatives), "false negatives.\n")
+    cat("The number of 1's in the", column_name, "column is", total_indicator_ones, "which is not equal to the length of the comparison vector", length_of_vname, "\n\n")
+  }
+}
+
+# Test each indicator column
+test_indicator_columns(individuals_in_named_pt_net_dt, "indicator_005_cluster", named_pts_in_005_clusters_vname)
+test_indicator_columns(individuals_in_named_pt_net_dt, "indicator_015_cluster", named_pts_in_015_clusters_vname)
+test_indicator_columns(individuals_in_named_pt_net_dt, "indicator_phyloany_cluster", named_pts_in_phyloany_clusters_vname)
+
+```
+
+
+### 005 cluster
+
+
+```{r}
+table(individuals_in_named_pt_net_dt$indicator_005_cluster, exclude = NULL)
+#table(genomic_db_w_index_persons_in_015$named_partner_indicator, exclude = NULL)
+
+## DemoGender
+table(individuals_in_named_pt_net_dt$DemoGender, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$DemoGender, exclude = NULL) +
+  factor(individuals_in_named_pt_net_dt$indicator_005_cluster, exclude = NULL)
+   )
+   
+## DemoRace
+table(individuals_in_named_pt_net_dt$DemoRace, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$DemoRace, exclude = NULL) +
+  factor(individuals_in_named_pt_net_dt$indicator_005_cluster, exclude = NULL)
+   )
+
+## Sequence
+table(individuals_in_named_pt_net_dt$RecodedSequenceSubtype, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$RecodedSequenceSubtype, exclude = NULL) +
+factor(individuals_in_named_pt_net_dt$indicator_005_cluster, exclude = NULL)
+ )
+
+## MSM
+table(individuals_in_named_pt_net_dt$RiskMSM, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$RiskMSM, exclude = NULL) +
+factor(individuals_in_named_pt_net_dt$indicator_005_cluster, exclude = NULL)
+ )
+
+## Heterosexual
+table(individuals_in_named_pt_net_dt$RiskHeterosexual, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$RiskHeterosexual, exclude = NULL) +
+factor(individuals_in_named_pt_net_dt$indicator_005_cluster, exclude = NULL)
+ )
+
+## IDU
+table(individuals_in_named_pt_net_dt$RiskIDU, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$RiskIDU, exclude = NULL) +
+factor(individuals_in_named_pt_net_dt$indicator_005_cluster, exclude = NULL)
+ )
+
+## age at HIV diagnosis
+summary(individuals_in_named_pt_net_dt$HIVDxAge)
+individuals_in_named_pt_net_dt %>%
+  group_by(indicator_005_cluster) %>%
+  summarise(mean_HIVDxAge = mean(HIVDxAge, na.rm = TRUE))
+```
+
+### 015 cluster
+
+```{r}
+table(individuals_in_named_pt_net_dt$indicator_015_cluster, exclude = NULL)
+#table(genomic_db_w_index_persons_in_015$named_partner_indicator, exclude = NULL)
+
+## DemoGender
+table(individuals_in_named_pt_net_dt$DemoGender, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$DemoGender, exclude = NULL) +
+  factor(individuals_in_named_pt_net_dt$indicator_015_cluster, exclude = NULL)
+   )
+   
+## DemoRace
+table(individuals_in_named_pt_net_dt$DemoRace, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$DemoRace, exclude = NULL) +
+  factor(individuals_in_named_pt_net_dt$indicator_015_cluster, exclude = NULL)
+   )
+
+## Sequence
+table(individuals_in_named_pt_net_dt$RecodedSequenceSubtype, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$RecodedSequenceSubtype, exclude = NULL) +
+factor(individuals_in_named_pt_net_dt$indicator_015_cluster, exclude = NULL)
+ )
+
+## MSM
+table(individuals_in_named_pt_net_dt$RiskMSM, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$RiskMSM, exclude = NULL) +
+factor(individuals_in_named_pt_net_dt$indicator_015_cluster, exclude = NULL)
+ )
+
+## Heterosexual
+table(individuals_in_named_pt_net_dt$RiskHeterosexual, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$RiskHeterosexual, exclude = NULL) +
+factor(individuals_in_named_pt_net_dt$indicator_015_cluster, exclude = NULL)
+ )
+
+## IDU
+table(individuals_in_named_pt_net_dt$RiskIDU, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$RiskIDU, exclude = NULL) +
+factor(individuals_in_named_pt_net_dt$indicator_015_cluster, exclude = NULL)
+ )
+
+## age at HIV diagnosis
+summary(individuals_in_named_pt_net_dt$HIVDxAge)
+individuals_in_named_pt_net_dt %>%
+  group_by(indicator_015_cluster) %>%
+  summarise(mean_HIVDxAge = mean(HIVDxAge, na.rm = TRUE))
+```
+
+### phyloanycluster
+
+```{r}
+table(individuals_in_named_pt_net_dt$indicator_phyloany_cluster, exclude = NULL)
+#table(genomic_db_w_index_persons_in_015$named_partner_indicator, exclude = NULL)
+
+## DemoGender
+table(individuals_in_named_pt_net_dt$DemoGender, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$DemoGender, exclude = NULL) +
+  factor(individuals_in_named_pt_net_dt$indicator_phyloany_cluster, exclude = NULL)
+   )
+   
+## DemoRace
+table(individuals_in_named_pt_net_dt$DemoRace, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$DemoRace, exclude = NULL) +
+  factor(individuals_in_named_pt_net_dt$indicator_phyloany_cluster, exclude = NULL)
+   )
+
+## Sequence
+table(individuals_in_named_pt_net_dt$RecodedSequenceSubtype, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$RecodedSequenceSubtype, exclude = NULL) +
+factor(individuals_in_named_pt_net_dt$indicator_phyloany_cluster, exclude = NULL)
+ )
+
+## MSM
+table(individuals_in_named_pt_net_dt$RiskMSM, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$RiskMSM, exclude = NULL) +
+factor(individuals_in_named_pt_net_dt$indicator_phyloany_cluster, exclude = NULL)
+ )
+
+## Heterosexual
+table(individuals_in_named_pt_net_dt$RiskHeterosexual, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$RiskHeterosexual, exclude = NULL) +
+factor(individuals_in_named_pt_net_dt$indicator_phyloany_cluster, exclude = NULL)
+ )
+
+## PWID
+table(individuals_in_named_pt_net_dt$RiskIDU, exclude = NULL)
+xtabs(~factor(individuals_in_named_pt_net_dt$RiskIDU, exclude = NULL) +
+factor(individuals_in_named_pt_net_dt$indicator_phyloany_cluster, exclude = NULL)
+ )
+
+## age at HIV diagnosis
+summary(individuals_in_named_pt_net_dt$HIVDxAge)
+res <-
+  individuals_in_named_pt_net_dt %>%
+  group_by(indicator_phyloany_cluster) %>%
+  summarise(mean_HIVDxAge = mean(HIVDxAge, na.rm = TRUE),
+            n=n())
+print(res)
+```
+
+[Thus, there are
+`r length(individuals_in_named_pt_net_dt$indicator_phyloany_cluster)`
+who are naming or being named as partners in partner DB. OF these,
+`r length(which(individuals_in_named_pt_net_dt$indicator_phyloany_cluster == 1))`
+clustered phylogenetically by the `phyloany` method, and
+`r length(which(individuals_in_named_pt_net_dt$indicator_phyloany_cluster == 0))`
+did not]{style="background-color: #FFFF00"}
+
+
+```{r}
+
+table(individuals_in_named_pt_net_dt$DemoGender, 
+      exclude = NULL)
+
+#######
+
+m1_clean_dt_converse <- 
+   individuals_in_named_pt_net_dt  %>%
+  select(StudyID, indicator_phyloany_cluster, ClusteredPhyloAny, DemoGender) %>%
+  filter(DemoGender != "") %>%
+   mutate(DemoGender = droplevels(DemoGender))
+
+table(m1_clean_dt_converse$DemoGender, exclude = NULL)
+
+m1_converse <- geem(as.numeric(as.character(indicator_phyloany_cluster)) ~ 
+               DemoGender, 
+           data = m1_clean_dt_converse, 
+            family = "binomial", 
+           id=ClusteredPhyloAny, 
+           corstr="exchangeable")
+summary(m1_converse)
+
+#######
+
+m2_clean_dt_converse <- 
+   individuals_in_named_pt_net_dt  %>%
+  select(StudyID, indicator_phyloany_cluster, ClusteredPhyloAny, DemoRace) %>%
+  #filter(DemoRace != "") %>%
+   mutate(DemoRace = droplevels(DemoRace)) %>%
+   mutate(DemoRace = relevel(DemoRace, ref = "Black"))
+
+table(m2_clean_dt_converse$DemoRace, exclude = NULL)
+
+m2_converse <- geem(as.numeric(as.character(indicator_phyloany_cluster)) ~ 
+               DemoRace, 
+           data = m2_clean_dt_converse, 
+            family = "binomial", 
+           id=ClusteredPhyloAny, 
+           corstr="exchangeable")
+summary(m2_converse)
+
+######
+
+m3_clean_dt_converse <- individuals_in_named_pt_net_dt %>%
+  select(StudyID, indicator_phyloany_cluster, ClusteredPhyloAny, RecodedSequenceSubtype) %>%
+  #filter(RecodedSequenceSubtype != "") %>%
+   mutate(RecodedSequenceSubtype = factor(RecodedSequenceSubtype)) %>% # Convert to factor first
+   mutate(RecodedSequenceSubtype = relevel(RecodedSequenceSubtype, ref = "B"))
+
+table(m3_clean_dt_converse$RecodedSequenceSubtype, exclude = NULL)
+
+m3_converse <- geem(as.numeric(as.character(indicator_phyloany_cluster)) ~ 
+               RecodedSequenceSubtype, 
+           data = m3_clean_dt_converse, 
+            family = "binomial", 
+           id=ClusteredPhyloAny, 
+           corstr="exchangeable")
+summary(m3_converse)
+
+######
+
+m4_clean_dt_converse <- 
+   individuals_in_named_pt_net_dt  %>%
+  select(StudyID, indicator_phyloany_cluster, ClusteredPhyloAny, RiskMSM) %>%
+  #filter(RiskMSM != "") %>%
+  mutate(RiskMSM = droplevels(RiskMSM))
+
+table(m4_clean_dt_converse$RiskMSM, exclude = NULL)
+
+m4_converse <- geem(as.numeric(as.character(indicator_phyloany_cluster)) ~ 
+               RiskMSM, 
+           data = m4_clean_dt_converse, 
+            family = "binomial", 
+           id=ClusteredPhyloAny, 
+           corstr="exchangeable")
+summary(m4_converse)
+
+#####
+
+m5_clean_dt_converse <- 
+   individuals_in_named_pt_net_dt  %>%
+  select(StudyID, indicator_phyloany_cluster, ClusteredPhyloAny, RiskHeterosexual) %>%
+  #filter(RiskHeterosexual != "") %>%
+   mutate(RiskHeterosexual = droplevels(RiskHeterosexual))
+
+table(m5_clean_dt_converse$RiskHeterosexual, exclude = NULL)
+
+m5_converse <- geem(as.numeric(as.character(indicator_phyloany_cluster)) ~ 
+               RiskHeterosexual, 
+           data = m5_clean_dt_converse, 
+            family = "binomial", 
+           id=ClusteredPhyloAny, 
+           corstr="exchangeable")
+summary(m5_converse)
+
+#####
+
+m6_clean_dt_converse <- 
+   individuals_in_named_pt_net_dt  %>%
+  select(StudyID, indicator_phyloany_cluster, ClusteredPhyloAny, RiskIDU) %>%
+ # filter( RiskIDU!= "") %>%
+   mutate( RiskIDU= droplevels(RiskIDU))
+
+table(m6_clean_dt_converse$RiskIDU, exclude = NULL)
+
+m6_converse <- geem(as.numeric(as.character(indicator_phyloany_cluster)) ~ 
+               RiskIDU, 
+           data = m6_clean_dt_converse, 
+            family = "binomial", 
+           id=ClusteredPhyloAny, 
+           corstr="exchangeable")
+summary(m6_converse)
+
+#####
+
+table(genomic_db_w_index_persons_in_clusteredphyloany$named_partner_indicator, 
+      exclude = NULL)
+
+table(genomic_db_w_index_persons_in_clusteredphyloany$HIVDxAge, 
+      exclude = NULL)
+
+
+m7_clean_dt_converse <- individuals_in_named_pt_net_dt %>%
+  select(StudyID, indicator_phyloany_cluster, ClusteredPhyloAny, HIVDxAge) %>%
+  mutate(HIVDxAge = as.numeric(HIVDxAge))
+
+m7_converse <- geem(as.numeric(as.character(indicator_phyloany_cluster)) ~ 
+               HIVDxAge, 
+           data = m7_clean_dt_converse, 
+            family = "binomial", 
+           id=ClusteredPhyloAny, 
+           corstr="exchangeable")
+summary(m7_converse)
+
+
+
+```
+
+
+

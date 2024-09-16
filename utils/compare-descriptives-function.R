@@ -21,12 +21,18 @@ compare_descriptives <- function(dt){
                                 breaks = breaks, 
                                 labels = labels)]
   
-  tab_age_at_diag <- table(dt$hivdiagnosis_year_group)
-  tab_age_at_diag_prop <- 
+  tab_hiv_diag_yr <- table(dt$hivdiagnosis_year_group)
+  num_tab_hiv_diag_yr  <- tab_hiv_diag_yr
+  tab_hiv_diag_yr <- 
     table(dt$hivdiagnosis_year_group)/sum(
     table(dt$hivdiagnosis_year_group)
   )
   
+  dt$SubtypeCategory <- ifelse(dt$SequenceSubtype == "B", "B", "non-B")
+  tab_subtype_b_counts <- table(dt$SubtypeCategory, exclude=NULL)
+  tab_subtype_b_prop <- table(dt$SubtypeCategory, exclude=NULL)/sum(table(dt$SubtypeCategory, exclude=NULL))
+
+
   msm <- table(dt$RiskMSM, exclude = NULL) #msm
   msm_prop <- 
     table(dt$RiskMSM, exclude = NULL)/sum(
@@ -50,7 +56,10 @@ compare_descriptives <- function(dt){
   return_objs[["gender"]] <- list(gender, gender_prop)
   return_objs[["race"]] <- list(race, race_prop)
   return_objs[["ethnicity"]] <- list(ethnicity, ethnicity_prop)
-  return_objs[["age_at_diag"]] <- list(summ_age_at_diag, tab_age_at_diag, tab_age_at_diag_prop)
+  return_objs[["age_at_diag"]] <- list(summ_age_at_diag)
+  return_objs[["num_tab_hiv_diag_yr"]] <- list(num_tab_hiv_diag_yr)
+  return_objs[["tab_hiv_diag_yr"]] <- list(tab_hiv_diag_yr)
+  return_objs[["tab_subtype_b"]] <- list(tab_subtype_b_counts, tab_subtype_b_prop)
   return_objs[["msm"]] <- list(msm, msm_prop)
   return_objs[["idu"]] <- list(idu, idu_prop)
   return_objs[["het"]] <- list(het, het_prop)
