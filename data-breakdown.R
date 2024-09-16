@@ -520,25 +520,35 @@ num_index_cases_whose_partners_not_contacted <-
 length(num_index_cases_whose_partners_not_contacted)
 
 
-named_partners_tested1_reached1_countstudyidfrom <- 
+num_index_cases_with_partners_tested1_reached1 <- 
   partner_db_non_missing_studyidto %>%
   filter(HIVTested == 1 & ClientReached == 1) %>%
   pull(StudyIDFrom) %>%
   unique()
-length(named_partners_tested1_reached1_countstudyidfrom)
+length(num_index_cases_with_partners_tested1_reached1)
 
-named_partners_tested1_countstudyidfrom <- 
+num_index_cases_with_partners_tested1 <- 
   partner_db_non_missing_studyidto %>%
   filter(HIVTested == 1) %>%
   pull(StudyIDFrom) %>%
   unique()
-length(named_partners_tested1_countstudyidfrom)
+length(num_index_cases_with_partners_tested1)
+
+num_index_cases_with_partner_testednot1_testedNA <- 
+  partner_db_non_missing_studyidto %>%
+  filter(HIVTested != 1 | is.na(HIVTested)) %>%
+  pull(StudyIDFrom) %>%
+  unique()
+length(num_index_cases_with_partner_testednot1_testedNA)
+
+
+
 
   ##############
     ### what about the partners who were not tested?
     ### were they previously tested?
-    length(named_partners_tested1_countstudyidfrom)
-    head(named_partners_tested1_countstudyidfrom)
+    length(num_index_cases_with_partners_tested1)
+    head(num_index_cases_with_partners_tested1)
 
     length(partner_db_non_missing_studyidto$StudyIDTo)
     head(partner_db_non_missing_studyidto$StudyIDTo)
@@ -569,6 +579,13 @@ length(named_partners_tested1_countstudyidfrom)
 
 
 
+  # Extract partners who were successfully reached but not tested
+  partners_reached_not_tested <- partner_db_non_missing_studyidto %>%
+    filter(ClientReached == 1 & (HIVTested != 1 | is.na(HIVTested)))
+
+  # Number of partners reached but not tested
+  n_reached_not_tested <- nrow(partners_reached_not_tested)
+  print(n_reached_not_tested)
 
 
     
