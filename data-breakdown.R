@@ -211,11 +211,16 @@ sum(table(partner_db_non_missing_studyidto$AlreadyIndex, exclude = NULL))
 
 # Compute intersections between sequenced persons in genomic db and partnerdb
 length(intersect(genomic_db_sequenced, partner_db$StudyIDFrom))
-length(intersect(genomic_db_sequenced, partner_db$StudyIDTo))
+length(intersect(genomic_db_sequenced, partner_db_non_missing_studyidto$StudyIDFrom))
+length(intersect(genomic_db_sequenced, partner_db_non_missing_studyidto$StudyIDTo))
 length(intersect(genomic_db_sequenced, partner_db$StudyIDTo))
 length(Reduce(intersect, list(genomic_db_sequenced, partner_db$StudyIDFrom, partner_db$StudyIDTo)))
 
 length(intersect(partner_db$StudyIDFrom, partner_db$StudyIDTo))
+
+length(Reduce(intersect, list(genomic_db_sequenced, partner_db_non_missing_studyidto$StudyIDFrom, 
+  partner_db_non_missing_studyidto$StudyIDTo)))
+
 
 # How many of the interviewed index cases who are also in the genomic DB provided identifiable partner data?
 index_cases_who_named_partners <- intersect(genomic_db_sequenced, partner_db_non_missing_studyidto$StudyIDFrom)
@@ -254,6 +259,16 @@ table(pt_dt_named_pt_of_494$referredToPrEP, exclude=NULL)
   ## number of partners named by index cases in the CTDB (computed above)
   length(c(n_unique_studyidfrom_non_missing_studyidto))
   length(c(n_unique_studyidto_non_missing_studyidto))
+
+  table(partner_db_non_missing_studyidto$CanNotify, exclude=NULL)
+  table(partner_db_non_missing_studyidto$ClientReached, exclude=NULL)
+  table(partner_db_non_missing_studyidto$NoReachWhy, exclude=NULL)
+  table(partner_db_non_missing_studyidto$HIVTested, exclude=NULL)
+  table(partner_db_non_missing_studyidto$AlreadyIndex, exclude=NULL)
+  table(partner_db_non_missing_studyidto$HIVTestResult_Final, exclude=NULL)
+  table(partner_db_non_missing_studyidto$referredToPrEP, exclude=NULL)
+
+
 
 # For the named partners by index cases who were sequenced,  
   ## how many appeared only in the CTDB?
