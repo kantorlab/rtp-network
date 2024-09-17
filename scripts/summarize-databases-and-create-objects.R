@@ -177,6 +177,7 @@ if (!dir.exists("derived_data")) {
 
 # Save the processed data objects
 
+saveRDS(partner_db, file = "derived_data/partner_db.rds")
 saveRDS(partner_db_non_missing_studyidto, file = "derived_data/partner_db_non_missing_studyidto.rds")
 saveRDS(genomic_db_sequenced_dt, file = "derived_data/genomic_db_sequenced_dt.rds")
 
