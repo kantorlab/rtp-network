@@ -150,7 +150,7 @@ n_common_persons/length(unique_all_ctdb)
 
     compare_descriptives(dt=common_persons_sequenced_dt)
 
-    ## common persons who provided partner data
+    ## common persons who provided partner data (n=494)
     common_persons_who_provided_partner_data_sequenced_id <- 
         which(genomic_db_sequenced %in% common_who_provided_partner_data)
     length(common_persons_who_provided_partner_data_sequenced_id)
@@ -160,7 +160,7 @@ n_common_persons/length(unique_all_ctdb)
 
     compare_descriptives(dt=common_persons_who_provided_partner_data_sequenced_dt)
 
-    ## partners named by inde cases who appeared in both databses
+    ## partners named by index cases who appeared in both databses (n=121)
     partners_named_by_index_cases_in_gdb_sequenced_id <- 
         which(genomic_db_sequenced %in% partners_named_by_index_cases_in_gdb)
     length(partners_named_by_index_cases_in_gdb_sequenced_id)
@@ -173,3 +173,39 @@ n_common_persons/length(unique_all_ctdb)
 # ============================
 # Section 5.0: Phylogenetic Clustering at Incresingly Granular Overlaps
 # ============================
+
+## Same overlap levels as above
+
+    ## All persons in GDB
+    table(genomic_db_sequenced_dt$ClusteredPhyloAny, exclude=NULL)
+    length(which(is.na(genomic_db_sequenced_dt$ClusteredPhyloAny)))
+    length(which(!is.na(genomic_db_sequenced_dt$ClusteredPhyloAny)))
+
+    length(which(!is.na(genomic_db_sequenced_dt$ClusteredPhyloAny)))/
+        length(genomic_db_sequenced_dt$ClusteredPhyloAny)
+
+    ## Individuals in gdb and ctdb (n=894)
+    table(common_persons_sequenced_dt$ClusteredPhyloAny, exclude=NULL)
+    length(which(is.na(common_persons_sequenced_dt$ClusteredPhyloAny)))
+    length(which(!is.na(common_persons_sequenced_dt$ClusteredPhyloAny)))
+
+    length(which(!is.na(common_persons_sequenced_dt$ClusteredPhyloAny)))/
+        length(common_persons_sequenced_dt$ClusteredPhyloAny)
+
+    ## common persons who provided partner data (n=494)
+    table(common_persons_who_provided_partner_data_sequenced_dt$ClusteredPhyloAny, exclude=NULL)
+    length(which(is.na(common_persons_who_provided_partner_data_sequenced_dt$ClusteredPhyloAny)))
+    length(which(!is.na(common_persons_who_provided_partner_data_sequenced_dt$ClusteredPhyloAny)))
+
+    length(which(!is.na(common_persons_who_provided_partner_data_sequenced_dt$ClusteredPhyloAny)))/
+        length(common_persons_who_provided_partner_data_sequenced_dt$ClusteredPhyloAny)
+
+    ## partners named by index cases who appeared in both databses (n=121)
+    table(partners_named_by_index_cases_in_gdb_sequenced_dt$ClusteredPhyloAny, exclude=NULL)
+    length(which(is.na(partners_named_by_index_cases_in_gdb_sequenced_dt$ClusteredPhyloAny)))
+    length(which(!is.na(partners_named_by_index_cases_in_gdb_sequenced_dt$ClusteredPhyloAny)))
+
+    length(which(!is.na(partners_named_by_index_cases_in_gdb_sequenced_dt$ClusteredPhyloAny)))/
+        length(partners_named_by_index_cases_in_gdb_sequenced_dt$ClusteredPhyloAny)
+
+
