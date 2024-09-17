@@ -483,7 +483,7 @@ ans2/nrow(sequenced_who_are_named_pts_dt)
   ans3 <- nrow(persons_in_both_db_dt) -  length(which(is.na(persons_in_both_db_dt$ClusteredPhyloAny)))
   ans3/nrow(persons_in_both_db_dt)
 
-# Compute Jaccard coefficient (person-level) ---------
+# Compute Jaccard coefficient (link-level) ---------
   ## See https://github.com/kantorlab/rtp-network/blob/138e5f9b0c80e103f1cd383099c4b04ca757d948/molecular-cluster-analysis.R#L521-L567
 
 # Distribution of Molecular Clusters  -------------
