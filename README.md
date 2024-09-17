@@ -3,8 +3,10 @@
 ### Used for paper
 
 - `scripts/`: Contains various R scripts used for data processing, and analysis.
+
   - **Files:**
       - `data-breakdown.R`: Script for breaking down data into components (Last modified: 2024-09-17). ONLY FOR REFERENCE FROM HERE ON OUT/  
+      **This file is now write-protected (permissions set to 644) and is only for reference. No further modifications should be made.**  
 
       - `summarize-databases-and-create-objects.R`: Script for summarizing databases and creating objects.
 
