@@ -15,8 +15,10 @@
 
 # 0.1 Libraries -------------
 rm(list=ls())
+
 library(data.table)
 library(dplyr)
+library(lubridate)
 library(here)
 
 
@@ -31,7 +33,7 @@ genomic_db_sequenced_dt <- readRDS("derived_data/genomic_db_sequenced_dt.rds")
 # 0.3 Functions -------------
 source(here("utils", "compute-cascade.R"))
 
-# =====================================================================
+# =============================
 
 # ============================
 # Section 1.0: Partners named by all index cases 
@@ -91,6 +93,48 @@ source(here("utils", "compute-cascade.R"))
     table(partners_tested_client_reached$HIVTestResult_Final, exclude=NULL)
     table(partners_tested_client_reached$referredToPrEP, exclude=NULL)
 
+    ## for partners, was timing of HIV Test before/after PCRS was offered 
+        ## replace NAs
+        partners_tested_client_reached <- partners_tested_client_reached %>%
+        mutate(
+            DatePCRSOffered = na_if(DatePCRSOffered, ""),
+            DateofHIVTest_Final = na_if(DateofHIVTest_Final, "")
+        )
+
+        ## parse dates
+        partners_tested_client_reached <- partners_tested_client_reached %>%
+        mutate(
+            DatePCRSOffered_parsed = ymd(DatePCRSOffered),
+            DateofHIVTest_Final_parsed = ymd(DateofHIVTest_Final)
+        )
+
+        ## filter records
+        partners_with_both_dates <- 
+            partners_tested_client_reached %>% 
+            filter(!is.na(DatePCRSOffered_parsed) & !is.na(DateofHIVTest_Final_parsed))
+
+        ## determine timing
+        partners_with_both_dates <- partners_with_both_dates %>%
+            mutate(
+                TestBeforePCRS = DateofHIVTest_Final_parsed < DatePCRSOffered_parsed,
+                TestAfterPCRS = DateofHIVTest_Final_parsed >= DatePCRSOffered_parsed
+            )
+
+
+        ## total partners with both dates
+        total_partners_with_both_dates <- nrow(partners_with_both_dates)
+        total_partners_with_both_dates
+
+        ## number of partners tested before PCRS was offered
+        num_test_before_PCRS <- sum(partners_with_both_dates$TestBeforePCRS, na.rm = TRUE)
+        num_test_before_PCRS
+
+        ## number of partners tested after PCRS was offered
+        num_test_after_PCRS <- sum(partners_with_both_dates$TestAfterPCRS, na.rm = TRUE)
+        num_test_after_PCRS
+
+
+
     ## characteristics of those not tested
     partners_not_tested <- 
         partner_db_non_missing_studyidto %>%
@@ -103,6 +147,7 @@ source(here("utils", "compute-cascade.R"))
     table(partners_not_tested$ReferredToHIVTest, exclude=NULL)
     table(partners_not_tested$HIVTestResult_Final, exclude=NULL)
     table(partners_not_tested$referredToPrEP, exclude=NULL)
+
 
     ## cross tabulate confirmed test with already index
 
@@ -150,4 +195,4 @@ source(here("utils", "compute-cascade.R"))
     table(partner_db_non_missing_studyidto$HIVTestResult_Final, exclude=NULL)
     table(partner_db_non_missing_studyidto$referredToPrEP, exclude=NULL)
 
-    
+# ============================= 
