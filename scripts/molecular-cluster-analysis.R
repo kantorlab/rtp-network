@@ -6,6 +6,7 @@ rm(list=ls())
 library(dplyr)
 library(network)
 library(sna)
+library(here)
 
 
 # Setup ---------------------------
@@ -744,4 +745,4 @@ eda_env$ct_el_unique <- ct_el_unique
 
 
 # Save the environment as an RDS file
-saveRDS(eda_env, "eda_objects.rds")
+saveRDS(eda_env, here("derived_data", "eda_objects.rds"))
