@@ -24,8 +24,10 @@
 
 ### Background (no longer actively maintained)
 
-idweek-viz/: Contains scripts and outputs related to visualizations prepared for the IDWeek conference presentation.
+Directories below are hidden because they are no longer tracked
 
-out/: Directory for storing old output files.
+`.idweek-viz/`: Contains scripts and outputs related to visualizations prepared for the IDWeek conference presentation.
 
-archive/: Contains archived scripts and data that are no longer actively used but kept for reference.
+`.out/`: Directory for storing old output files.
+
+`.archive/`: Contains archived scripts and data that are no longer actively used but kept for reference.
