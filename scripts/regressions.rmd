@@ -1,10 +1,7 @@
----
-title: "R Notebook"
-output: html_notebook
-editor_options: 
-  markdown: 
-    wrap: 72
----
+*Note*: 
+- Best to run this file in the r console in RStudio using the run button above. 
+- Running it in vscode will need the pandoc module to be loaded, creating an html. But the html may not be rendered directly.
+
 
 ```{r setup, include=FALSE}
 rm(list=ls())
@@ -15,48 +12,46 @@ library(dplyr)
 library(stringi)
 library(network)
 library(geeM)
-#library(geepack)
+library(here)
 ```
 
 ## Load the data
 
 ```{r}
-#eda_env <- readRDS("/users/akhann16/code/rtp-network/out/eda_objects.rds")
-#genomic_db <- eda_env$genomic_db
-#net_dt <- eda_env$net_dt 
-#named_pt_idx_005 <- eda_env$named_pt_idx_005 
-#named_pt_idx_015 <- eda_env$named_pt_idx_015
 
-data_dir <- "/gpfs/data/rkantor/rtp/datasets/D51_20230512_unified"
-list.files(path=data_dir)
-partner_db <- as.data.table(read.csv("/gpfs/data/rkantor/rtp/shared_dir/ContactTracingNetwork20230726.csv"))
-genomic_db_full <- as.data.table(read.csv(paste0(data_dir, "/Individuals.csv")))
+partner_db <- readRDS(here("derived_data", "partner_db.rds"))
+
+partner_db_non_missing_studyidto <- readRDS(here("derived_data", "partner_db_non_missing_studyidto.rds"))
+
+
+genomic_db_allcols_sequenced <- readRDS(here("derived_data", "genomic_db_sequenced_dt.rds"))
+
 ```
 
 ## Use factor types where appropriate in coding variables for genomic_db
 
 ```{r}
-genomic_db_full$StudyID <- factor(genomic_db_full$StudyID)
-genomic_db_full$DemoGender <- factor(genomic_db_full$DemoGender)
-genomic_db_full$DemoRace <- factor(genomic_db_full$DemoRace)
-genomic_db_full$DemoHispanic <- factor(genomic_db_full$DemoHispanic)
-genomic_db_full$DemoBirthCountry <- factor(genomic_db_full$DemoBirthCountry)
-genomic_db_full$RiskPrimary <- factor(genomic_db_full$RiskPrimary)
-genomic_db_full$RiskMSM <- factor(genomic_db_full$RiskMSM)
-genomic_db_full$RiskIDU <- factor(genomic_db_full$RiskIDU)
-genomic_db_full$RiskHeterosexual <- factor(genomic_db_full$RiskHeterosexual)
-genomic_db_full$Sequence <- factor(genomic_db_full$Sequence)
-genomic_db_full$SequenceSubtype <- factor(genomic_db_full$SequenceSubtype)
-genomic_db_full$ClusteredHIVTrace005 <- factor(genomic_db_full$ClusteredHIVTrace005)
-genomic_db_full$ClusteredHIVTrace015 <- factor(genomic_db_full$ClusteredHIVTrace015)
-genomic_db_full$ClusteredPhyloAny <- factor(genomic_db_full$ClusteredPhyloAny)
+genomic_db_allcols_sequenced$StudyID <- factor(genomic_db_allcols_sequenced$StudyID)
+genomic_db_allcols_sequenced$DemoGender <- factor(genomic_db_allcols_sequenced$DemoGender)
+genomic_db_allcols_sequenced$DemoRace <- factor(genomic_db_allcols_sequenced$DemoRace)
+genomic_db_allcols_sequenced$DemoHispanic <- factor(genomic_db_allcols_sequenced$DemoHispanic)
+genomic_db_allcols_sequenced$DemoBirthCountry <- factor(genomic_db_allcols_sequenced$DemoBirthCountry)
+genomic_db_allcols_sequenced$RiskPrimary <- factor(genomic_db_allcols_sequenced$RiskPrimary)
+genomic_db_allcols_sequenced$RiskMSM <- factor(genomic_db_allcols_sequenced$RiskMSM)
+genomic_db_allcols_sequenced$RiskIDU <- factor(genomic_db_allcols_sequenced$RiskIDU)
+genomic_db_allcols_sequenced$RiskHeterosexual <- factor(genomic_db_allcols_sequenced$RiskHeterosexual)
+genomic_db_allcols_sequenced$Sequence <- factor(genomic_db_allcols_sequenced$Sequence)
+genomic_db_allcols_sequenced$SequenceSubtype <- factor(genomic_db_allcols_sequenced$SequenceSubtype)
+genomic_db_allcols_sequenced$ClusteredHIVTrace005 <- factor(genomic_db_allcols_sequenced$ClusteredHIVTrace005)
+genomic_db_allcols_sequenced$ClusteredHIVTrace015 <- factor(genomic_db_allcols_sequenced$ClusteredHIVTrace015)
+genomic_db_allcols_sequenced$ClusteredPhyloAny <- factor(genomic_db_allcols_sequenced$ClusteredPhyloAny)
 ```
 
 ## Select the `genomic_db_full` columns used further in the analysis
 
 ```{r}
 genomic_db <- 
-  genomic_db_full %>% 
+  genomic_db_allcols_sequenced %>% 
   select(StudyID, DemoGender, DemoRace, DemoHispanic, 
          HIVDxAge, HIVDxDate, RiskMSM, RiskIDU, 
          RiskHeterosexual, Sequence, SequenceSubtype, 
@@ -80,9 +75,9 @@ named_pt_net <- net
 ## Utilities
 
 ```{r}
-source("utils/create-edgelists-from-mol-clusters.R")
-source("utils/regressions-functions.R")
-source("utils/split-counts-by-attributes.R")
+source(here("utils", "create-edgelists-from-mol-clusters.R"))
+source(here("utils", "regressions-functions.R"))
+source(here("utils", "split-counts-by-attributes.R"))
 ```
 
 ## Recode Sequence Subtype as B/non-B (needed for regressions):
@@ -258,6 +253,12 @@ phyloany_named_pt_res$hivdxage
 ```
 
 ### Conduct Analysis
+
+# ============================
+# Table 2 (Lower Part)
+# ============================
+#######
+
 
 ```{r}
 
@@ -602,6 +603,9 @@ did not]{style="background-color: #FFFF00"}
 table(individuals_in_named_pt_net_dt$DemoGender, 
       exclude = NULL)
 
+# ============================
+# Table 2 (Upper Part)
+# ============================
 #######
 
 m1_clean_dt_converse <- 
