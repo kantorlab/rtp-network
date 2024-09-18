@@ -201,3 +201,48 @@ source(here("utils", "compute-cascade.R"))
   ## n(partners) = 1056
   ## n(index_cases) = 494 
 # ============================
+
+genomic_db_sequenced <- genomic_db_sequenced_dt$StudyID
+
+# How many of the interviewed index cases who are also in the genomic DB provided identifiable partner data?
+index_cases_who_named_partners <- intersect(genomic_db_sequenced,
+     partner_db_non_missing_studyidto$StudyIDFrom)
+length(index_cases_who_named_partners)
+
+# How many of the interviewed index cases who are also in the genomic DB did not provide identifiable partner data?
+intersected_persons_partner_genomic_db <- intersect(genomic_db_sequenced, partner_db$StudyIDFrom)
+intersected_persons_without_named_partner <- intersected_persons_partner_genomic_db[!intersected_persons_partner_genomic_db %in% partner_db_non_missing_studyidto$StudyIDFrom]
+length(intersected_persons_without_named_partner)  
+
+# How many total partners are named by the index cases in the genomic DB who named partners?
+row_id_sequenced_index_cases_who_named_pts <- 
+    which(partner_db_non_missing_studyidto$StudyIDFrom %in% index_cases_who_named_partners)
+n_total_pts_named_by_sequenced_index_cases_who_named_pts <- (partner_db_non_missing_studyidto$StudyIDTo[row_id_sequenced_index_cases_who_named_pts])
+length(n_total_pts_named_by_sequenced_index_cases_who_named_pts) #total
+length(unique(n_total_pts_named_by_sequenced_index_cases_who_named_pts))
+
+## Partner naming cascade for the persons who are named by the 494 overlapping persons between CTDB and GDB
+unique_n_total_pts_named_by_sequenced_index_cases_who_named_pts <- 
+    unique(n_total_pts_named_by_sequenced_index_cases_who_named_pts)
+row_id_unique_n_total_pts_named_by_sequenced_index_cases_who_named_pts <-
+  which(partner_db_non_missing_studyidto$StudyIDTo %in% unique_n_total_pts_named_by_sequenced_index_cases_who_named_pts)
+length(row_id_unique_n_total_pts_named_by_sequenced_index_cases_who_named_pts)
+
+pt_dt_named_pt_of_494 <- 
+  partner_db_non_missing_studyidto[row_id_unique_n_total_pts_named_by_sequenced_index_cases_who_named_pts,]
+dim(pt_dt_named_pt_of_494)
+
+## Cascade
+table(pt_dt_named_pt_of_494$CanNotify, exclude=NULL)
+table(pt_dt_named_pt_of_494$ClientReached, exclude=NULL)
+table(pt_dt_named_pt_of_494$AcceptPCRS, exclude=NULL)  
+table(pt_dt_named_pt_of_494$NoReachWhy, exclude=NULL)
+table(pt_dt_named_pt_of_494$ReferredToHIVTest, exclude=NULL)
+table(pt_dt_named_pt_of_494$HIVTested, exclude=NULL)
+table(pt_dt_named_pt_of_494$AlreadyIndex, exclude=NULL)
+table(pt_dt_named_pt_of_494$HIVTestResult_Final, exclude=NULL)
+table(pt_dt_named_pt_of_494$referredToPrEP, exclude=NULL)
+
+## partners named by index cases who appeared in both databses (n=121)
+### See here https://github.com/kantorlab/rtp-network/blob/d40ab6379a70dd87f0869b5d2a6c25294a57e183/scripts/database-overlap.R#L203-L209
+
