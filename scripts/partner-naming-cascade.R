@@ -43,7 +43,7 @@ source(here("utils", "compute-cascade.R"))
 
     ## num indexes who provided partner data
     indexes_who_provided_partner_data <- 
-    unique((partner_db_non_missing_studyidto$StudyIDFrom))
+      unique((partner_db_non_missing_studyidto$StudyIDFrom))
     length(indexes_who_provided_partner_data)
 
     ## num partners named by indexes who provided partner data
@@ -133,8 +133,6 @@ source(here("utils", "compute-cascade.R"))
         num_test_after_PCRS <- sum(partners_with_both_dates$TestAfterPCRS, na.rm = TRUE)
         num_test_after_PCRS
 
-
-
     ## characteristics of those not tested
     partners_not_tested <- 
         partner_db_non_missing_studyidto %>%
@@ -185,6 +183,7 @@ source(here("utils", "compute-cascade.R"))
 
     ## how many partners are diagnosed and sequenced
     sum(partners_named_by_indexes %in% genomic_db_sequenced_dt$StudyID)
+    sum(unique(partners_named_by_indexes) %in% unique(genomic_db_sequenced_dt$StudyID))
 
     ## CASCADE 
     table(partner_db_non_missing_studyidto$CanNotify, exclude=NULL)
@@ -196,3 +195,9 @@ source(here("utils", "compute-cascade.R"))
     table(partner_db_non_missing_studyidto$referredToPrEP, exclude=NULL)
 
 # ============================= 
+
+# ============================
+# Section 2.0: Partners named by index cases who provided partner data 
+  ## n(partners) = 1056
+  ## n(index_cases) = 494 
+# ============================
