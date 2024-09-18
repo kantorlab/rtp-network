@@ -1,7 +1,9 @@
 # =====================================================================
 # Title: 
-  ## Computing partner naming cascades, among all named partners 
-  ## and all partners named by index cases who provided partner data 
+  ## Computing Cascades:
+  ## Overall:  (1) among all named partners 
+  ##           (2) among partners named by index cases who provided partner data 
+  ## Stratified:(1) by behavior, race and ethnicity among all named partners 
 
 # Description: 
   ## Consolidate third section of the results           
@@ -303,4 +305,35 @@ table(pt_dt_named_pt_of_494$referredToPrEP, exclude=NULL)
 
 ## partners named by index cases who appeared in both databses (n=121)
 ### See here https://github.com/kantorlab/rtp-network/blob/d40ab6379a70dd87f0869b5d2a6c25294a57e183/scripts/database-overlap.R#L203-L209
+
+# ============================
+# Section 3.0: Stratified Cascades 
+# ============================
+
+## msm 
+compute_cascade("msm", genomic_db = genomic_db_sequenced_dt)
+
+## idu 
+compute_cascade("idu", genomic_db = genomic_db_sequenced_dt)
+
+## hrh 
+compute_cascade("hrh", genomic_db = genomic_db_sequenced_dt)
+
+## white
+compute_cascade("white", genomic_db = genomic_db_sequenced_dt)
+
+## black
+compute_cascade("black", genomic_db = genomic_db_sequenced_dt)
+
+## asian
+compute_cascade("asian", genomic_db = genomic_db_sequenced_dt)
+
+## other
+compute_cascade("other", genomic_db = genomic_db_sequenced_dt)
+
+## hispanic
+compute_cascade("hispanic", genomic_db = genomic_db_sequenced_dt)
+
+## nonhispanic
+compute_cascade("nonhispanic", genomic_db = genomic_db_sequenced_dt)
 
