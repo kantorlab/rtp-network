@@ -1,0 +1,34 @@
+---
+title: "XYZ"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(data.table)
+```
+
+## Introduction
+Last time, we discussed the contact tracing dataset and my analysis thus far and questions on it. Vlad is interested in knowing if the changing number of partners reported by the index cases can be identified. 
+
+There are two other related questions:
+  - If the recency of infection is [known]( https://docs.google.com/document/d/1j0uxP8P0DGefUEg8sr8ncT1GWIvz-6AOK42S8zcIans/edit#bookmark=id.yqp4tue4v2f).
+
+  - A minor question about who we mean as ["Third Party Notification"](https://docs.google.com/document/d/1j0uxP8P0DGefUEg8sr8ncT1GWIvz-6AOK42S8zcIans/edit#bookmark=id.un9xszbe7gwi).
+  
+```{r}
+data_dir <- "/gpfs/data/rkantor/rtp/datasets/D30_20211013_V1"
+list.files(path=data_dir)
+net_dt <- read.csv(paste0(data_dir, "/ContactTracingNetwork.csv"))
+individuals_dt <- read.csv(paste0(data_dir, "/Individuals.csv"))
+
+dim(net_dt)
+str(net_dt)
+sort(colnames(net_dt))
+View(net_dt)
+
+dim(individuals_dt)
+colnames(individuals_dt)
+```
+  
+  
