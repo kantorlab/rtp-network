@@ -28,6 +28,7 @@ partner_db <- readRDS("derived_data/partner_db.rds")
 partner_db_non_missing_studyidto <- readRDS("derived_data/partner_db_non_missing_studyidto.rds")
 
 genomic_db_sequenced_dt <- readRDS("derived_data/genomic_db_sequenced_dt.rds")
+genomic_db_sequenced <- genomic_db_sequenced_dt$StudyID
 
 
 # 0.3 Functions -------------
@@ -143,9 +144,28 @@ source(here("utils", "compute-cascade.R"))
     table(partners_not_tested$AlreadyIndex, exclude=NULL)
     table(partners_not_tested$AcceptPCRS, exclude=NULL)
     table(partners_not_tested$ReferredToHIVTest, exclude=NULL)
-    table(partners_not_tested$HIVTestResult_Final, exclude=NULL)
+    table(partners_not_tested$HIVTestResult_Final, exclude=NULL); sum(table(partners_not_tested$HIVTestResult_Final, exclude=NULL))
     table(partners_not_tested$referredToPrEP, exclude=NULL)
 
+    ## What about the HIV status for the partners who were reached but not tested?
+        ## Filter data on partners not tested but reached
+        partners_not_tested_clientreached1 <- 
+            partners_not_tested %>%
+                filter(ClientReached == 1)
+        dim(partners_not_tested_clientreached1)
+    
+        ## Check the HIV test result for these partners is in the CTDB
+        table(partners_not_tested_clientreached1$HIVTestResult_Final, exclude=NULL)
+
+        ## Check if these partners are already recorded as index cases in the CTDB
+        table(partners_not_tested_clientreached1$AlreadyIndex, exclude=NULL)
+        
+        ## Check if these partners are known and recorded in the sequenced dataset 
+        sum(partners_not_tested_clientreached1$StudyIDFrom %in% genomic_db_sequenced)
+        length(genomic_db_sequenced)
+
+        sum(partners_not_tested_clientreached1$StudyIDFrom %in% genomic_db_sequenced)/
+            nrow(partners_not_tested_clientreached1)
 
     ## cross tabulate confirmed test with already index
 
@@ -185,7 +205,7 @@ source(here("utils", "compute-cascade.R"))
     sum(partners_named_by_indexes %in% genomic_db_sequenced_dt$StudyID)
     sum(unique(partners_named_by_indexes) %in% unique(genomic_db_sequenced_dt$StudyID))
 
-    ## CASCADE 
+    ## Other variables of interest
     table(partner_db_non_missing_studyidto$CanNotify, exclude=NULL)
     table(partner_db_non_missing_studyidto$ClientReached, exclude=NULL)
     table(partner_db_non_missing_studyidto$NoReachWhy, exclude=NULL)
@@ -202,7 +222,6 @@ source(here("utils", "compute-cascade.R"))
   ## n(index_cases) = 494 
 # ============================
 
-genomic_db_sequenced <- genomic_db_sequenced_dt$StudyID
 
 # How many of the interviewed index cases who are also in the genomic DB provided identifiable partner data?
 index_cases_who_named_partners <- intersect(genomic_db_sequenced,
@@ -231,6 +250,45 @@ length(row_id_unique_n_total_pts_named_by_sequenced_index_cases_who_named_pts)
 pt_dt_named_pt_of_494 <- 
   partner_db_non_missing_studyidto[row_id_unique_n_total_pts_named_by_sequenced_index_cases_who_named_pts,]
 dim(pt_dt_named_pt_of_494)
+table(pt_dt_named_pt_of_494$HIVTested, exclude=NULL)
+
+
+## What about the HIV status for the partners who were reached but not tested?
+    table(pt_dt_named_pt_of_494$HIVTested, exclude=NULL)
+    length(c(which(pt_dt_named_pt_of_494$HIVTested != 1), which(is.na(pt_dt_named_pt_of_494$HIVTested))))
+
+    ## Filter data on partners reached
+    pt_dt_named_pt_of_494clientreached1 <- 
+        pt_dt_named_pt_of_494  %>%
+            filter(ClientReached == 1)
+    table(pt_dt_named_pt_of_494clientreached1$ClientReached, exclude=NULL)
+    table(pt_dt_named_pt_of_494clientreached1$HIVTested, exclude=NULL)
+
+    ## Filter data on partners not tested but reached
+    pt_dt_named_pt_of_494_nottested_clientreached1 <- 
+       pt_dt_named_pt_of_494clientreached1  %>%
+            filter(HIVTested != 1 | is.na(HIVTested)) 
+    dim(pt_dt_named_pt_of_494_nottested_clientreached1)
+    
+    table(pt_dt_named_pt_of_494_nottested_clientreached1$HIVTested, exclude=NULL)
+    
+    length(c(which(pt_dt_named_pt_of_494_nottested_clientreached1$HIVTested != 1), 
+            which(is.na(pt_dt_named_pt_of_494_nottested_clientreached1$HIVTested))))
+
+
+
+    ## Check the HIV test result for these partners is in the CTDB
+    table(pt_dt_named_pt_of_494_nottested_clientreached1$HIVTestResult_Final, exclude=NULL)
+
+    ## Check if these partners are already recorded as index cases in the CTDB
+    table(pt_dt_named_pt_of_494_nottested_clientreached1$AlreadyIndex, exclude=NULL)
+    
+    ## Check if these partners are known and recorded in the sequenced dataset 
+    sum(pt_dt_named_pt_of_494_nottested_clientreached1$StudyIDFrom %in% genomic_db_sequenced)
+    length(genomic_db_sequenced)
+
+    sum(pt_dt_named_pt_of_494_nottested_clientreached1$StudyIDFrom %in% genomic_db_sequenced)/
+        nrow(pt_dt_named_pt_of_494_nottested_clientreached1)
 
 ## Cascade
 table(pt_dt_named_pt_of_494$CanNotify, exclude=NULL)
