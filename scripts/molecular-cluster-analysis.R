@@ -1,3 +1,9 @@
+# =====================================================================
+# Title: Analyze molecular clusters, create molecular links, and measure overlap with CTDB
+
+# ====================================================================
+
+
 rm(list=ls())
 
 
@@ -24,11 +30,12 @@ set.seed(1234567)
 
 # Read data ---------------------------
 
-data_dir <- "/gpfs/data/rkantor/rtp/datasets/D51_20230512_unified"
-list.files(path=data_dir)
-net_dt_old <- read.csv(paste0(data_dir, "/ContactTracingNetwork.csv"))
-net_dt <- read.csv("/gpfs/data/rkantor/rtp/shared_dir/ContactTracingNetwork20230726.csv")
-individuals_dt <- read.csv(paste0(data_dir, "/Individuals.csv"))
+partner_db <- readRDS("derived_data/partner_db.rds")
+partner_db_non_missing_studyidto <- readRDS("derived_data/partner_db_non_missing_studyidto.rds")
+net_dt <- partner_db
+
+genomic_db_sequenced_dt <- readRDS("derived_data/genomic_db_sequenced_dt.rds")
+individuals_dt <- genomic_db_sequenced_dt
 
 
 # Preliminary Summaries ---------------------------
