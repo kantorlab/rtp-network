@@ -6,11 +6,11 @@ library(patchwork)
 library(here)
 
 # Read the saved RDS file (which contains both p_overall and labels_n)
-plot_data <- readRDS(here("manuscript-viz", "p_overall.rds"))
-p_combined <- readRDS(here("manuscript-viz", "p_combined_manual_linebreaks.rds"))
+plot_data <- readRDS(here("manuscript-viz", "out", "p_overall.rds"))
+p_combined <- readRDS(here("manuscript-viz", "out", "p_combined_manual_linebreaks.rds"))
 
-overall_labels <- readRDS(here("manuscript-viz", "overall_labels.rds"))
-overlapping_labels <- readRDS(here("manuscript-viz", "overlapping_labels.rds"))
+overall_labels <- readRDS(here("manuscript-viz", "out", "overall_labels.rds"))
+overlapping_labels <- readRDS(here("manuscript-viz", "out", "overlapping_labels.rds"))
 
 
 # Extract the plot and labels from the list
@@ -23,7 +23,7 @@ p_overall <- p_overall +
   theme(panel.background = element_rect(fill = "white", color = "black", linewidth = 1.5))  # Background color for top panel
 
 # Read the second plot
-p_split_cascade <- readRDS(here("manuscript-viz", "p_split_cascade.rds"))
+p_split_cascade <- readRDS(here("manuscript-viz", "out", "p_split_cascade.rds"))
 
 # Customize background for the second plot
 p_split_cascade <- p_split_cascade +
@@ -63,11 +63,11 @@ new_combined_plot <- p_combined / divider / p_split_cascade +
 new_combined_plot
 
 # Save the combined plot
-loc_to_save_combined <- here("manuscript-viz", "combined_cascade_clear.pdf")
+loc_to_save_combined <- here("manuscript-viz", "out", "combined_cascade_clear.pdf")
 ggsave(loc_to_save_combined, plot = combined_plot, 
        width = 12, height = 12, dpi = 300)
 
 
-loc_to_save_combined <- here("manuscript-viz", "new_combined_cascade_clear.png")
+loc_to_save_combined <- here("manuscript-viz", "out", "new_combined_cascade_clear.png")
 ggsave(loc_to_save_combined, plot = new_combined_plot, 
        width = 14, height = 14, dpi = 300)

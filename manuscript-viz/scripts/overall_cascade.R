@@ -61,14 +61,14 @@ p_overall <- ggplot(overall_data, aes(x = Category, y = Value, fill = Category))
 print(p_overall)
 
 # Save plot
-loc_to_save <- here("manuscript-viz", "overall_cascade.pdf")
+loc_to_save <- here("manuscript-viz", "out", "overall_cascade.pdf")
 ggsave(loc_to_save, plot = p_overall, 
       width = 8, height = 6, dpi = 300)
 
 # RDS for multipanel plot
 saveRDS(list(p_overall=p_overall, 
              labels_n=labels_n),
-        file = here("manuscript-viz", "p_overall.rds"))
+        file = here("manuscript-viz", "out", "p_overall.rds"))
 
 ###
 ## Add bars to show cascade among overlapping persons as well
@@ -137,10 +137,10 @@ p_combined <- ggplot(combined_data, aes(x = Category, y = Value, fill = Category
 print(p_combined)
 
 # Save updated plot
-loc_to_save_combined <- here("manuscript-viz", "combined_cascade_manual_linebreaks.pdf")
+loc_to_save_combined <- here("manuscript-viz", "out", "combined_cascade_manual_linebreaks.pdf")
 ggsave(loc_to_save_combined, plot = p_combined, 
        width = 8, height = 6, dpi = 300)
 
-saveRDS(p_combined, file = here("manuscript-viz", "p_combined_manual_linebreaks.rds"))
-saveRDS(overall_labels, file = here("manuscript-viz", "overall_labels.rds"))
-saveRDS(overlapping_labels, file = here("manuscript-viz", "overlapping_labels.rds"))
+saveRDS(p_combined, file = here("manuscript-viz", "out", "p_combined_manual_linebreaks.rds"))
+saveRDS(overall_labels, file = here("manuscript-viz", "out", "overall_labels.rds"))
+saveRDS(overlapping_labels, file = here("manuscript-viz", "out", "overlapping_labels.rds"))
