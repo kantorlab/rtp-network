@@ -11,7 +11,7 @@ par(mar=c(1,1,1,1)) #for figures
 set.seed(1234567)
 
 # Load Objects
-eda_env <- readRDS("eda_objects.rds")
+eda_env <- readRDS(here("derived_data", "eda_objects.rds"))
 ct_net_unique <- eda_env$ct_net_unique
 phylo_net <- eda_env$phylo_net
 ct_el <- eda_env$ct_el 
@@ -65,21 +65,21 @@ phylo_node_colors <- ifelse(phylo_net_ids %in% common_node_ids, "limegreen", "or
 node_size <- 2  # Adjust as necessary
 
 # Plot contact tracing network
-png("ct_net_plot.png", width=800, height=800)
+png(here("manuscript-viz", "out", "ct_net_plot.png"), width=800, height=800)
 gplot(ct_net_unique, gmode="graph", displaylabels = FALSE, 
       vertex.col=ct_node_colors, edge.col=ct_edge_colors, 
       vertex.cex=node_size, edge.lwd=3)
 dev.off()
 
 # Plot phylogenetic network
-png("phylo_net_plot.png", width=800, height=800)
+png(here("manuscript-viz", "out", "phylo_net_plot.png"), width=800, height=800)
 gplot(phylo_net, gmode="graph", displaylabels = FALSE, 
       vertex.col=phylo_node_colors, edge.col=phylo_edge_colors, 
       vertex.cex=node_size, edge.lwd=3)
 dev.off()
 
 # Plot side by side
-png("side_by_side_plots.png", width=1600, height=800)
+png(here("manuscript-viz", "out", "side_by_side_plots.png"), width=1600, height=800)
 layout(matrix(c(1,2), 1, 2, byrow = TRUE))
 gplot(ct_net_unique, gmode="graph", displaylabels = FALSE, 
       vertex.col=ct_node_colors, edge.col=ct_edge_colors, 
@@ -115,21 +115,21 @@ overlap_edge_colors <- "green"
 node_size <- 2  # Adjust as necessary
 
 # Plot overlapping contact tracing network
-png("ct_net_overlap_plot.png", width=800, height=800)
+png(here("manuscript-viz", "out", "ct_net_overlap_plot.png"), width=800, height=800)
 gplot(ct_net_overlap, gmode="graph", displaylabels = FALSE, 
       vertex.col=overlap_node_colors, edge.col=overlap_edge_colors, 
       vertex.cex=node_size, edge.lwd=3)
 dev.off()
 
 # Plot overlapping phylogenetic network
-png("phylo_net_overlap_plot.png", width=800, height=800)
+png(here("manuscript-viz", "out", "phylo_net_overlap_plot.png"), width=800, height=800)
 gplot(phylo_net_overlap, gmode="graph", displaylabels = FALSE, 
       vertex.col=overlap_node_colors, edge.col=overlap_edge_colors, 
       vertex.cex=node_size, edge.lwd=3)
 dev.off()
 
 # Plot side by side overlapping networks
-png("side_by_side_overlap_plots.png", width=1600, height=800)
+png(here("manuscript-viz", "out", "side_by_side_overlap_plots.png"), width=1600, height=800)
 layout(matrix(c(1,2), 1, 2, byrow = TRUE))
 gplot(ct_net_overlap, gmode="graph", displaylabels = FALSE, 
       vertex.col=overlap_node_colors, edge.col=overlap_edge_colors, 
