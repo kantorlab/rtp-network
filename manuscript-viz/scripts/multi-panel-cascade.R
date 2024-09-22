@@ -7,6 +7,11 @@ library(here)
 
 # Read the saved RDS file (which contains both p_overall and labels_n)
 plot_data <- readRDS(here("manuscript-viz", "p_overall.rds"))
+p_combined <- readRDS(here("manuscript-viz", "p_combined_manual_linebreaks.rds"))
+
+overall_labels <- readRDS(here("manuscript-viz", "overall_labels.rds"))
+overlapping_labels <- readRDS(here("manuscript-viz", "overlapping_labels.rds"))
+
 
 # Extract the plot and labels from the list
 p_overall <- plot_data$p_overall
@@ -32,7 +37,9 @@ divider <- plot_spacer() +
                color = "black", linewidth = 0.5, linetype = "solid")
 
 # Combine the two plots with a divider and extra space
-combined_plot <- p_overall / divider / p_split_cascade + 
+combined_plot <- 
+p_overall / divider / p_split_cascade + 
+#p_combined / divider / p_split_cascade + 
   plot_layout(ncol = 1, heights = c(1, 0.1, 2)) +  # Adjust the heights for spacer
   plot_annotation(tag_levels = "A") &  
   theme(
@@ -44,7 +51,23 @@ combined_plot <- p_overall / divider / p_split_cascade +
 # Display the combined plot
 print(combined_plot)
 
+# Combine the new plot `p_combined` with a divider and extra space for testing
+new_combined_plot <- p_combined / divider / p_split_cascade + 
+  plot_layout(ncol = 1, heights = c(1, 0.1, 2)) +  # Adjust the heights for spacer
+  plot_annotation(tag_levels = "A") &  
+  theme(
+    plot.tag = element_text(size = 24, face = "bold"),  # Make the tags larger and bold
+    plot.tag.position = c(0.48, 1.05),
+    plot.margin = margin(10, 10, 10, 10)
+  )
+new_combined_plot
+
 # Save the combined plot
 loc_to_save_combined <- here("manuscript-viz", "combined_cascade_clear.pdf")
 ggsave(loc_to_save_combined, plot = combined_plot, 
        width = 12, height = 12, dpi = 300)
+
+
+loc_to_save_combined <- here("manuscript-viz", "new_combined_cascade_clear.png")
+ggsave(loc_to_save_combined, plot = new_combined_plot, 
+       width = 14, height = 14, dpi = 300)

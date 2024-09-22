@@ -142,3 +142,5 @@ ggsave(loc_to_save_combined, plot = p_combined,
        width = 8, height = 6, dpi = 300)
 
 saveRDS(p_combined, file = here("manuscript-viz", "p_combined_manual_linebreaks.rds"))
+saveRDS(overall_labels, file = here("manuscript-viz", "overall_labels.rds"))
+saveRDS(overlapping_labels, file = here("manuscript-viz", "overlapping_labels.rds"))
