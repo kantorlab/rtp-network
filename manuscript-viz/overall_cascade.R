@@ -9,7 +9,7 @@ library(here)
 # Structuring the data with the average values
 overall_data <- data.frame(
   Category = c("Named_Mean", "Contact_Attempted_Mean", "Reached_Mean", "Tested_Mean", "Diagnosed_Mean", "Sequenced_Mean"),
-  Value = c(1342, 880, 807, 338, 152, 152)
+  Value = c(1342, 880, 807, 570, 152, 152)
 )
 
 # Adjusting the factor levels and labels for the Category column
@@ -35,7 +35,7 @@ my_colors <- setNames(set1_colors, levels_to_colors)
 
 # Create the labels
 labels_n = c("1342", "880 (66%)", "807(92%)", 
-            "338 (42%)", "152 (45%)", "152 (100%)")
+            "570 (71%)", "152 (27%)", "152 (100%)")
 
 # Updated plot code
 p_overall <- ggplot(overall_data, aes(x = Category, y = Value, fill = Category)) +
