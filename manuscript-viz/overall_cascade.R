@@ -140,3 +140,5 @@ print(p_combined)
 loc_to_save_combined <- here("manuscript-viz", "combined_cascade_manual_linebreaks.pdf")
 ggsave(loc_to_save_combined, plot = p_combined, 
        width = 8, height = 6, dpi = 300)
+
+saveRDS(p_combined, file = here("manuscript-viz", "p_combined_manual_linebreaks.rds"))
