@@ -5,6 +5,9 @@ library(here)
 library(dplyr)
 library(network)
 library(sna)
+library(png)
+library(grid)
+library(ggpubr)
 
 # Setup
 par(mar=c(1,1,1,1)) #for figures
@@ -141,6 +144,56 @@ dev.off()
 
 
 
-# Try making the node placement identical ---------
+####
+# Integrated Plot with Data Flow Diagram
+####
 
-## layout coords will need to be specified. (try later)
+# Create a custom divider with a label
+create_divider_with_label <- function(label) {
+  ggplot() +
+    annotate("text", x = 0.5, y = 0.5, label = label, size = 8, fontface = "bold", hjust = 0.5, vjust = 0.5) +
+    theme_void()
+}
+
+# Load the Data Flow Diagram
+img <- readPNG(here("manuscript-viz", "out", "Data Flow Diagram.png"))
+plot_A <- ggplot() +
+  annotation_custom(rasterGrob(img, width = unit(1,"npc"), height = unit(1,"npc"))) +
+  theme_void()
+
+# Read the contact tracing network plot image
+ct_net_img <- readPNG(here("manuscript-viz", "out", "ct_net_plot.png"))
+plot_B <- ggplot() +
+  annotation_custom(rasterGrob(ct_net_img, width = unit(1,"npc"), height = unit(1,"npc"))) +
+  theme_void()
+
+# Read the phylogenetic network plot image
+phylo_net_img <- readPNG(here("manuscript-viz", "out", "phylo_net_plot.png"))
+plot_C <- ggplot() +
+  annotation_custom(rasterGrob(phylo_net_img, width = unit(1,"npc"), height = unit(1,"npc"))) +
+  theme_void()
+
+# Read the correct overlapping networks plot image
+overlap_net_img <- readPNG(here("manuscript-viz", "out", "ct_net_overlap_plot.png"))  # Ensure this is the correct overlap plot
+plot_D <- ggplot() +
+  annotation_custom(rasterGrob(overlap_net_img, width = unit(1,"npc"), height = unit(1,"npc"))) +
+  theme_void()
+
+# Create dividers with labels
+divider_A <- create_divider_with_label("A")
+divider_B <- create_divider_with_label("B")
+divider_C <- create_divider_with_label("C")
+divider_D <- create_divider_with_label("D")
+
+# Arrange the plots with dividers in a layout
+combined_plot <- ggarrange(
+  divider_A, plot_A,
+  divider_B, plot_B,
+  divider_C, plot_C,
+  divider_D, plot_D,
+  ncol = 1, nrow = 8,  # 4 dividers + 4 plots
+  heights = c(0.1, 2, 0.2, 1, 0.2, 1, 0.2, 1)  # Adjust heights (increase divider size or plot size as necessary)
+)
+
+# Save the combined plot as a PNG
+ggsave(here("manuscript-viz", "out", "combined_4x1_with_dividers.png"), combined_plot, width = 10, height = 25)
