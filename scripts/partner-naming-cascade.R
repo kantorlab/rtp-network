@@ -136,6 +136,10 @@ source(here("utils", "compute-cascade.R"))
         num_test_after_PCRS <- sum(partners_with_both_dates$TestAfterPCRS, na.rm = TRUE)
         num_test_after_PCRS
 
+        partners_with_both_dates$StudyIDTo
+
+        
+
     ## characteristics of those not tested
     partners_not_tested <- 
         partner_db_non_missing_studyidto %>%
@@ -164,9 +168,14 @@ source(here("utils", "compute-cascade.R"))
         
         ## Check if these partners are known and recorded in the sequenced dataset 
         sum(partners_not_tested_clientreached1$StudyIDFrom %in% genomic_db_sequenced)
+        sum(partners_not_tested_clientreached1$StudyIDTo %in% genomic_db_sequenced)
         length(genomic_db_sequenced)
 
         sum(partners_not_tested_clientreached1$StudyIDFrom %in% genomic_db_sequenced)/
+            nrow(partners_not_tested_clientreached1)
+
+        
+        sum(partners_not_tested_clientreached1$StudyIDTo %in% genomic_db_sequenced)/
             nrow(partners_not_tested_clientreached1)
 
     ## cross tabulate confirmed test with already index
@@ -287,9 +296,13 @@ table(pt_dt_named_pt_of_494$HIVTested, exclude=NULL)
     
     ## Check if these partners are known and recorded in the sequenced dataset 
     sum(pt_dt_named_pt_of_494_nottested_clientreached1$StudyIDFrom %in% genomic_db_sequenced)
+    sum(pt_dt_named_pt_of_494_nottested_clientreached1$StudyIDTo %in% genomic_db_sequenced)
     length(genomic_db_sequenced)
 
     sum(pt_dt_named_pt_of_494_nottested_clientreached1$StudyIDFrom %in% genomic_db_sequenced)/
+        nrow(pt_dt_named_pt_of_494_nottested_clientreached1)
+
+    sum(pt_dt_named_pt_of_494_nottested_clientreached1$StudyIDTo %in% genomic_db_sequenced)/
         nrow(pt_dt_named_pt_of_494_nottested_clientreached1)
 
 ## Cascade
