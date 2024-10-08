@@ -137,7 +137,6 @@ source(here("utils", "compute-cascade.R"))
         num_test_after_PCRS
 
         partners_with_both_dates$StudyIDTo
-
         
 
     ## characteristics of those not tested
@@ -215,6 +214,72 @@ source(here("utils", "compute-cascade.R"))
     ## how many partners are diagnosed and sequenced
     sum(partners_named_by_indexes %in% genomic_db_sequenced_dt$StudyID)
     sum(unique(partners_named_by_indexes) %in% unique(genomic_db_sequenced_dt$StudyID))
+
+    ## compare dates of diagnosis relative to the date PCRS was offered for named partners who are diagnosed and sequenced
+        ## set up
+        partners_diagnosed_sequenced <- partners_named_by_indexes[which(partners_named_by_indexes %in% genomic_db_sequenced_dt$StudyID)]
+        length(partners_diagnosed_sequenced)
+        partners_diagnosed_sequenced
+        pt_data_on_pts_diagnosed_sequenced <- partner_db_non_missing_studyidto[which(partner_db_non_missing_studyidto$StudyIDTo %in% partners_diagnosed_sequenced),]
+        dim(pt_data_on_pts_diagnosed_sequenced) #181 total partner rows corresponding to nominations by index cases 
+        unique(pt_data_on_pts_diagnosed_sequenced$StudyIDTo) #152 unique partners
+        pt_data_on_pts_diagnosed_sequenced$DatePCRSOffered
+
+
+        pt_seq_diagnosed_gdb_id_dt <- genomic_db_sequenced_dt[which(genomic_db_sequenced_dt$Study %in% partners_diagnosed_sequenced),]
+        table(pt_seq_diagnosed_gdb_id_dt$HIVDxDate) #date of HIV diagnosis
+
+        # merge the two datasets on the partner ID
+        merged_data <- merge(
+        pt_data_on_pts_diagnosed_sequenced,
+        pt_seq_diagnosed_gdb_id_dt,
+        by.x = 'StudyIDTo',
+        by.y = 'StudyID'
+        )
+
+        dim(merged_data)
+
+        # replace empty strings with NA in DatePCRSOffered
+        merged_data$DatePCRSOffered[merged_data$DatePCRSOffered == ""] <- NA
+
+        # convert DatePCRSOffered and HIVDxDate to Date format
+        merged_data$DatePCRSOffered <- as.Date(merged_data$DatePCRSOffered, format = '%Y-%m-%d')
+        head(merged_data$DatePCRSOffered, 25)
+        
+        merged_data$HIVDxDate <- as.Date(merged_data$HIVDxDate, format = '%Y-%m-%d')
+        head(merged_data$HIVDxDate, 25)
+
+
+        # Calculate the time difference in days
+        merged_data$TimeDiff <- as.numeric(merged_data$HIVDxDate - merged_data$DatePCRSOffered)
+        summary(merged_data$TimeDiff)
+        length(which(!is.na(merged_data$TimeDiff)))
+
+        length(which(!is.na(merged_data$TimeDiff)))
+        length(which(merged_data$TimeDiff > 0))
+        length(which(merged_data$TimeDiff < 0))
+        length(which(merged_data$TimeDiff == 0))
+
+        # Summary of the time differences
+        summary(merged_data$TimeDiff)
+
+        # Number of partners diagnosed before PCRS was offered
+        diagnosed_before_pcrs <- sum(merged_data$TimeDiff < 0, na.rm = TRUE)
+
+        # Number of partners diagnosed after PCRS was offered
+        diagnosed_after_pcrs <- sum(merged_data$TimeDiff > 0, na.rm = TRUE)
+
+        # Number of partners diagnosed on the same day as PCRS was offered
+        diagnosed_on_same_day <- sum(merged_data$TimeDiff == 0, na.rm = TRUE)
+
+        # Output the results
+        cat("Number of partners diagnosed before PCRS was offered:", diagnosed_before_pcrs, "\n")
+        cat("Number of partners diagnosed after PCRS was offered:", diagnosed_after_pcrs, "\n")
+        cat("Number of partners diagnosed on the same day as PCRS was offered:", diagnosed_on_same_day, "\n")
+
+
+
+
 
     ## Other variables of interest
     table(partner_db_non_missing_studyidto$CanNotify, exclude=NULL)
