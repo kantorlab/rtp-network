@@ -44,8 +44,8 @@ p_overall / divider / p_split_cascade +
   plot_annotation(tag_levels = "A") &  
   theme(
     plot.tag = element_text(size = 24, face = "bold"),  # Make the tags larger and bold
-    plot.tag.position = c(0.48, 1.05),
-    plot.margin = margin(10, 10, 10, 10)
+    plot.tag.position = c(0.48, 1.02),
+    plot.margin = margin(t = 20, r = 10, b = 10, l = 10)
   )
 
 # Display the combined plot

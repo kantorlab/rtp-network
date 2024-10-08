@@ -96,7 +96,7 @@ p <- ggplot(combined_df, aes(x = Grouping, y = Value, fill = Category)) +
     palette="Set1", 
     breaks=levels, 
     labels=c("Named", "Attempted", "Reached", 
-            "Tested", "Diagnosed", "Sequenced"), name="Cascade Categories")+
+            "Newly Tested", "Diagnosed", "Sequenced"), name="Cascade Categories")+
   theme_minimal() +
   theme(
     plot.title = element_blank(),

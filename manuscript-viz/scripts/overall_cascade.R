@@ -23,13 +23,13 @@ overall_data$Category <- factor(overall_data$Category,
                                 labels = c("Named", 
                                            "Attempted",
                                            "Reached",
-                                           "Tested", 
+                                           "Newly Tested", 
                                            "Diagnosed", 
                                            "Sequenced"))
 
 # Color settings
 set1_colors <- brewer.pal(6, "Set1")
-levels_to_colors <- c("Named", "Attempted", "Reached", "Tested", "Diagnosed", "Sequenced")
+levels_to_colors <- c("Named", "Attempted", "Reached", "Newly Tested", "Diagnosed", "Sequenced")
 my_colors <- setNames(set1_colors, levels_to_colors)
 
 
@@ -106,7 +106,7 @@ combined_data$Category <- factor(combined_data$Category,
                                  labels = c("Named", 
                                             "Attempted",
                                             "Reached",
-                                            "Tested", 
+                                            "Newly Tested", 
                                             "Diagnosed", 
                                             "Sequenced"))
 
