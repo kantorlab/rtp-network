@@ -155,8 +155,9 @@ create_divider_with_label <- function(label) {
     theme_void()
 }
 
-# Load the Data Flow Diagram
-img <- readPNG(here("manuscript-viz", "out", "Data Flow Diagram.png"))
+# Load the Data Flow Diagram 
+#img <- readPNG(here("manuscript-viz", "out", "Data Flow Diagram.png"))
+img <- readPNG(here("manuscript-viz", "out", "Data Flow Diagram high res.png"))
 plot_A <- ggplot() +
   annotation_custom(rasterGrob(img, width = unit(1,"npc"), height = unit(1,"npc"))) +
   theme_void()
@@ -197,3 +198,45 @@ combined_plot <- ggarrange(
 
 # Save the combined plot as a PNG
 ggsave(here("manuscript-viz", "out", "combined_4x1_with_dividers.png"), combined_plot, width = 10, height = 25)
+
+
+# Experiment with a different layout
+
+## Arrange the plots in a 2x2 grid layout
+combined_plot <- ggarrange(
+  plot_A + ggtitle("A: Data Flow Diagram"),
+  plot_B + ggtitle("B: Contact Tracing Network"),
+  plot_C + ggtitle("C: Phylogenetic Network"),
+  plot_D + ggtitle("D: Overlapping Network"),
+  ncol = 2, nrow = 2,
+  #labels = c("A", "B", "C", "D"),
+  heights = c(1, 1), widths = c(1, 1)
+)
+
+# Save the combined plot as a PNG
+ggsave(here("manuscript-viz", "out", "combined_2x2_with_titles.png"), combined_plot, width = 20, height = 15)
+
+
+
+# Load the Flowchart (High Resolution PNG)
+flowchart_img <- img
+flowchart_plot <- ggplot() +
+  annotation_custom(rasterGrob(flowchart_img, width = unit(1, "npc"), height = unit(1, "npc"))) +
+  theme_void() +
+  ggtitle("A: Data Flow Diagram") +
+  theme(plot.title = element_text(size = 20))
+
+# Arrange Layout
+combined_plot <- ggarrange(
+  flowchart_plot,
+  ggarrange(plot_B, plot_C, plot_D, ncol = 3,
+  labels = c("B: Contact Tracing Network", "C: Phylogenetic Network", "D: Overlapping Network")
+  ),
+  ncol = 1, nrow = 2,
+  heights = c(2, 1) # Flowchart takes twice the height of the bottom row
+)
+
+# Save the Combined Plot
+ggsave(here("manuscript-viz", "out", "combined_plot_1x3.png"), combined_plot, width = 20, height = 18, dpi = 300)
+
+
