@@ -10,8 +10,13 @@
 
       - `summarize-databases-and-create-objects.R`: Script for summarizing databases and creating objects.
 
+      - `database-overlap.R`: Consolidate second section of the results "Overlap Between the CTDB and the GDB"
 
+      - `partner-naming-cascade.R`: Describes how many partners were named, contacted, reached, and so on, for all named partners and those appearing in both databases. 
 
+      - `molecular-cluster-analysis.R`: Create molecular links within the clusters, and analyze the molecular networks. 
+
+      - `regressions.rmd`: Fit the regression models in the last section of the results.
 
 - `derived_data/`: Stores processed data objects (e.g., RDS files) generated from raw data. These are used in analyses to avoid reprocessing raw data each time.
 
