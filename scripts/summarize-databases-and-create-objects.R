@@ -131,6 +131,19 @@ genomic_db <- as.data.table(read.csv(paste0(data_dir, "/Individuals.csv")))
   ## Distribution of size and number of partner naming clusters
   ### see https://github.com/kantorlab/rtp-network/blob/b87b4ddbb253b21d620eb69e1b2edccd0ae5f36d/molecular-cluster-analysis.R#L570-L586
 
+  ## one person who was named as partner but not interviewed as index
+  n_unique_studyidfrom <- unique(partner_db$StudyIDFrom)
+  n_unique_studyidto <- unique(partner_db$StudyIDTo)
+  n_unique_ctdb <- unique(c(n_unique_studyidfrom, n_unique_studyidto))
+
+  length(n_unique_studyidfrom)
+  length(n_unique_studyidto)
+  length(n_unique_ctdb)
+
+  unique_ctdb_not_in_from <- setdiff(n_unique_ctdb, n_unique_studyidfrom)
+  unique_ctdb_not_in_from
+
+
 
 # ============================
 # Section 2.0: Genomic Database
