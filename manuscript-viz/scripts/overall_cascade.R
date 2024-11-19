@@ -5,7 +5,7 @@ library(tidyr)
 library(ggplot2)
 library(RColorBrewer)
 library(here)
-
+library(ggpattern)
 
 # Structuring the data with the average values
 overall_data <- data.frame(
@@ -139,6 +139,15 @@ p_combined <- ggplot(combined_data, aes(x = Category, y = Value, fill = Category
   )
 
 print(p_combined)
+
+
+# Save updated plot
+loc_to_save_combined <- here("manuscript-viz", "out", "combined_cascade_enhanced.pdf")
+ggsave(loc_to_save_combined, plot = p_combined, 
+       width = 8, height = 6, dpi = 300)
+
+saveRDS(p_combined, file = here("manuscript-viz", "out", "p_combined_enhanced.rds"))
+
 
 # Save updated plot
 loc_to_save_combined <- here("manuscript-viz", "out", "combined_cascade_manual_linebreaks.pdf")
