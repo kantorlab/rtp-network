@@ -6,6 +6,7 @@ library(ggplot2)
 library(RColorBrewer)
 library(here)
 
+
 # Structuring the data with the average values
 overall_data <- data.frame(
   Category = c("Named_Mean", "Contact_Attempted_Mean", "Reached_Mean", "Tested_Mean", "Diagnosed_Mean", "Sequenced_Mean"),
@@ -113,7 +114,10 @@ combined_data$Category <- factor(combined_data$Category,
                                             
 # Updated plot with explicit line breaks
 p_combined <- ggplot(combined_data, aes(x = Category, y = Value, fill = Category)) +
-  geom_bar(aes(alpha = Group), stat = "identity", position = position_dodge(width = 0.8), width = 0.7) +
+  geom_bar(aes(alpha = Group), stat = "identity", position = position_dodge(width = 0.8), 
+                width = 0.7,
+                color = "black",                
+                linetype = ifelse(combined_data$Group == "Overlapping", "dashed", "solid")) +
   geom_text(aes(label = ifelse(Group == "Overall", overall_labels, overlapping_labels)), 
             vjust = -0.5, fontface = "bold", size = 3.5,  # Adjust size for better fit
             hjust = ifelse(combined_data$Group == "Overall", 1.2, -0.2), 
