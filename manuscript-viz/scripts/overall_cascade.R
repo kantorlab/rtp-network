@@ -1,5 +1,36 @@
 rm(list=ls())
 
+# Loading environment units for ggpattern
+
+  # Define the module initialization script path
+ module_init <- "/oscar/rt/9.2/software/0.20-generic/0.20.1/opt/spack/linux-rhel9-x86_64_v3/gcc-11.3.1/lmod-8.7.24-w2akdkbkyuipk2xvuggmddbe2p4alxs7/lmod/lmod/init/bash"
+
+
+  # Build the shell command
+  cmd <- paste0(
+    "bash -c '",
+    "source ", module_init, " && ",
+    "module load udunits/2.2.28-rycabdx && ",
+    "env'"
+  )
+
+  # Run the command and capture the output
+  env_output <- system(cmd, intern = TRUE)
+
+  # Parse and set environment variables
+  env_vars <- strsplit(env_output, "=")
+  for (var in env_vars) {
+    if (length(var) == 2) {
+      name <- var[[1]]
+      value <- var[[2]]
+      Sys.setenv(name = value)
+    }
+  }
+
+  # Verify LD_LIBRARY_PATH
+  print(Sys.getenv("LD_LIBRARY_PATH"))
+
+
 # Loading necessary libraries
 library(tidyr)
 library(ggplot2)
