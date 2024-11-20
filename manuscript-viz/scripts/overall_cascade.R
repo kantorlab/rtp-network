@@ -1,42 +1,41 @@
 rm(list=ls())
 
-# Loading environment units for ggpattern
+##############################################################
+# WARNING:
+# WORKS ONLY IN TERMINAL R SESSION (NOT VSCODE R SESSION)
+# SOURCE  manuscript-viz/scripts/cascade-plot-settings.sh FIRST
+##############################################################
 
-  # Define the module initialization script path
- module_init <- "/oscar/rt/9.2/software/0.20-generic/0.20.1/opt/spack/linux-rhel9-x86_64_v3/gcc-11.3.1/lmod-8.7.24-w2akdkbkyuipk2xvuggmddbe2p4alxs7/lmod/lmod/init/bash"
 
+# Environments -------
 
-  # Build the shell command
-  cmd <- paste0(
-    "bash -c '",
-    "source ", module_init, " && ",
-    "module load udunits/2.2.28-rycabdx && ",
-    "env'"
+  ## for units
+  Sys.setenv(
+    LD_LIBRARY_PATH = paste(
+      Sys.getenv("LD_LIBRARY_PATH"),
+      "/oscar/data/cbc/hji/sRNAtoolbox/usr/lib/x86_64-linux-gnu",
+      "/oscar/data/cbc/pcao5/dolphin_next/usr/lib/x86_64-linux-gnu",
+      sep = ":"
+    )
   )
 
-  # Run the command and capture the output
-  env_output <- system(cmd, intern = TRUE)
+  dyn.load("/oscar/data/cbc/hji/sRNAtoolbox/usr/lib/x86_64-linux-gnu/libudunits2.so.0")
 
-  # Parse and set environment variables
-  env_vars <- strsplit(env_output, "=")
-  for (var in env_vars) {
-    if (length(var) == 2) {
-      name <- var[[1]]
-      value <- var[[2]]
-      Sys.setenv(name = value)
-    }
-  }
-
-  # Verify LD_LIBRARY_PATH
-  print(Sys.getenv("LD_LIBRARY_PATH"))
+  ## for sf
+  system("module load proj/9.2.0-ni5rcfb")
+  system("module load gdal/3.7.0-4p4onmf")
+  system("module load geos/3.11.2-a6hfu6a")
 
 
-# Loading necessary libraries
+# Loading necessary libraries -------
+
 library(tidyr)
 library(ggplot2)
 library(RColorBrewer)
 library(here)
 library(ggpattern)
+library(units)
+library(sf)
 
 # Structuring the data with the average values
 overall_data <- data.frame(
@@ -171,9 +170,51 @@ p_combined <- ggplot(combined_data, aes(x = Category, y = Value, fill = Category
 
 print(p_combined)
 
+combined_data$Pattern <- ifelse(combined_data$Group == "Overlapping", "stripe", "none")
+
+p_combined <- ggplot(combined_data, aes(x = Category, y = Value, fill = Category)) +
+  geom_bar_pattern(
+    aes(pattern = Pattern),
+    stat = "identity",
+    position = position_dodge(width = 0.8),
+    width = 0.7,
+    color = "black",
+    pattern_fill = "black",
+    pattern_color = "black",
+    pattern_angle = 45,
+    pattern_density = 0.05,
+    pattern_spacing = 0.02,
+    pattern_key_scale_factor = 0.6  # Adjusts the legend pattern size
+  ) +
+  geom_text(
+    aes(label = ifelse(Group == "Overall", overall_labels, overlapping_labels)),
+    vjust = -0.5,
+    fontface = "bold",
+    size = 3.5,
+    hjust = ifelse(combined_data$Group == "Overall", 1.2, -0.2),
+    position = position_dodge(width = 0.8)
+  ) +
+  labs(
+    title = "",
+    y = "Total Partners",
+    x = "Cascade Categories"
+  ) +
+  scale_fill_manual(values = set1_colors) +
+  scale_y_continuous(limits = c(0, 1500)) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 12, face = "bold"),
+    axis.title.x = element_text(size = 18, face = "bold", color = "blue"),
+    axis.title.y = element_text(size = 18, face = "bold", color = "blue"),
+    axis.text.y = element_text(size = 12, face = "bold", color = "black"),
+    axis.text.x = element_text(size = 12, face = "bold", color = "black"),
+    legend.position = "none"
+  )
+
+p_combined
 
 # Save updated plot
-loc_to_save_combined <- here("manuscript-viz", "out", "combined_cascade_enhanced.pdf")
+loc_to_save_combined <- here("manuscript-viz", "out", "combined_cascade_enhanced2.pdf")
 ggsave(loc_to_save_combined, plot = p_combined, 
        width = 8, height = 6, dpi = 300)
 
