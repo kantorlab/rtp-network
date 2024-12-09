@@ -163,7 +163,7 @@ img <- readPNG(here("manuscript-viz", "out", "Data Flow Diagram.png"))
 plot_A <- ggplot() +
   annotation_custom(rasterGrob(img, width = unit(1,"npc"), height = unit(1,"npc"))) +
   theme_void()+
-  ggtitle("A: Data Flow Diagram")+
+  ggtitle("")+
   theme(plot.title = element_text(face = "bold", size = 16))  
 ggsave(here("manuscript-viz", "out", "Fig2A.png"), plot = plot_A, width = 6, height = 4, dpi = 300)
 
@@ -172,7 +172,7 @@ ct_net_img <- readPNG(here("manuscript-viz", "out", "ct_net_plot.png"))
 plot_B <- ggplot() +
   annotation_custom(rasterGrob(ct_net_img, width = unit(1,"npc"), height = unit(1,"npc"))) +
   theme_void()+
-  ggtitle("B: Contact Tracing Network")+
+  ggtitle("")+
   theme(plot.title = element_text(face = "bold", size = 16))  
 ggsave(here("manuscript-viz", "out", "Fig2B.png"), plot = plot_B, dpi = 300)
 
@@ -181,7 +181,7 @@ phylo_net_img <- readPNG(here("manuscript-viz", "out", "phylo_net_plot.png"))
 plot_C <- ggplot() +
   annotation_custom(rasterGrob(phylo_net_img, width = unit(1,"npc"), height = unit(1,"npc"))) +
   theme_void()+
-  ggtitle("C: Phylogenetic Network")+
+  ggtitle("")+
   theme(plot.title = element_text(face = "bold", size = 16))  
 ggsave(here("manuscript-viz", "out", "Fig2C.png"), plot = plot_C, dpi = 300)
 
@@ -191,7 +191,7 @@ overlap_net_img <- readPNG(here("manuscript-viz", "out", "ct_net_overlap_plot.pn
 plot_D <- ggplot() +
   annotation_custom(rasterGrob(overlap_net_img, width = unit(1,"npc"), height = unit(1,"npc"))) +
   theme_void()+
-  ggtitle("D: Overlapping Network")+
+  ggtitle("")+
   theme(plot.title = element_text(face = "bold", size = 16))  
 ggsave(here("manuscript-viz", "out", "Fig2D.png"), plot = plot_D, dpi = 300)
 
@@ -261,7 +261,7 @@ ggsave(here("manuscript-viz", "out", "combined_plot_1x3.png"), combined_plot, wi
 flowchart_plot <- ggplot() +
   annotation_custom(rasterGrob(flowchart_img, width = unit(1, "npc"), height = unit(1, "npc"))) +
   theme_void() +
-  ggtitle("A: Data Flow Diagram") +
+  ggtitle("") +
   theme(plot.title = element_text(size = 24, face = "bold", hjust = 0.5, vjust = -1))
 
 # Save the plot as Figure 2A
@@ -271,7 +271,7 @@ ggsave(here("manuscript-viz", "out", "Figure_2A.png"), flowchart_plot, width = 1
 ## Figures 2B, C and D:
 combined_network_plot <- ggarrange(
   ggarrange(plot_B, plot_C, plot_D, ncol = 1, nrow=3,
-  labels = c("B: Contact Tracing Network", "C: Phylogenetic Network", "D: Overlapping Network")
+  labels = c("")
   ),
   heights = c(1, 1, 1) 
 )
