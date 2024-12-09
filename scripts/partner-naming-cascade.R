@@ -53,6 +53,7 @@ source(here("utils", "compute-cascade.R"))
     partners_named_by_indexes <- 
         unique((partner_db_non_missing_studyidto$StudyIDTo))
     length(partners_named_by_indexes)
+    length(partner_db_non_missing_studyidto$StudyIDTo)
 
     ## with how many partners were contacts attempted
     table(partner_db_non_missing_studyidto$ClientReached, exclude=NULL)
@@ -69,7 +70,18 @@ source(here("utils", "compute-cascade.R"))
         filter(ClientReached == 1) %>%
         pull(StudyIDTo)
         length(partners_reached)
-        length(unique(partners_reached))
+    
+    length(unique(partners_reached))
+    length(partners_reached)
+
+    ## how many referred for testing
+    table(partner_db_non_missing_studyidto$ReferredToHIVTest, exclude=NULL)
+    unique_partners_referred_to_hiv_test <-
+        partner_db_non_missing_studyidto %>%
+        filter(ReferredToHIVTest == 1) %>%
+        distinct(StudyIDTo) %>%
+        pull()
+    length(unique_partners_referred_to_hiv_test)
 
     ## how many successfully tested
     table(partner_db_non_missing_studyidto$HIVTested, exclude=NULL)
@@ -79,7 +91,8 @@ source(here("utils", "compute-cascade.R"))
         select(StudyIDFrom, StudyIDTo)
     str(partners_tested)
     length(unique(partners_tested$StudyIDFrom))
-    length(unique(partners_tested$StudyIDTo))
+    length((partners_tested$StudyIDTo))
+
 
     partners_tested_client_reached <- 
         partner_db_non_missing_studyidto %>%
@@ -87,6 +100,15 @@ source(here("utils", "compute-cascade.R"))
     str(partners_tested_client_reached)
     length(unique(partners_tested_client_reached$StudyIDFrom))
     length(unique(partners_tested_client_reached$StudyIDTo))
+
+    ## final hiv test
+    table(partner_db_non_missing_studyidto$HIVTestResult_Final, exclude=NULL)
+    length(which(!is.na(partner_db_non_missing_studyidto$HIVTestResult_Final))) #agrees with meghan's estimate, email: 12/06/2024
+     ## per meghan's email (12/06/2024), these are coded as:
+        # 3: Rapid test negative – Our DIS used to do rapid tests at RIDOH for any partners that wanted to come in but we stopped this once COVID hit and have not picked the activity back up since
+        # 6: HIV-1 positive
+        # 11: HIV-1 negative
+        # 12: HIV negative    
 
     ## chacteristics of those tested & client reached
     table(partners_tested_client_reached$HIVTested, exclude=NULL)
