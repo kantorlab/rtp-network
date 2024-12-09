@@ -839,31 +839,31 @@ length(Reduce(intersect, list(genomic_db_sequenced, partner_db$StudyIDFrom,
 #compute_cascade("all")
 
 ## msm 
-compute_cascade("msm")
+compute_cascade("msm", genomic_db=genomic_db)
 
 ## idu 
-compute_cascade("idu")
+compute_cascade("idu", genomic_db=genomic_db)
 
 ## hrh 
-compute_cascade("hrh")
+compute_cascade("hrh", genomic_db=genomic_db)
 
 ## white
-compute_cascade("white")
+compute_cascade("white", genomic_db=genomic_db)
 
 ## black
-compute_cascade("black")
+compute_cascade("black", genomic_db=genomic_db)
 
 ## asian
-compute_cascade("asian")
+compute_cascade("asian", genomic_db=genomic_db)
 
 ## other
-compute_cascade("other")
+compute_cascade("other", genomic_db=genomic_db)
 
 ## hispanic
-compute_cascade("hispanic")
+compute_cascade("hispanic", genomic_db=genomic_db)
 
 ## nonhispanic
-compute_cascade("nonhispanic")
+compute_cascade("nonhispanic", genomic_db=genomic_db)
 
 
 ## Meeting with Meghan:
