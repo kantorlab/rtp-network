@@ -43,6 +43,9 @@ genomic_db_sequenced <- genomic_db$StudyID[genomic_db_sequenced_id]
 genomic_db_sequenced_dt <- genomic_db[genomic_db_sequenced_id,]
 dim(genomic_db_sequenced_dt)
 
+length(unique(genomic_db$StudyID))
+length(genomic_db_sequenced_id)
+
 # How many sequenced persons are in a molecular cluster
 
 n_not_in_cluster <- 
