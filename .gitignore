@@ -6,3 +6,6 @@ scratch/*
 *.html
 out/*
 .Rproj.user
+
+# Exceptions 
+!manuscript-viz/ofid-cover.png
