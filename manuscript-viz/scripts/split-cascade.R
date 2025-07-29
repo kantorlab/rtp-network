@@ -112,11 +112,11 @@ p <- ggplot(combined_df, aes(x = Grouping, y = Value, fill = Category)) +
   facet_wrap(~Type, scales = "free_x", ncol = 3) +
   ylim(0, max(combined_df$Value) + 0.1*max(combined_df$Value))
 
-loc_to_save <- here("manuscript-viz", "split_cascade.pdf")
+loc_to_save <- here("manuscript-viz", "out", "split_cascade.pdf")
 print(p)
 ggsave(loc_to_save, plot = p, 
       width = 12, height = 6, dpi = 300)
 
 p_split <- p
 
-saveRDS(p_split, file = here("manuscript-viz", "p_split_cascade.rds"))
+saveRDS(p_split, file = here("manuscript-viz", "out", "p_split_cascade.rds"))

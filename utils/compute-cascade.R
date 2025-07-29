@@ -1,4 +1,4 @@
-compute_cascade <- function(cat){
+compute_cascade <- function(cat, genomic_db){
   
   allowed_cats <- c("msm", "idu", "hrh", 
                       "white", "black", "asian", "other",

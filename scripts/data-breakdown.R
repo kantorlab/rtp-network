@@ -1,3 +1,11 @@
+# =====================================================================
+# Contained most of the analysis until 2024-09-17
+# ONLY FOR REFERENCE FROM HERE ON OUT
+          
+# =====================================================================
+
+
+
 rm(list=ls())
 
 # Libraries -------------
@@ -5,6 +13,7 @@ rm(list=ls())
 library(data.table)
 library(dplyr)
 library(stringi)
+library(lubridate)
 
 
 # Datasets -------------
@@ -33,6 +42,9 @@ length(genomic_db_sequenced_id)
 genomic_db_sequenced <- genomic_db$StudyID[genomic_db_sequenced_id]
 genomic_db_sequenced_dt <- genomic_db[genomic_db_sequenced_id,]
 dim(genomic_db_sequenced_dt)
+
+length(unique(genomic_db$StudyID))
+length(genomic_db_sequenced_id)
 
 # How many sequenced persons are in a molecular cluster
 
@@ -249,8 +261,11 @@ dim(pt_dt_named_pt_of_494)
 
 table(pt_dt_named_pt_of_494$CanNotify, exclude=NULL)
 table(pt_dt_named_pt_of_494$ClientReached, exclude=NULL)
+table(pt_dt_named_pt_of_494$AcceptPCRS, exclude=NULL)  
 table(pt_dt_named_pt_of_494$NoReachWhy, exclude=NULL)
+table(pt_dt_named_pt_of_494$ReferredToHIVTest, exclude=NULL)
 table(pt_dt_named_pt_of_494$HIVTested, exclude=NULL)
+table(pt_dt_named_pt_of_494$AlreadyIndex, exclude=NULL)
 table(pt_dt_named_pt_of_494$HIVTestResult_Final, exclude=NULL)
 table(pt_dt_named_pt_of_494$referredToPrEP, exclude=NULL)
 
@@ -262,11 +277,93 @@ table(pt_dt_named_pt_of_494$referredToPrEP, exclude=NULL)
 
   table(partner_db_non_missing_studyidto$CanNotify, exclude=NULL)
   table(partner_db_non_missing_studyidto$ClientReached, exclude=NULL)
+  table(substr(partner_db_non_missing_studyidto$DatePCRSOffered, 1, 4), exclude=NULL)
+  table(substr(partner_db_non_missing_studyidto$IndexHIVTDate, 1, 4), exclude=NULL)
+  table(partner_db_non_missing_studyidto$AcceptPCRS, exclude=NULL)  
   table(partner_db_non_missing_studyidto$NoReachWhy, exclude=NULL)
+  table(partner_db_non_missing_studyidto$ReferredToHIVTest, exclude=NULL)
   table(partner_db_non_missing_studyidto$HIVTested, exclude=NULL)
   table(partner_db_non_missing_studyidto$AlreadyIndex, exclude=NULL)
   table(partner_db_non_missing_studyidto$HIVTestResult_Final, exclude=NULL)
   table(partner_db_non_missing_studyidto$referredToPrEP, exclude=NULL)
+  table(partner_db_non_missing_studyidto$Year, exclude=NULL)
+
+  table(partner_db_non_missing_studyidto$DateofHIVTest_Final, exclude=NULL)
+  table(partner_db_non_missing_studyidto$DatePCRSOffered, exclude=NULL)
+
+  ## which partners had their final hiv test before being offered pcrs
+  partners_with_test_before_pcrs <- 
+    partner_db_non_missing_studyidto %>%
+      mutate(
+        DateofHIVTest_Final = na_if(DateofHIVTest_Final, "") %>% ymd(),
+        DatePCRSOffered = na_if(DatePCRSOffered, "") %>% ymd()
+      ) %>%
+      filter(!is.na(DateofHIVTest_Final), !is.na(DatePCRSOffered)) %>%
+      filter(DateofHIVTest_Final < DatePCRSOffered)
+
+  print(partners_with_test_before_pcrs)
+  nrow(partners_with_test_before_pcrs)
+
+ ## which partners were already index
+  partners_already_index_dt <- 
+      partner_db_non_missing_studyidto %>%
+        filter(AlreadyIndex == "true")
+
+  print(partners_already_index_dt)
+  View(partners_already_index_dt)
+
+  length(partners_already_index_dt$StudyIDFrom)
+  length(unique(partners_already_index_dt$StudyIDFrom))
+
+  length(partners_already_index_dt$StudyIDTo)
+  length(unique(partners_already_index_dt$StudyIDTo))
+
+  length(intersect(unique(partners_already_index_dt$StudyIDFrom), unique(partners_already_index_dt$StudyIDTo)))
+
+
+ ## which partners are tested
+  partners_tested_dt <- 
+        partner_db_non_missing_studyidto %>%
+          filter(HIVTested == 1)
+
+  nrow(partners_tested_dt)
+  table(partners_tested_dt$DateofHIVTest_Final, exclude=NULL)
+
+  View(partners_tested_dt)
+
+  unique(partners_tested_dt$StudyIDTo)
+
+  length(which(partners_tested_dt$StudyIDTo %in% genomic_db_sequenced))
+  length(which(genomic_db_sequenced %in% partners_tested_dt$StudyIDTo ))
+
+ ## how many unique index cases are nominating these partners
+ dim(partners_tested_dt)
+length(unique(partners_tested_dt$StudyIDTo))
+length(unique(partners_tested_dt$StudyIDFrom))
+
+unique_index_with_partners_tested <- unique(partners_tested_dt$StudyIDFrom)
+
+sum(unique_index_with_partners_tested %in% genomic_db_sequenced)
+
+sum(unique(partners_tested_dt$StudyIDTo) %in% genomic_db_sequenced)
+
+length(Reduce(intersect, list(genomic_db_sequenced, 
+    partners_tested_dt$StudyIDFrom, 
+    partners_tested_dt$StudyIDTo))) 
+
+
+length(Reduce(intersect, list(genomic_db_sequenced, 
+    partner_db$StudyIDFrom, 
+    partner_db$StudyIDTo))) 
+
+length(Reduce(intersect, list(genomic_db_sequenced, 
+    partner_db_non_missing_studyidto$StudyIDFrom, 
+    partner_db_non_missing_studyidto$StudyIDTo))) 
+
+
+
+
+
 
 
 
@@ -389,7 +486,7 @@ ans2/nrow(sequenced_who_are_named_pts_dt)
   ans3 <- nrow(persons_in_both_db_dt) -  length(which(is.na(persons_in_both_db_dt$ClusteredPhyloAny)))
   ans3/nrow(persons_in_both_db_dt)
 
-# Compute Jaccard coefficient (person-level) ---------
+# Compute Jaccard coefficient (link-level) ---------
   ## See https://github.com/kantorlab/rtp-network/blob/138e5f9b0c80e103f1cd383099c4b04ca757d948/molecular-cluster-analysis.R#L521-L567
 
 # Distribution of Molecular Clusters  -------------
@@ -494,7 +591,22 @@ named_seq_pt_char$tab_hiv_diag_yr
 length(index_cases_who_named_partners) # row 1 - all
 length(unique(partner_db_non_missing_studyidto$StudyIDTo))
 table(partner_db_non_missing_studyidto$ClientReached, exclude = NULL)
+table(partner_db_non_missing_studyidto$ClientReached, exclude = NULL)
 sum(table(partner_db_non_missing_studyidto$ClientReached, exclude = NULL))
+
+table(partner_db_non_missing_studyidto$NoReachWhy, exclude=NULL)
+table(partner_db_non_missing_studyidto$ReferredToHIVTest, exclude=NULL)
+table(partner_db_non_missing_studyidto$HIVTested, exclude=NULL)
+table(partner_db_non_missing_studyidto$AlreadyIndex, exclude=NULL)
+table(partner_db_non_missing_studyidto$HIVTestResult_Final, exclude=NULL)
+table(partner_db_non_missing_studyidto$referredToPrEP, exclude=NULL)
+
+duplicated_study_id_to <- which(duplicated(partner_db_non_missing_studyidto$StudyIDTo))
+get_original_unique_ids <- duplicated_study_id_to-1
+
+all_duplicated_partner_ids <- unique(sort(c(get_original_unique_ids, duplicated_study_id_to)))
+
+View(partner_db_non_missing_studyidto[duplicated_study_id_to,])
 
 
 #table(partner_db_non_missing_studyidto$HIVTested, exclude = NULL)
@@ -730,31 +842,31 @@ length(Reduce(intersect, list(genomic_db_sequenced, partner_db$StudyIDFrom,
 #compute_cascade("all")
 
 ## msm 
-compute_cascade("msm")
+compute_cascade("msm", genomic_db=genomic_db)
 
 ## idu 
-compute_cascade("idu")
+compute_cascade("idu", genomic_db=genomic_db)
 
 ## hrh 
-compute_cascade("hrh")
+compute_cascade("hrh", genomic_db=genomic_db)
 
 ## white
-compute_cascade("white")
+compute_cascade("white", genomic_db=genomic_db)
 
 ## black
-compute_cascade("black")
+compute_cascade("black", genomic_db=genomic_db)
 
 ## asian
-compute_cascade("asian")
+compute_cascade("asian", genomic_db=genomic_db)
 
 ## other
-compute_cascade("other")
+compute_cascade("other", genomic_db=genomic_db)
 
 ## hispanic
-compute_cascade("hispanic")
+compute_cascade("hispanic", genomic_db=genomic_db)
 
 ## nonhispanic
-compute_cascade("nonhispanic")
+compute_cascade("nonhispanic", genomic_db=genomic_db)
 
 
 ## Meeting with Meghan:
