@@ -1,5 +1,23 @@
-## Directories
 
+
+<p align="center">
+  <a href="https://academic.oup.com/ofid/article/12/7/ofaf341/8160580">
+    <img src="manuscript-viz/ofid-cover.png" alt="OFID Cover" width="300"/>
+  </a>
+</p>
+
+
+[![Reproducible with renv](https://img.shields.io/badge/Reproducibility-renv-blue)](https://rstudio.github.io/renv/)
+[![R Version](https://img.shields.io/badge/R-4.4.0-blue.svg)](https://cran.r-project.org/)
+
+# Data and Code for:  
+**Integrating Partner Services and Molecular Epidemiology Data to Enhance HIV Transmission Disruption in Rhode Island**  
+[*Open Forum Infectious Diseases*, Volume 12, Issue 7, July 2025, ofaf341](https://academic.oup.com/ofid/article/12/7/ofaf341/8160580)
+
+This repository contains the code and derived data objects used to produce the results reported in the paper above. 
+
+---
+## Directories
 ### Used for paper
 
 - `scripts/`: Contains various R scripts used for data processing, and analysis.
